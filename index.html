@@ -710,7 +710,10 @@
   #canvas .g-ib-field,.canvas-clone .g-ib-field{flex:1;border:1px solid #d1d1d6;border-radius:999px;color:#8e8e93;background:#fff;display:flex;align-items:center;}
   #canvas .g-ib-send,.canvas-clone .g-ib-send{flex:none;border-radius:50%;background:#0b93f6;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1;}
   /* 아바타 + 메시지 묶음 (카톡 스타일) */
-  #canvas .g-msg-group,.canvas-clone .g-msg-group{display:flex !important;align-items:flex-start !important;gap:.45em !important;margin:.55em 0 !important;}
+  #canvas .g-msg-group,.canvas-clone .g-msg-group{display:flex !important;align-items:flex-start !important;gap:.45em !important;margin:var(--para-gap,.6em) 0 0 !important;}
+  /* 본문 문단 블록: 문단·말풍선 묶음·인용선 사이 경계 간격을 --para-gap 하나로 통일(위쪽 마진만 → 겹침 없이 균일) */
+  #canvas .g-para,.canvas-clone .g-para{display:block !important;margin:var(--para-gap,.6em) 0 0 !important;}
+  #canvas .g-para:first-child,.canvas-clone .g-para:first-child{margin-top:0 !important;}
   #canvas .g-msg-group.left,.canvas-clone .g-msg-group.left{flex-direction:row !important;}
   #canvas .g-msg-group.right,.canvas-clone .g-msg-group.right{flex-direction:row-reverse !important;}
   #canvas .g-msg-group:first-child,.canvas-clone .g-msg-group:first-child{margin-top:0 !important;}
@@ -756,7 +759,8 @@
   #canvas .g-title-blk,.canvas-clone .g-title-blk{display:block !important;margin:0 0 .8em !important;}
   #canvas .g-title-main,.canvas-clone .g-title-main{display:block !important;font-size:var(--title-size,1.6em) !important;font-weight:700 !important;font-family:var(--title-font,inherit) !important;color:var(--title-color,inherit) !important;line-height:1.25 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-title-sub,.canvas-clone .g-title-sub{display:block !important;font-size:var(--subtitle-size,1.15em) !important;font-weight:400 !important;font-family:var(--title-font,inherit) !important;color:var(--subtitle-color,inherit) !important;margin-top:.25em !important;line-height:1.3 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
-  #canvas .g-quote,.canvas-clone .g-quote{display:block !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
+  #canvas .g-quote,.canvas-clone .g-quote{display:block !important;margin-top:var(--para-gap,.6em) !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
+  #canvas .g-quote:first-child,.canvas-clone .g-quote:first-child{margin-top:0 !important;}
   #canvas .g-quote.left,.canvas-clone .g-quote.left{border-left:.16em solid var(--quote-color,rgba(140,140,140,.55)) !important;padding-left:.6em !important;}
   #canvas .g-quote.right,.canvas-clone .g-quote.right{border-right:.16em solid var(--quote-color,rgba(140,140,140,.55)) !important;padding-right:.6em !important;text-align:right !important;}
   #canvas .g-hr,.canvas-clone .g-hr{display:flex !important;align-items:center !important;justify-content:center !important;margin:.7em 0 !important;height:1em !important;line-height:1 !important;color:transparent !important;overflow:visible !important;}
@@ -976,6 +980,10 @@
                 <div class="field">
                   <span class="label">행간 <span class="val">1.7</span></span>
                   <div class="rangewrap"><input id="line-height" type="range" min="10" max="20" step="1" value="17"></div>
+                </div>
+                <div class="field">
+                  <span class="label">문단 간격 <span class="val">0.60em</span></span>
+                  <div class="rangewrap"><input id="para-gap" type="range" min="0" max="200" step="5" value="60"></div>
                 </div>
               </div>
             </div>
@@ -2033,6 +2041,42 @@
       inner.insertBefore(group, ref);
     });
   }
+  // 렌더 후(groupAvatars 다음) 본문의 인라인 나레이션을 문단 블록(.g-para)으로 감싼다.
+  // 빈 줄(연속 <br> 2개 이상)이 문단 경계. 블록 경계 요소(말풍선 묶음·인용선·구분선·제목·이름)는
+  // 그대로 두고, 문단·묶음·인용선에 --para-gap 마진이 붙어 경계 간격이 통일된다.
+  // 캔버스(미리보기/저장)에만 적용 — 편집창은 손대지 않는다.
+  function wrapParagraphs(root){
+    var inner=root.querySelector('.g-inner'); if(!inner) return;
+    function isBoundary(nd){
+      return nd && nd.nodeType===1 && nd.classList && (
+        nd.classList.contains('g-msg-group') || nd.classList.contains('g-quote') ||
+        nd.classList.contains('g-hr') || nd.classList.contains('g-title-blk') ||
+        nd.classList.contains('g-name'));
+    }
+    var kids=[].slice.call(inner.childNodes);
+    var run=[], brRun=0, toRemove=[];
+    function flush(){
+      while(run.length && run[0].nodeType===1 && run[0].tagName==='BR'){ toRemove.push(run.shift()); }
+      while(run.length && run[run.length-1].nodeType===1 && run[run.length-1].tagName==='BR'){ toRemove.push(run.pop()); }
+      var has=false;
+      run.forEach(function(n){ if((n.nodeType===3 && n.nodeValue.replace(/\u200b/g,'').trim()!=='') || (n.nodeType===1 && n.tagName!=='BR')) has=true; });
+      if(!has){ run.forEach(function(n){ toRemove.push(n); }); run=[]; return; }
+      var p=document.createElement('div'); p.className='g-para';
+      inner.insertBefore(p, run[0]);
+      run.forEach(function(n){ p.appendChild(n); });
+      run=[];
+    }
+    kids.forEach(function(nd){
+      if(isBoundary(nd)){ flush(); brRun=0; return; }
+      var isBr=nd.nodeType===1 && nd.tagName==='BR';
+      var isEmpty=nd.nodeType===3 && nd.nodeValue.replace(/\u200b/g,'').trim()==='';
+      if(isBr){ brRun++; if(brRun>=2){ toRemove.push(nd); flush(); } else { run.push(nd); } }
+      else if(isEmpty){ toRemove.push(nd); }
+      else { brRun=0; run.push(nd); }
+    });
+    flush();
+    toRemove.forEach(function(n){ if(n.parentNode) n.parentNode.removeChild(n); });
+  }
   function stripBubblesFrag(frag){
     [].forEach.call(frag.querySelectorAll('svg.g-tail'), function(s){ if(s.parentNode) s.parentNode.removeChild(s); });
     [].forEach.call(frag.querySelectorAll('.g-bub'), function(b){ var p=b.parentNode; if(!p) return; while(b.firstChild){ p.insertBefore(b.firstChild,b); } p.removeChild(b); });
@@ -3073,6 +3117,8 @@
     el.style.lineHeight = String((parseFloat($('line-height').value)/10).toFixed(2));
     el.style.padding = pad+'px';
     el.style.setProperty('--gpad', pad+'px');
+    var _pg=$('para-gap'); var _pgv=_pg?parseFloat(_pg.value):60; if(isNaN(_pgv)) _pgv=60;
+    el.style.setProperty('--para-gap', (_pgv/100)+'em');
     // 아이메시지 상단바 / 입력창 (폰트 기준 크기 — 레퍼런스 이식)
     var _top = el.querySelector('.g-topbar');
     if(_top){
@@ -3280,12 +3326,13 @@
     updateEmptyBubbles();
     styleCharBubbles(editor);
     canvas.innerHTML = '<div class="g-inner">' + buildHtml() + '</div>';
-    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); fitStage();
+    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); wrapParagraphs(canvas); fitStage();
     setVal('font-size', $('font-size').value+'px');
     if($('stretch')) setVal('stretch', $('stretch').value+'%');
     if($('grad-angle')) setVal('grad-angle', angleLabel($('grad-angle').value));
     setVal('letter-spacing', parseFloat($('letter-spacing').value).toFixed(1));
     setVal('line-height', (parseFloat($('line-height').value)/10).toFixed(1));
+    if($('para-gap')) setVal('para-gap', (parseFloat($('para-gap').value)/100).toFixed(2)+'em');
     setVal('pad', $('pad').value+'px');
     setVal('base-w', $('base-w').value+'px');
     setVal('ratio-w', $('ratio-w').value+'px');
@@ -3391,7 +3438,7 @@
     var e=$(id); if(e){ e.addEventListener('input', function(){ updateTitleSizeLabels(); render(); }); e.addEventListener('change', function(){ updateTitleSizeLabels(); render(); }); }
   });
 
-  ['name-pos','font','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w','opacity','bright'].forEach(function(id){
+  ['name-pos','font','font-size','stretch','letter-spacing','line-height','para-gap','pad','break-mode','base-w','ratio-w','opacity','bright'].forEach(function(id){
     var e=$(id); if(e){ e.addEventListener('input', render); e.addEventListener('change', render); }
   });
 
@@ -3800,7 +3847,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','font-size','stretch','letter-spacing','line-height','para-gap','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
