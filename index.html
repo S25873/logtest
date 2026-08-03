@@ -4588,5 +4588,56 @@
 })();
 
 </script>
+<script>
+/* 글꼴 목록 줄높이 통일: 각 폰트가 실제 차지하는 세로 높이(line-height:normal 기준)를
+   측정해, 그 비율만큼 옵션 font-size를 역보정 → 모든 옵션 줄 높이를 균일하게.
+   metric이 큰 폰트(예: 스타더스트)는 글자가 작아지지만 칸 높이는 같아짐. */
+(function(){
+  var FAM={
+    'opt-pretendard':'"Pretendard",sans-serif',
+    'opt-paperozi':'"Paperozi",sans-serif',
+    'opt-presentation':"'Presentation',sans-serif",
+    'opt-gmarket':"'GMarketSans',sans-serif",
+    'opt-nanummyeongjo':"'Nanum Myeongjo','\ub098\ub214\uba85\uc870',serif",
+    'opt-ridibatang':"'Ridibatang',serif",
+    'opt-stardust':"'PfStardust',sans-serif",
+    'opt-mona':"'Mona12','Mona12 Text KR',sans-serif"
+  };
+  var BASE=13.5; // metric이 가장 작은 폰트가 유지할 크기(px). 나머지는 이보다 작아짐
+  function normalize(){
+    try{
+      var probe=document.createElement('span');
+      probe.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:nowrap;line-height:normal;font-size:200px;padding:0;margin:0;border:0;';
+      probe.textContent='\uac00\ud799Ag\uc57c1';
+      document.body.appendChild(probe);
+      var ratio={}, minR=Infinity, cls;
+      for(cls in FAM){
+        probe.style.fontFamily=FAM[cls];
+        // 리플로우 강제 후 측정
+        var r=probe.getBoundingClientRect().height/200;
+        if(!r||!isFinite(r)||r<=0) r=1.2;
+        ratio[cls]=r; if(r<minR) minR=r;
+      }
+      document.body.removeChild(probe);
+      for(cls in FAM){
+        var fs=BASE*(minR/ratio[cls]);
+        if(!isFinite(fs)||fs<=0) fs=BASE;
+        var els=document.querySelectorAll('option.'+cls);
+        for(var i=0;i<els.length;i++){ els[i].style.fontSize=fs.toFixed(2)+'px'; }
+      }
+    }catch(e){}
+  }
+  function run(){
+    var fams=['Pretendard','Paperozi','Presentation','GMarketSans','Nanum Myeongjo','Ridibatang','PfStardust','Mona12'];
+    if(document.fonts&&document.fonts.load){
+      var proms=fams.map(function(f){ try{return document.fonts.load('16px "'+f+'"');}catch(e){return null;} });
+      Promise.all(proms).catch(function(){}).then(function(){
+        (document.fonts.ready||Promise.resolve()).then(normalize).catch(normalize);
+      });
+    } else { setTimeout(normalize,600); }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+})();
+</script>
 </body>
 </html>
