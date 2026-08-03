@@ -23,6 +23,9 @@
   @font-face{font-family:'Presentation';font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-4Regular.woff2') format('woff2');}
   @font-face{font-family:'Presentation';font-weight:600;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-6SemiBold.woff2') format('woff2');}
   @font-face{font-family:'Presentation';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-7Bold.woff2') format('woff2');}
+  @font-face{font-family:'ElegantSerif';font-weight:500;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2604-1@1.0/GraceSerif-Regular.woff2') format('woff2');}
+  @font-face{font-family:'ElegantSerif';font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2604-1@1.0/GraceSerif-Bold.woff2') format('woff2');}
+  @font-face{font-family:'OgRenaissanceSecret';font-weight:normal;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2312-1@1.1/OG_Renaissance_Secret-Rg.woff2') format('woff2');}
 
   /* ============================================================
      디자인 토큰 — 순수 모노톤
@@ -256,15 +259,7 @@
   select{cursor:pointer;appearance:none;-webkit-appearance:none;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%23949494' stroke-width='1.5'><path d='M4 6l4 4 4-4'/></svg>");
     background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;}
-  select option.optcat{font-weight:700;color:var(--ink);}
-  option.opt-pretendard{font-family:"Pretendard",sans-serif;}
-  option.opt-paperozi{font-family:"Paperozi",sans-serif;}
-  option.opt-presentation{font-family:'Presentation',sans-serif;}
-  option.opt-gmarket{font-family:'GMarketSans',sans-serif;}
-  option.opt-nanummyeongjo{font-family:'Nanum Myeongjo','나눔명조',serif;}
-  option.opt-ridibatang{font-family:'Ridibatang',serif;}
-  option.opt-stardust{font-family:'PfStardust',sans-serif;}
-  option.opt-mona{font-family:'Mona12','Mona12 Text KR',sans-serif;}
+  select option.optcat{font-weight:700;font-size:16px;color:var(--ink)!important;}
   input[type=text]:focus,select:focus,textarea:focus{
     border-color:var(--ink);background:var(--surface);outline:none;
     box-shadow:0 0 0 3px var(--accent-soft);
@@ -962,18 +957,20 @@
               <div class="field">
                 <label class="label" for="font">본문 글꼴</label>
                 <select id="font">
-                  <option class="optcat" disabled>고딕</option>
-                  <option class="opt-pretendard" value='"Pretendard",sans-serif' selected>프리텐다드</option>
-                  <option class="opt-paperozi" value='"Paperozi",sans-serif'>페이퍼로지</option>
-                  <option class="opt-presentation" value="'Presentation',sans-serif">프리젠테이션</option>
-                  <option class="opt-gmarket" value="'GMarketSans',sans-serif">G마켓 산스</option>
-                  <option class="optcat" disabled>명조</option>
-                  <option class="opt-nanummyeongjo" value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
-                  <option class="opt-ridibatang" value='"Ridibatang",serif'>리디바탕</option>
-                  <option class="optcat" disabled>손글씨</option>
-                  <option class="opt-stardust" value="'PfStardust',sans-serif">스타더스트</option>
-                  <option class="optcat" disabled>장식</option>
-                  <option class="opt-mona" value="'Mona12','Mona12 Text KR',sans-serif">모나</option>
+                  <option class="optcat" disabled>&lt;고딕&gt;</option>
+                  <option value='"Pretendard",sans-serif' selected>프리텐다드</option>
+                  <option value='"Paperozi",sans-serif'>페이퍼로지</option>
+                  <option value="'Presentation',sans-serif">프리젠테이션</option>
+                  <option value="'GMarketSans',sans-serif">G마켓 산스</option>
+                  <option class="optcat" disabled>&lt;명조&gt;</option>
+                  <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
+                  <option value='"Ridibatang",serif'>리디바탕</option>
+                  <option class="optcat" disabled>&lt;손글씨&gt;</option>
+                  <option value="'PfStardust',sans-serif">스타더스트</option>
+                  <option class="optcat" disabled>&lt;장식&gt;</option>
+                  <option value="'Mona12','Mona12 Text KR',sans-serif">모나</option>
+                  <option value="'ElegantSerif',serif">우아한 세리프</option>
+                  <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
                 </select>
               </div>
               <div class="grid-2" style="margin-top:16px">
@@ -1042,18 +1039,20 @@
                 <label class="label" for="title-font">제목 · 소제목 글꼴</label>
                 <select id="title-font">
                   <option value="" selected>본문과 동일</option>
-                  <option class="optcat" disabled>고딕</option>
-                  <option class="opt-pretendard" value='"Pretendard",sans-serif'>프리텐다드</option>
-                  <option class="opt-paperozi" value='"Paperozi",sans-serif'>페이퍼로지</option>
-                  <option class="opt-presentation" value="'Presentation',sans-serif">프리젠테이션</option>
-                  <option class="opt-gmarket" value="'GMarketSans',sans-serif">G마켓 산스</option>
-                  <option class="optcat" disabled>명조</option>
-                  <option class="opt-nanummyeongjo" value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
-                  <option class="opt-ridibatang" value='"Ridibatang",serif'>리디바탕</option>
-                  <option class="optcat" disabled>손글씨</option>
-                  <option class="opt-stardust" value="'PfStardust',sans-serif">스타더스트</option>
-                  <option class="optcat" disabled>장식</option>
-                  <option class="opt-mona" value="'Mona12','Mona12 Text KR',sans-serif">모나</option>
+                  <option class="optcat" disabled>&lt;고딕&gt;</option>
+                  <option value='"Pretendard",sans-serif'>프리텐다드</option>
+                  <option value='"Paperozi",sans-serif'>페이퍼로지</option>
+                  <option value="'Presentation',sans-serif">프리젠테이션</option>
+                  <option value="'GMarketSans',sans-serif">G마켓 산스</option>
+                  <option class="optcat" disabled>&lt;명조&gt;</option>
+                  <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
+                  <option value='"Ridibatang",serif'>리디바탕</option>
+                  <option class="optcat" disabled>&lt;손글씨&gt;</option>
+                  <option value="'PfStardust',sans-serif">스타더스트</option>
+                  <option class="optcat" disabled>&lt;장식&gt;</option>
+                  <option value="'Mona12','Mona12 Text KR',sans-serif">모나</option>
+                  <option value="'ElegantSerif',serif">우아한 세리프</option>
+                  <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
                 </select>
               </div>
               <div class="grid-2" style="margin-top:16px">
@@ -1106,18 +1105,20 @@
                   <label class="label" for="name-font">하단 글꼴</label>
                   <select id="name-font">
                     <option value="" selected>본문과 동일</option>
-                    <option class="optcat" disabled>고딕</option>
-                    <option class="opt-pretendard" value='"Pretendard",sans-serif'>프리텐다드</option>
-                    <option class="opt-paperozi" value='"Paperozi",sans-serif'>페이퍼로지</option>
-                    <option class="opt-presentation" value="'Presentation',sans-serif">프리젠테이션</option>
-                    <option class="opt-gmarket" value="'GMarketSans',sans-serif">G마켓 산스</option>
-                    <option class="optcat" disabled>명조</option>
-                    <option class="opt-nanummyeongjo" value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
-                    <option class="opt-ridibatang" value='"Ridibatang",serif'>리디바탕</option>
-                    <option class="optcat" disabled>손글씨</option>
-                    <option class="opt-stardust" value="'PfStardust',sans-serif">스타더스트</option>
-                    <option class="optcat" disabled>장식</option>
-                    <option class="opt-mona" value="'Mona12','Mona12 Text KR',sans-serif">모나</option>
+                    <option class="optcat" disabled>&lt;고딕&gt;</option>
+                    <option value='"Pretendard",sans-serif'>프리텐다드</option>
+                    <option value='"Paperozi",sans-serif'>페이퍼로지</option>
+                    <option value="'Presentation',sans-serif">프리젠테이션</option>
+                    <option value="'GMarketSans',sans-serif">G마켓 산스</option>
+                    <option class="optcat" disabled>&lt;명조&gt;</option>
+                    <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
+                    <option value='"Ridibatang",serif'>리디바탕</option>
+                    <option class="optcat" disabled>&lt;손글씨&gt;</option>
+                    <option value="'PfStardust',sans-serif">스타더스트</option>
+                    <option class="optcat" disabled>&lt;장식&gt;</option>
+                    <option value="'Mona12','Mona12 Text KR',sans-serif">모나</option>
+                    <option value="'ElegantSerif',serif">우아한 세리프</option>
+                    <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
                   </select>
                 </div>
               </div>
@@ -4587,57 +4588,6 @@
   window.addEventListener('resize', function(){ if(typeof moveAllThumbs==='function') moveAllThumbs(); });
 })();
 
-</script>
-<script>
-/* 글꼴 목록 줄높이 통일: 각 폰트가 실제 차지하는 세로 높이(line-height:normal 기준)를
-   측정해, 그 비율만큼 옵션 font-size를 역보정 → 모든 옵션 줄 높이를 균일하게.
-   metric이 큰 폰트(예: 스타더스트)는 글자가 작아지지만 칸 높이는 같아짐. */
-(function(){
-  var FAM={
-    'opt-pretendard':'"Pretendard",sans-serif',
-    'opt-paperozi':'"Paperozi",sans-serif',
-    'opt-presentation':"'Presentation',sans-serif",
-    'opt-gmarket':"'GMarketSans',sans-serif",
-    'opt-nanummyeongjo':"'Nanum Myeongjo','\ub098\ub214\uba85\uc870',serif",
-    'opt-ridibatang':"'Ridibatang',serif",
-    'opt-stardust':"'PfStardust',sans-serif",
-    'opt-mona':"'Mona12','Mona12 Text KR',sans-serif"
-  };
-  var BASE=13.5; // metric이 가장 작은 폰트가 유지할 크기(px). 나머지는 이보다 작아짐
-  function normalize(){
-    try{
-      var probe=document.createElement('span');
-      probe.style.cssText='position:absolute;left:-9999px;top:-9999px;visibility:hidden;white-space:nowrap;line-height:normal;font-size:200px;padding:0;margin:0;border:0;';
-      probe.textContent='\uac00\ud799Ag\uc57c1';
-      document.body.appendChild(probe);
-      var ratio={}, minR=Infinity, cls;
-      for(cls in FAM){
-        probe.style.fontFamily=FAM[cls];
-        // 리플로우 강제 후 측정
-        var r=probe.getBoundingClientRect().height/200;
-        if(!r||!isFinite(r)||r<=0) r=1.2;
-        ratio[cls]=r; if(r<minR) minR=r;
-      }
-      document.body.removeChild(probe);
-      for(cls in FAM){
-        var fs=BASE*(minR/ratio[cls]);
-        if(!isFinite(fs)||fs<=0) fs=BASE;
-        var els=document.querySelectorAll('option.'+cls);
-        for(var i=0;i<els.length;i++){ els[i].style.fontSize=fs.toFixed(2)+'px'; }
-      }
-    }catch(e){}
-  }
-  function run(){
-    var fams=['Pretendard','Paperozi','Presentation','GMarketSans','Nanum Myeongjo','Ridibatang','PfStardust','Mona12'];
-    if(document.fonts&&document.fonts.load){
-      var proms=fams.map(function(f){ try{return document.fonts.load('16px "'+f+'"');}catch(e){return null;} });
-      Promise.all(proms).catch(function(){}).then(function(){
-        (document.fonts.ready||Promise.resolve()).then(normalize).catch(normalize);
-      });
-    } else { setTimeout(normalize,600); }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
-})();
 </script>
 </body>
 </html>
