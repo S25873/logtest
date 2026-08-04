@@ -3737,7 +3737,9 @@
     ctx.closePath();
   }
   function usePseudoTailNow(){
-    return canvas.classList.contains('bg-solid-tail') && !canvas.classList.contains('bub-simple') && !canvas.classList.contains('bub-soft');
+    /* 저장 시 아이메시지 모양이면 배경(단색/그라데이션/사진) 무관하게 pseudo 꼬리를 캔버스에 재현.
+       재현은 destination-out(투명 지우기)이라 실제 배경이 비쳐 그라데이션·사진도 정확. 미리보기만 그라데이션·사진에서 SVG 폴백 */
+    return !canvas.classList.contains('bub-simple') && !canvas.classList.contains('bub-soft');
   }
   function collectPseudoTails(canvasRect, scale){
     var out=[];
@@ -3941,8 +3943,8 @@
         mk.style.setProperty('background-color','transparent','important');
         mk.style.setProperty('background-image','none','important');
       });
-      var tailRects=collectTailRects(canvas);
       var pseudoTails=collectPseudoTails(canvasRect, 2);
+      var tailRects=pseudoTails.length ? [] : collectTailRects(canvas);
       if(pseudoTails.length) canvas.classList.add('exp-notail');
       var restoreTails=hideTails(canvas);
       // 아바타 사진: html2canvas가 저해상도로 굽는 문제가 있어, 위치를 모아 두고 저장 중엔 숨긴 뒤 최종 캔버스에 원본으로 직접 고품질 렌더
