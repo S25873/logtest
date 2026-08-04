@@ -691,13 +691,14 @@
   #editor .g-bub.recv *{color:var(--bub-recv-ink,#000) !important;}
   #editor .g-bub.send *{color:var(--bub-send-ink,#fff) !important;}
   #editor .g-bub mark.em{color:var(--em,inherit) !important;}
-  #editor .g-bub>svg.g-tail{position:absolute;bottom:-1px;width:16px;height:10px;z-index:0;overflow:visible;pointer-events:none;}
+  #editor .g-bub>svg.g-tail{position:absolute;bottom:-4px;width:16px;height:10px;z-index:0;overflow:visible;pointer-events:none;}
   #editor .g-bub.recv>svg.g-tail{left:-5px;}
   #editor .g-bub.send>svg.g-tail{right:-5px;transform:scaleX(-1);}
   #editor .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea);}
   #editor .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5);}
   #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left{border-bottom-left-radius:5px;}
   #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right{border-bottom-right-radius:5px;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail{margin-bottom:6px;}
   #editor .g-bub.is-empty:before{content:"내용";opacity:.6;}
   #editor .g-bub.recv.is-empty:before{color:var(--bub-recv-ink,#000);}
   #editor .g-bub.send.is-empty:before{color:var(--bub-send-ink,#fff);}
@@ -819,7 +820,7 @@
   #canvas .g-bub-name.send,.canvas-clone .g-bub-name.send{margin-left:auto !important;margin-right:.4em !important;text-align:right !important;color:var(--bub-name-send,#8a8a8a) !important;}
   #canvas .g-bub-name + .g-bub,.canvas-clone .g-bub-name + .g-bub{margin-top:.25em !important;}
   #canvas .g-bub-name:first-child,.canvas-clone .g-bub-name:first-child{margin-top:0 !important;}
-  #canvas .g-bub>svg.g-tail,.canvas-clone .g-bub>svg.g-tail{position:absolute !important;bottom:-.05em !important;z-index:0 !important;width:1.35em !important;height:.85em !important;display:block !important;overflow:visible !important;pointer-events:none !important;}
+  #canvas .g-bub>svg.g-tail,.canvas-clone .g-bub>svg.g-tail{position:absolute !important;bottom:-.22em !important;z-index:0 !important;width:1.35em !important;height:.85em !important;display:block !important;overflow:visible !important;pointer-events:none !important;}
   #canvas .g-bub.recv>svg.g-tail,.canvas-clone .g-bub.recv>svg.g-tail{left:-.42em !important;}
   #canvas .g-bub.send>svg.g-tail,.canvas-clone .g-bub.send>svg.g-tail{right:-.42em !important;transform:scaleX(-1) !important;}
   #canvas .g-bub.recv>svg.g-tail path,.canvas-clone .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea) !important;}
@@ -827,6 +828,8 @@
   /* 아이메시지 기본 모양: 꼬리 달린 칸의 '꼬리 쪽 아래 모서리'를 덜 둥글게 → 말풍선이 타원에서 끊기지 않고 꼬리로 이어짐 */
   #canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv,#canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left{border-bottom-left-radius:.35em !important;}
   #canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.send,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.send,#canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right{border-bottom-right-radius:.35em !important;}
+  /* 꼬리(SVG)가 달린 칸은 꼬리가 아래로 빠지므로 그 칸에만 아래 여백 추가(다른 꼬리·심플/소프트 제외) */
+  #canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail{margin-bottom:.3em !important;}
 
   #canvas .g-bub mark.em,.canvas-clone .g-bub mark.em{color:var(--em) !important;}
 
