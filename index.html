@@ -837,6 +837,9 @@
   #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::before,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::before{border-bottom-left-radius:0.8em 0.7em !important;border-right:1em solid var(--bub,var(--bub-send,#248bf5)) !important;right:-0.35em !important;transform:translate(0,-0.1em) !important;}
   #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::after,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::after{background:var(--tail-mask,#fff) !important;border-bottom-left-radius:0.5em !important;right:-2.5em !important;transform:translate(-1.875em,-0.125em) !important;width:0.625em !important;}
 
+  /* 저장 중(exp-notail)엔 pseudo 꼬리를 숨김 — html2canvas가 마스크를 못 그리므로 대신 캔버스에 직접 그림 */
+  #canvas.exp-notail .g-bub.tail::before,#canvas.exp-notail .g-bub.tail::after,.canvas-clone.exp-notail .g-bub.tail::before,.canvas-clone.exp-notail .g-bub.tail::after{display:none !important;}
+
   #canvas .g-bub mark.em,.canvas-clone .g-bub mark.em{color:var(--em) !important;}
 
   /* ============================================================
@@ -3719,6 +3722,62 @@
     img.src=srcData;
   }
 
+  /* 저장 시 ::before/::after 아이메시지 꼬리를 캔버스에 재현(html2canvas가 마스크를 못 그림).
+     ::before(말풍선색 라운드 사각형) 그린 뒤 ::after(마스크)를 destination-out으로 깎아 갈고리 생성.
+     CSS 값(사용자 제공 기법의 em 단위화)을 그대로 좌표화 → 미리보기 pseudo와 동일 형상. */
+  function roundRectOneCorner(ctx, x0, y0, x1, y1, corner, rx, ry){
+    ctx.beginPath();
+    if(corner==='bl'){
+      ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.lineTo(x1,y1); ctx.lineTo(x0+rx,y1);
+      ctx.quadraticCurveTo(x0,y1,x0,y1-ry); ctx.lineTo(x0,y0);
+    } else {
+      ctx.moveTo(x0,y0); ctx.lineTo(x1,y0); ctx.lineTo(x1,y1-ry);
+      ctx.quadraticCurveTo(x1,y1,x1-rx,y1); ctx.lineTo(x0,y1); ctx.lineTo(x0,y0);
+    }
+    ctx.closePath();
+  }
+  function usePseudoTailNow(){
+    return canvas.classList.contains('bg-solid-tail') && !canvas.classList.contains('bub-simple') && !canvas.classList.contains('bub-soft');
+  }
+  function collectPseudoTails(canvasRect, scale){
+    var out=[];
+    if(!usePseudoTailNow()) return out;
+    [].forEach.call(canvas.querySelectorAll('.g-bub.tail'), function(bub){
+      var r=bub.getBoundingClientRect(); if(r.width<=0||r.height<=0) return;
+      var fs=parseFloat(getComputedStyle(bub).fontSize)||16, e=fs*scale;
+      var isSend, color;
+      if(bub.classList.contains('char-bub')){ isSend=bub.classList.contains('right'); var cc=findChar(bub.getAttribute('data-char')); color=cc?cc.bub:'#cccccc'; }
+      else { isSend=bub.classList.contains('send'); color=isSend?($('c-bsend')?$('c-bsend').value:'#248bf5'):($('c-brecv')?$('c-brecv').value:'#e5e5ea'); }
+      var bx=(r.left-canvasRect.left)*scale, byTop=(r.top-canvasRect.top)*scale, bw=r.width*scale, bh=r.height*scale;
+      var BBy=byTop+bh, BRx=isSend?(bx+bw):bx;
+      var b_x0,b_x1,b_y0,b_y1,a_x0,a_x1,a_y0,a_y1,corner, brx=0.8*e, bry=0.7*e, ra=0.5*e;
+      if(isSend){ corner='bl';
+        b_x1=BRx+0.35*e; b_x0=b_x1-1*e; b_y1=BBy; b_y0=b_y1-1*e;
+        a_x1=BRx+0.625*e; a_x0=a_x1-0.625*e; a_y1=BBy-0.025*e; a_y0=a_y1-1*e;
+      } else { corner='br';
+        b_x0=BRx-0.35*e; b_x1=b_x0+1*e; b_y1=BBy; b_y0=b_y1-1*e;
+        a_x0=BRx-0.625*e; a_x1=a_x0+0.625*e; a_y1=BBy-0.025*e; a_y0=a_y1-1*e;
+      }
+      out.push({ color:color, corner:corner, brx:brx, bry:bry, ra:ra,
+        b:[b_x0,b_y0,b_x1,b_y1], a:[a_x0,a_y0,a_x1,a_y1] });
+    });
+    return out;
+  }
+  function paintPseudoTail(mainCtx, d){
+    var b=d.b, a=d.a;
+    var originX=Math.floor(Math.min(b[0],a[0])-2), originY=Math.floor(Math.min(b[1],a[1])-2);
+    var W=Math.ceil(Math.max(b[2],a[2])-originX+2), H=Math.ceil(Math.max(b[3],a[3])-originY+2);
+    if(W<=0||H<=0) return;
+    var off=document.createElement('canvas'); off.width=W; off.height=H;
+    var octx=off.getContext('2d');
+    function LX(x){ return x-originX; } function LY(y){ return y-originY; }
+    octx.fillStyle=d.color; roundRectOneCorner(octx,LX(b[0]),LY(b[1]),LX(b[2]),LY(b[3]),d.corner,d.brx,d.bry); octx.fill();
+    octx.globalCompositeOperation='destination-out';
+    roundRectOneCorner(octx,LX(a[0]),LY(a[1]),LX(a[2]),LY(a[3]),d.corner,d.ra,d.ra); octx.fill();
+    octx.globalCompositeOperation='source-over';
+    mainCtx.drawImage(off, originX, originY);
+  }
+
   /* 꼬리 패스 (2D 캔버스에 직접) */
   function traceTailPath(ctx, x, y, w, h, flip){
     var sx=w/16, sy=h/20;
@@ -3882,10 +3941,9 @@
         mk.style.setProperty('background-color','transparent','important');
         mk.style.setProperty('background-image','none','important');
       });
-      // 저장 시엔 CSS ::before/::after 꼬리를 html2canvas가 제대로 못 그리므로,
-      // bg-solid-tail을 잠시 꺼서 SVG 꼬리를 살린 뒤 그 경로로 직접 그린다(복원은 restoreCanvasBg의 styleCanvas가 다시 켬).
-      canvas.classList.remove('bg-solid-tail');
       var tailRects=collectTailRects(canvas);
+      var pseudoTails=collectPseudoTails(canvasRect, 2);
+      if(pseudoTails.length) canvas.classList.add('exp-notail');
       var restoreTails=hideTails(canvas);
       // 아바타 사진: html2canvas가 저해상도로 굽는 문제가 있어, 위치를 모아 두고 저장 중엔 숨긴 뒤 최종 캔버스에 원본으로 직접 고품질 렌더
       var avBakes=[], avHidden=[];
@@ -3914,6 +3972,7 @@
       var hlLayer=canvas.querySelector('.g-bg-layer'), prevLayerDisplay=null;
       if(hlLayer){ prevLayerDisplay=hlLayer.style.display; hlLayer.style.display='none'; }
       function restoreCanvasBg(){
+        canvas.classList.remove('exp-notail');
         if(prevBg) canvas.style.background=prevBg; else canvas.style.removeProperty('background');
         if(prevBgColor) canvas.style.backgroundColor=prevBgColor; else canvas.style.removeProperty('background-color');
         styleCanvas(canvas); applyHlSolid(canvas);
@@ -3931,6 +3990,7 @@
           hlRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(rc.x*2, rc.y*2, rc.w*2, rc.h*2); });
           hrRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(rc.x*2, rc.y*2, rc.w*2, rc.h*2); });
           tailRects.forEach(function(t){ ctx.save(); ctx.fillStyle=t.color; traceTailPath(ctx, t.x*2, t.y*2, t.w*2, t.h*2, t.flip); ctx.fill(); ctx.restore(); });
+          pseudoTails.forEach(function(d){ paintPseudoTail(ctx, d); });
           ctx.drawImage(textCanvas, 0, 0, outW, outH);
           drawBakedAvatars(ctx, avBakes, function(){ deliverImage(out, type, cleanup, mode); });
         });
