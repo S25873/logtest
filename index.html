@@ -3882,6 +3882,9 @@
         mk.style.setProperty('background-color','transparent','important');
         mk.style.setProperty('background-image','none','important');
       });
+      // 저장 시엔 CSS ::before/::after 꼬리를 html2canvas가 제대로 못 그리므로,
+      // bg-solid-tail을 잠시 꺼서 SVG 꼬리를 살린 뒤 그 경로로 직접 그린다(복원은 restoreCanvasBg의 styleCanvas가 다시 켬).
+      canvas.classList.remove('bg-solid-tail');
       var tailRects=collectTailRects(canvas);
       var restoreTails=hideTails(canvas);
       // 아바타 사진: html2canvas가 저해상도로 굽는 문제가 있어, 위치를 모아 두고 저장 중엔 숨긴 뒤 최종 캔버스에 원본으로 직접 고품질 렌더
