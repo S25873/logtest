@@ -691,14 +691,18 @@
   #editor .g-bub.recv *{color:var(--bub-recv-ink,#000) !important;}
   #editor .g-bub.send *{color:var(--bub-send-ink,#fff) !important;}
   #editor .g-bub mark.em{color:var(--em,inherit) !important;}
-  #editor .g-bub>svg.g-tail{position:absolute;bottom:-4px;width:16px;height:10px;z-index:0;overflow:visible;pointer-events:none;}
+  #editor .g-bub>svg.g-tail{position:absolute;bottom:0;width:16px;height:10px;z-index:0;overflow:visible;pointer-events:none;}
   #editor .g-bub.recv>svg.g-tail{left:-5px;}
   #editor .g-bub.send>svg.g-tail{right:-5px;transform:scaleX(-1);}
   #editor .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea);}
   #editor .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5);}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left{border-bottom-left-radius:5px;}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right{border-bottom-right-radius:5px;}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail{margin-bottom:6px;}
+  /* 아이메시지 기본 모양: SVG 꼬리 대신 ::before/::after 진짜 아이메시지 꼬리(사용자 제공 기법, em 단위화). 편집창 배경은 항상 단색(--surface-2)이라 항상 적용 */
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail>svg.g-tail{display:none;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail:not(.is-empty)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail:not(.is-empty)::after{content:"";position:absolute;bottom:-0.1em;height:1em;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv:not(.is-empty)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left:not(.is-empty)::before{border-bottom-right-radius:0.8em 0.7em;border-left:1em solid var(--bub,var(--bub-recv,#e5e5ea));left:-0.35em;transform:translate(0,-0.1em);}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv:not(.is-empty)::after,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left:not(.is-empty)::after{background:var(--tail-mask,var(--surface-2));border-bottom-right-radius:0.5em;left:1.25em;transform:translate(-1.875em,-0.125em);width:0.625em;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send:not(.is-empty)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right:not(.is-empty)::before{border-bottom-left-radius:0.8em 0.7em;border-right:1em solid var(--bub,var(--bub-send,#248bf5));right:-0.35em;transform:translate(0,-0.1em);}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send:not(.is-empty)::after,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right:not(.is-empty)::after{background:var(--tail-mask,var(--surface-2));border-bottom-left-radius:0.5em;right:-2.5em;transform:translate(-1.875em,-0.125em);width:0.625em;}
   #editor .g-bub.is-empty:before{content:"내용";opacity:.6;}
   #editor .g-bub.recv.is-empty:before{color:var(--bub-recv-ink,#000);}
   #editor .g-bub.send.is-empty:before{color:var(--bub-send-ink,#fff);}
@@ -820,16 +824,18 @@
   #canvas .g-bub-name.send,.canvas-clone .g-bub-name.send{margin-left:auto !important;margin-right:.4em !important;text-align:right !important;color:var(--bub-name-send,#8a8a8a) !important;}
   #canvas .g-bub-name + .g-bub,.canvas-clone .g-bub-name + .g-bub{margin-top:.25em !important;}
   #canvas .g-bub-name:first-child,.canvas-clone .g-bub-name:first-child{margin-top:0 !important;}
-  #canvas .g-bub>svg.g-tail,.canvas-clone .g-bub>svg.g-tail{position:absolute !important;bottom:-.22em !important;z-index:0 !important;width:1.35em !important;height:.85em !important;display:block !important;overflow:visible !important;pointer-events:none !important;}
+  #canvas .g-bub>svg.g-tail,.canvas-clone .g-bub>svg.g-tail{position:absolute !important;bottom:0 !important;z-index:0 !important;width:1.35em !important;height:.85em !important;display:block !important;overflow:visible !important;pointer-events:none !important;}
   #canvas .g-bub.recv>svg.g-tail,.canvas-clone .g-bub.recv>svg.g-tail{left:-.42em !important;}
   #canvas .g-bub.send>svg.g-tail,.canvas-clone .g-bub.send>svg.g-tail{right:-.42em !important;transform:scaleX(-1) !important;}
   #canvas .g-bub.recv>svg.g-tail path,.canvas-clone .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea) !important;}
   #canvas .g-bub.send>svg.g-tail path,.canvas-clone .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5) !important;}
-  /* 아이메시지 기본 모양: 꼬리 달린 칸의 '꼬리 쪽 아래 모서리'를 덜 둥글게 → 말풍선이 타원에서 끊기지 않고 꼬리로 이어짐 */
-  #canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv,#canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left{border-bottom-left-radius:.35em !important;}
-  #canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.send,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.send,#canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right{border-bottom-right-radius:.35em !important;}
-  /* 꼬리(SVG)가 달린 칸은 꼬리가 아래로 빠지므로 그 칸에만 아래 여백 추가(다른 꼬리·심플/소프트 제외) */
-  #canvas:not(.bub-simple):not(.bub-soft) .g-bub.tail,.canvas-clone:not(.bub-simple):not(.bub-soft) .g-bub.tail{margin-bottom:.3em !important;}
+  /* 아이메시지 기본 모양 + 단색 배경(.bg-solid-tail): SVG 꼬리 숨기고 ::before/::after 진짜 아이메시지 꼬리. 마스크(::after)가 배경색(--tail-mask)이라 단색에서만 정확 → 그라데이션·사진 배경은 이 클래스 없어 SVG 꼬리로 폴백 */
+  #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail>svg.g-tail,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail>svg.g-tail{display:none !important;}
+  #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::before,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::after{content:"" !important;position:absolute !important;bottom:-0.1em !important;height:1em !important;z-index:0 !important;}
+  #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv::before,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left::before{border-bottom-right-radius:0.8em 0.7em !important;border-left:1em solid var(--bub,var(--bub-recv,#e5e5ea)) !important;left:-0.35em !important;transform:translate(0,-0.1em) !important;}
+  #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv::after,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left::after{background:var(--tail-mask,#fff) !important;border-bottom-right-radius:0.5em !important;left:1.25em !important;transform:translate(-1.875em,-0.125em) !important;width:0.625em !important;}
+  #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::before,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::before{border-bottom-left-radius:0.8em 0.7em !important;border-right:1em solid var(--bub,var(--bub-send,#248bf5)) !important;right:-0.35em !important;transform:translate(0,-0.1em) !important;}
+  #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::after,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.send::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right::after{background:var(--tail-mask,#fff) !important;border-bottom-left-radius:0.5em !important;right:-2.5em !important;transform:translate(-1.875em,-0.125em) !important;width:0.625em !important;}
 
   #canvas .g-bub mark.em,.canvas-clone .g-bub mark.em{color:var(--em) !important;}
 
@@ -3270,6 +3276,7 @@
     el.style.width = w+'px';
     el.style.background = bgValue;
     el.style.setProperty('--tail-mask', (bgMode==='solid') ? $('c-bg').value : '#ffffff');
+    el.classList.toggle('bg-solid-tail', bgMode==='solid');
     el.style.setProperty('--bub-recv', $('c-brecv').value);
     el.style.setProperty('--bub-send', $('c-bsend').value);
     el.style.setProperty('--bub-recv-ink', bubInkRecv());
