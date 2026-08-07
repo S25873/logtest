@@ -706,6 +706,12 @@
   #editor .g-img.is-sel{box-shadow:0 0 0 2px var(--accent);}
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
   #editor .g-img.is-sel:hover::after{color:#fff;background:var(--danger);border-color:var(--danger);}
+  #editor .g-bub-img{display:block;max-width:100%;height:auto;border-radius:11px;margin:0;}
+  #editor .g-bub.has-img:not(.img-only) .g-bub-img{margin-bottom:5px;}
+  #editor .g-bub.img-only{padding:0 !important;background:transparent !important;}
+  #editor .g-bub.img-only .g-bub-img{border-radius:14px;}
+  #editor .g-bub.img-only>svg.g-tail{display:none !important;}
+  #editor .g-bub.img-only::before,#editor .g-bub.img-only::after{content:none !important;display:none !important;}
   #editor .g-bub{display:block;position:relative;width:fit-content;max-width:80%;padding:4px 10px;border-radius:14px;margin:2px 0;white-space:pre-wrap;}
   #editor .g-bub.recv{margin-right:auto;margin-left:8px;background:var(--bub-recv,#e5e5ea);color:var(--bub-recv-ink,#000) !important;}
   #editor .g-bub.send{margin-left:auto;margin-right:8px;background:var(--bub-send,#248bf5);color:var(--bub-send-ink,#fff) !important;}
@@ -719,11 +725,11 @@
   #editor .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5);}
   /* 아이메시지 기본 모양: SVG 꼬리 대신 ::before/::after 진짜 아이메시지 꼬리(사용자 제공 기법, em 단위화). 편집창 배경은 항상 단색(--surface-2)이라 항상 적용 */
   #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail>svg.g-tail{display:none;}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail:not(.is-empty)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail:not(.is-empty)::after{content:"";position:absolute;bottom:-0.1em;height:1em;}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv:not(.is-empty)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left:not(.is-empty)::before{border-bottom-right-radius:0.8em 0.7em;border-left:1em solid var(--bub,var(--bub-recv,#e5e5ea));left:-0.35em;transform:translate(0,-0.1em);}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv:not(.is-empty)::after,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left:not(.is-empty)::after{background:var(--tail-mask,var(--surface-2));border-bottom-right-radius:0.5em;left:1.25em;transform:translate(-1.875em,-0.125em);width:0.625em;}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send:not(.is-empty)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right:not(.is-empty)::before{border-bottom-left-radius:0.8em 0.7em;border-right:1em solid var(--bub,var(--bub-send,#248bf5));right:-0.35em;transform:translate(0,-0.1em);}
-  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send:not(.is-empty)::after,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right:not(.is-empty)::after{background:var(--tail-mask,var(--surface-2));border-bottom-left-radius:0.5em;right:-2.5em;transform:translate(-1.875em,-0.125em);width:0.625em;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail:not(.is-empty):not(.img-only)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail:not(.is-empty):not(.img-only)::after{content:"";position:absolute;bottom:-0.1em;height:1em;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv:not(.is-empty):not(.img-only)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left:not(.is-empty):not(.img-only)::before{border-bottom-right-radius:0.8em 0.7em;border-left:1em solid var(--bub,var(--bub-recv,#e5e5ea));left:-0.35em;transform:translate(0,-0.1em);}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.recv:not(.is-empty):not(.img-only)::after,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.left:not(.is-empty):not(.img-only)::after{background:var(--tail-mask,var(--surface-2));border-bottom-right-radius:0.5em;left:1.25em;transform:translate(-1.875em,-0.125em);width:0.625em;}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send:not(.is-empty):not(.img-only)::before,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right:not(.is-empty):not(.img-only)::before{border-bottom-left-radius:0.8em 0.7em;border-right:1em solid var(--bub,var(--bub-send,#248bf5));right:-0.35em;transform:translate(0,-0.1em);}
+  #editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.send:not(.is-empty):not(.img-only)::after,#editor:not(.bub-simple):not(.bub-soft) .g-bub.tail.char-bub.right:not(.is-empty):not(.img-only)::after{background:var(--tail-mask,var(--surface-2));border-bottom-left-radius:0.5em;right:-2.5em;transform:translate(-1.875em,-0.125em);width:0.625em;}
   #editor .g-bub.is-empty:before{content:"내용";opacity:.6;}
   #editor .g-bub.recv.is-empty:before{color:var(--bub-recv-ink,#000);}
   #editor .g-bub.send.is-empty:before{color:var(--bub-send-ink,#fff);}
@@ -855,6 +861,12 @@
   #canvas .g-bub.send>svg.g-tail,.canvas-clone .g-bub.send>svg.g-tail{right:-.42em !important;transform:scaleX(-1) !important;}
   #canvas .g-bub.recv>svg.g-tail path,.canvas-clone .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea) !important;}
   #canvas .g-bub.send>svg.g-tail path,.canvas-clone .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5) !important;}
+  #canvas .g-bub-img,.canvas-clone .g-bub-img{display:block !important;max-width:100% !important;height:auto !important;border-radius:.72em !important;margin:0 !important;}
+  #canvas .g-bub.has-img:not(.img-only) .g-bub-img,.canvas-clone .g-bub.has-img:not(.img-only) .g-bub-img{margin-bottom:.4em !important;}
+  #canvas .g-bub.img-only,.canvas-clone .g-bub.img-only{padding:0 !important;background:transparent !important;}
+  #canvas .g-bub.img-only .g-bub-img,.canvas-clone .g-bub.img-only .g-bub-img{border-radius:1.15em !important;}
+  #canvas .g-bub.img-only>svg.g-tail,.canvas-clone .g-bub.img-only>svg.g-tail{display:none !important;}
+  #canvas .g-bub.img-only::before,#canvas .g-bub.img-only::after,.canvas-clone .g-bub.img-only::before,.canvas-clone .g-bub.img-only::after{content:none !important;display:none !important;}
   /* 아이메시지 기본 모양 + 단색 배경(.bg-solid-tail): SVG 꼬리 숨기고 ::before/::after 진짜 아이메시지 꼬리. 마스크(::after)가 배경색(--tail-mask)이라 단색에서만 정확 → 그라데이션·사진 배경은 이 클래스 없어 SVG 꼬리로 폴백 */
   #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail>svg.g-tail,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail>svg.g-tail{display:none !important;}
   #canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::before,#canvas.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::after,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::before,.canvas-clone.bg-solid-tail:not(.bub-simple):not(.bub-soft) .g-bub.tail::after{content:"" !important;position:absolute !important;bottom:-0.1em !important;height:1em !important;z-index:0 !important;}
@@ -2163,12 +2175,27 @@
     n.textContent=(c&&c.name)?c.name:'\u200b';
     return n;
   }
+  function markPhotoBubbles(root){
+    if(!root) return;
+    [].forEach.call(root.querySelectorAll('.g-bub'), function(b){
+      var hasImg=!!b.querySelector('img.g-bub-img, img');
+      var txt=b.textContent.replace(/\u200b/g,'').trim();
+      b.classList.toggle('has-img', hasImg);
+      b.classList.toggle('img-only', hasImg && txt==='');
+    });
+  }
   function styleCharBubbles(root){
     if(!root) return;
+    markPhotoBubbles(root);
     [].forEach.call(root.querySelectorAll('.g-bub.char-bub'), function(b){
       var c=findChar(b.getAttribute('data-char')); if(!c) return;
-      b.style.setProperty('background', c.bub, 'important');
-      b.style.setProperty('color', c.ink, 'important');
+      if(b.classList.contains('img-only')){
+        b.style.setProperty('background','transparent','important');
+        b.style.removeProperty('color');
+      } else {
+        b.style.setProperty('background', c.bub, 'important');
+        b.style.setProperty('color', c.ink, 'important');
+      }
       b.style.setProperty('--bub', c.bub);
       var path=b.querySelector('svg.g-tail path'); if(path){ path.style.setProperty('fill', c.bub, 'important'); }
     });
@@ -2436,14 +2463,23 @@
     var bub = '<rect x="'+(L?7:6)+'" y="8" width="11" height="8" rx="4" fill="'+color+'" stroke="rgba(0,0,0,.14)" stroke-width="1"/>';
     return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+bar+bub+'</svg></span>';
   }
+  function photoBubIcon(side, color){
+    var L = side==='left';
+    var bar = '<rect x="'+(L?2:19)+'" y="3.5" width="3" height="17" rx="1.5" fill="currentColor"/>';
+    var frame = '<rect x="'+(L?7:6)+'" y="7" width="11" height="10" rx="2.4" fill="'+color+'" stroke="rgba(0,0,0,.16)" stroke-width="1"/>';
+    var pic = '<circle cx="'+(L?10.5:9.5)+'" cy="10.5" r="1.1" fill="rgba(255,255,255,.9)"/><path d="M'+(L?7.6:6.6)+' 16l2.4-2.6 1.7 1.7 1.9-2.1 2.4 3z" fill="rgba(255,255,255,.9)"/>';
+    return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+bar+frame+pic+'</svg></span>';
+  }
   function openCharInsertSheet(charId){
     var c=findChar(charId); if(!c) return;
     var col=c.bub||'#e5e5ea';
     openSheetDef({ title:(c.name||'인물')+' 말풍선', options:[
       { label:'이름+사진', preview:sideBubIcon('left',col), run:function(){ insertCharBubbles(charId,'left','tail'); } },
       { label:'말풍선만', preview:sideBubIcon('left',col), run:function(){ insertCharBubbles(charId,'left','cont'); } },
+      { label:'사진 메시지', preview:photoBubIcon('left',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'left', tail:true, withName:true}); } },
       { label:'이름+사진', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','tail'); } },
-      { label:'말풍선만', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','cont'); } }
+      { label:'말풍선만', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','cont'); } },
+      { label:'사진 메시지', preview:photoBubIcon('right',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'right', tail:true, withName:true}); } }
     ]});
   }
   function applyBubble(kind, tail, withName){
@@ -2648,7 +2684,9 @@
        용량 폭주 방지를 위해 긴 변 1400px로 축소해 저장.
      ============================================================ */
   var _imgFile = $('img-file');
-  function pickLogImage(){ if(_imgFile) _imgFile.click(); }
+  var _imgMode = null;   // null → 로그 이미지 블록, {side,charId,tail,withName} → 사진 말풍선
+  function pickLogImage(){ _imgMode=null; if(_imgFile) _imgFile.click(); }
+  function pickPhotoBubble(desc){ _imgMode=desc||{side:'left'}; saveSel(); if(_imgFile) _imgFile.click(); }
   function downscaleImage(src, maxDim, cb){
     var img=new Image();
     img.onload=function(){
@@ -2679,14 +2717,52 @@
     var r=document.createRange(); r.setStartAfter(box); r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
     cleanEditor(); render(); saveSel(); updateFormatButtons();
   }
+  // 사진 말풍선: 이미지가 들어있는 말풍선(char-bub 또는 plain recv/send). 캡션은 말풍선 안에 이어서 입력.
+  function insertPhotoBubbleImg(desc, url){
+    editor.focus();
+    var sel=window.getSelection();
+    if(!(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer))){
+      if(_savedRange && editor.contains(_savedRange.startContainer)){ sel.removeAllRanges(); sel.addRange(_savedRange.cloneRange()); }
+      else { var re=document.createRange(); re.selectNodeContents(editor); re.collapse(false); sel.removeAllRanges(); sel.addRange(re); }
+    }
+    var range=sel.getRangeAt(0);
+    var side=(desc.side==='right')?'right':'left';
+    var out=document.createDocumentFragment(), bub;
+    if(desc.charId && findChar(desc.charId)){
+      if(desc.withName) out.appendChild(makeCharName(desc.charId, side));
+      bub=makeCharBub(desc.charId, side, !!desc.tail);
+      if(desc.withName) bub.setAttribute('data-av','1');
+    } else {
+      bub=document.createElement('span');
+      bub.className='g-bub '+(side==='right'?'send':'recv')+' '+(desc.tail?'tail':'cont');
+    }
+    var im=document.createElement('img'); im.className='g-bub-img'; im.src=url; im.alt='';
+    bub.appendChild(im);
+    bub.appendChild(document.createTextNode('\u200b'));   // 캡션 커서 자리
+    out.appendChild(bub);
+    range.collapse(false); range.insertNode(out);
+    var r=document.createRange(); r.selectNodeContents(bub); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
+    cleanEditor(); if(typeof absorbBubBreak==='function') absorbBubBreak(bub); styleCharBubbles(editor); render(); saveSel(); updateFormatButtons();
+  }
   if(_imgFile){
     _imgFile.addEventListener('change', function(e){
       var f=e.target.files && e.target.files[0]; e.target.value='';
+      var mode=_imgMode; _imgMode=null;
       if(!f) return;
       var rd=new FileReader();
-      rd.onload=function(ev){ downscaleImage(ev.target.result, 1400, insertLogImage); };
+      rd.onload=function(ev){ downscaleImage(ev.target.result, 1400, function(url){
+        if(mode && typeof mode==='object'){ insertPhotoBubbleImg(mode, url); }
+        else { insertLogImage(url); }
+      }); };
       rd.readAsDataURL(f);
     });
+  }
+  // '+ 삽입 → 사진 말풍선' 방향 선택 시트 (plain 말풍선)
+  function photoBubbleSideSheet(){
+    openSheetDef({ title:'사진 말풍선', options:[
+      { label:'왼쪽 (상대)', preview:sideBubIcon('left','#e5e5ea'), noFocus:true, run:function(){ pickPhotoBubble({side:'left', tail:true}); } },
+      { label:'오른쪽 (나)', preview:sideBubIcon('right','#248bf5'), noFocus:true, run:function(){ pickPhotoBubble({side:'right', tail:true}); } }
+    ]});
   }
 
   /* 삽입 이미지 선택 · 삭제 (구분선과 동일한 방식) */
@@ -2817,6 +2893,7 @@
   var SHEETS = {
     insert: { title: '삽입', options: [
       { label: '사진', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="10" r="1.6" fill="currentColor"/><path d="M4 17l4.5-4.5 3.5 3.5 3-3L20 16.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>', noFocus:true, run: function(){ pickLogImage(); } },
+      { label: '사진 말풍선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="15" height="12" rx="4" fill="currentColor" opacity=".14"/><rect x="6" y="8.5" width="9" height="7" rx="1.6" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="11" r="1" fill="currentColor"/><path d="M6.6 15l2-2.2 1.5 1.5 1.6-1.8 2 2.5z" fill="currentColor"/></svg></span>', noFocus:true, run: function(){ photoBubbleSideSheet(); } },
       { label: '인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="10" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', noFocus:true, run: function(){ openSheet('quote'); } },
       { label: '구분선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', noFocus:true, run: function(){ openSheet('hr'); } }
     ]},
@@ -3519,6 +3596,13 @@
         if(ch.nodeType!==1) return;
         if(ch.nodeName && ch.nodeName.toLowerCase()==='svg') return;
         var tag = ch.tagName;
+        if(tag==='IMG'){
+          var _bs=ch.getAttribute('src')||'';
+          for(var bi=ch.attributes.length-1;bi>=0;bi--){ ch.removeAttribute(ch.attributes[bi].name); }
+          if(_bs) ch.setAttribute('src', _bs);
+          ch.setAttribute('alt',''); ch.className='g-bub-img';
+          return;
+        }
         var isBub = tag==='SPAN' && ch.classList.contains('g-bub');
         var isBubName = tag==='SPAN' && ch.classList.contains('g-bub-name');
         var spBlk = (tag==='DIV') ? specialBlockClass(ch) : '';
