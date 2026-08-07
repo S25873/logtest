@@ -846,7 +846,7 @@
   #canvas mark.em,.canvas-clone mark.em{color:var(--em) !important;background:transparent !important;display:inline !important;}
   #canvas mark.ul,.canvas-clone mark.ul{color:inherit !important;background:transparent !important;display:inline !important;
     text-decoration:underline !important;text-decoration-thickness:.05em !important;text-underline-offset:.12em !important;}
-  #canvas mark.sub,.canvas-clone mark.sub{color:var(--sub-color,#8a8a8a) !important;background:transparent !important;display:inline !important;font-size:.8em !important;}
+  #canvas mark.sub,.canvas-clone mark.sub{color:var(--sub-color,#8a8a8a) !important;background:transparent !important;display:inline !important;font-size:var(--sub-size,.8em) !important;}
   #canvas mark.gray,.canvas-clone mark.gray{color:var(--sub-color,#8a8a8a) !important;background:transparent !important;display:inline !important;}
   #canvas .g-title-blk,.canvas-clone .g-title-blk{display:block !important;margin:0 0 var(--titleblk-gap,.8em) !important;}
   #canvas .g-title-main,.canvas-clone .g-title-main{display:block !important;font-size:var(--title-size,1.6em) !important;font-weight:700 !important;font-family:var(--title-font,inherit) !important;color:var(--title-color,inherit) !important;line-height:1.25 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
@@ -1098,8 +1098,8 @@
                   <div class="rangewrap"><input id="font-size" type="range" min="20" max="50" value="32"></div>
                 </div>
                 <div class="field">
-                  <span class="label">장평 <span class="val">100%</span></span>
-                  <div class="rangewrap"><input id="stretch" type="range" min="80" max="120" step="1" value="100"></div>
+                  <span class="label">서브 글자 크기 <span class="val">80%</span></span>
+                  <div class="rangewrap"><input id="subtext-size" type="range" min="50" max="100" step="5" value="80"></div>
                 </div>
               </div>
               <div class="grid-2" style="margin-top:16px">
@@ -1112,9 +1112,15 @@
                   <div class="rangewrap"><input id="line-height" type="range" min="10" max="20" step="1" value="17"></div>
                 </div>
               </div>
-              <div class="field" style="margin-top:16px">
-                <span class="label">문단 간격 <span class="val" id="para-gap-val">20px</span></span>
-                <div class="rangewrap"><input id="para-gap" type="range" min="0" max="48" step="1" value="20"></div>
+              <div class="grid-2" style="margin-top:16px">
+                <div class="field">
+                  <span class="label">장평 <span class="val">100%</span></span>
+                  <div class="rangewrap"><input id="stretch" type="range" min="80" max="120" step="1" value="100"></div>
+                </div>
+                <div class="field">
+                  <span class="label">문단 간격 <span class="val" id="para-gap-val">20px</span></span>
+                  <div class="rangewrap"><input id="para-gap" type="range" min="0" max="48" step="1" value="20"></div>
+                </div>
               </div>
 
               <p class="section__head" style="margin-top:24px">(＋로 넣는) 본문 사진</p>
@@ -3434,6 +3440,27 @@
       if(rest.querySelector && rest.querySelector('img')) return false;
       return (rest.textContent||'').replace(/\u200b/g,'')===''; }catch(e){ return false; }
   }
+  function isCaretAtBubStart(el, range){
+    if(!range.collapsed) return false;
+    try{ var r=document.createRange(); r.selectNodeContents(el); r.setEnd(range.startContainer, range.startOffset);
+      var before=r.cloneContents();
+      // 이미지도 내용으로 취급(커서 앞에 이미지가 있으면 시작 아님)
+      if(before.querySelector && before.querySelector('img')) return false;
+      return (before.textContent||'').replace(/\u200b/g,'')===''; }catch(e){ return false; }
+  }
+  // 말풍선 맨 앞에서 엔터: 이름표+말풍선을 한 덩어리로 보고 그 '위'에 빈 줄을 만들어 그룹을 아래로 민다.
+  //   (말풍선 안쪽에 br을 넣으면 이름과 사진 사이에 틈이 생기던 문제 해결)
+  function exitCharBubUp(bub){
+    var sel=window.getSelection();
+    var head = bubNameBefore(bub) || bub;        // 이름표가 있으면 그룹의 머리는 이름표
+    head.parentNode.insertBefore(document.createElement('br'), head);   // 그룹 위 빈 줄
+    // 커서는 말풍선 맨 앞에 유지 → 엔터를 또 눌러도 계속 그룹만 아래로 밀린다
+    var first=bub.firstChild, tn=(first && first.nodeType===3)?first:null;
+    if(!tn){ tn=document.createTextNode('\u200b'); bub.insertBefore(tn, first); }
+    var r=document.createRange(); r.setStart(tn, 0); r.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r);
+    saveSel(); render();
+  }
   function exitCharBub(bub){
     var sel=window.getSelection();
     // 바로 다음(빈 텍스트만 건너뜀)이 또 다른 말풍선이면 = 미리보기에서 한 그룹으로 묶인 상태.
@@ -3460,6 +3487,7 @@
     var range=sel.getRangeAt(0);
     if(!editor.contains(range.startContainer)) return false;
     if(!forceBreak && inBub && inBub.classList.contains('char-bub') && isCaretAtBubEnd(inBub, range)){ exitCharBub(inBub); return true; }
+    if(!forceBreak && inBub && inBub.classList.contains('char-bub') && isCaretAtBubStart(inBub, range)){ exitCharBubUp(inBub); return true; }
     range.deleteContents();
     var br=document.createElement('br'); range.insertNode(br);
     // br 바로 뒤 위치는 브라우저가 이전 텍스트로 병합시켜 줄바꿈이 씹히므로,
@@ -3732,6 +3760,7 @@
     if(bbg){ el.style.setProperty('--bub-body-gap', parseFloat(bbg.value)+'px'); }
     if(pg){ el.style.setProperty('--para-gap', parseFloat(pg.value)+'px'); }
     if(sg){ el.style.setProperty('--stack-gap', parseFloat(sg.value)+'px'); }
+    var subsz=$('subtext-size'); if(subsz){ var _ss=parseFloat(subsz.value); if(isNaN(_ss)) _ss=80; el.style.setProperty('--sub-size', (_ss/100)+'em'); }
     var psz=$('photo-size'); if(psz){ var _pp=parseFloat(psz.value); el.style.setProperty('--photo-w', _pp+'%'); el.style.setProperty('--photo-w-px', Math.round(w*_pp/100)+'px'); }
     var lisz=$('logimg-size'); if(lisz){ el.style.setProperty('--logimg-w', parseFloat(lisz.value)+'%'); }
     var lirad=$('logimg-radius'); if(lirad){ el.style.setProperty('--logimg-radius', parseFloat(lirad.value)+'px'); }
@@ -3790,6 +3819,21 @@
         av.style.transformOrigin = 'center';
         av.style.marginLeft = mAv;
         av.style.marginRight = mAv;
+      });
+      // 말풍선 삽입 사진(g-bub-img)도 장평 영향 제거 — 장평 100%일 때의 크기·비율 그대로 유지.
+      //   폭을 고정 px(photo-w-px, 단 원본보다 크게 확대 안 되게 natural로 상한)로 못박아 %인플레이션을 없애고,
+      //   scaleX(1/s)로 가로 압축을 되돌린다(높이는 scaleX 무관이라 자동으로 자연 비율). 사진은 아바타 반대쪽(본문 안쪽)으로 펴지게 방향별 origin.
+      var _pw=$('photo-size'); var _ppv=_pw?parseFloat(_pw.value):60; if(isNaN(_ppv))_ppv=60;
+      var _photoPx=Math.round(w*_ppv/100);
+      var invImg = (s===1) ? '' : 'scaleX('+(1/s)+')';
+      [].forEach.call(inner.querySelectorAll('.g-bub-img'), function(im){
+        if(s===1){ im.style.transform=''; im.style.transformOrigin=''; im.style.width=''; return; }
+        var natW=im.naturalWidth||0;
+        im.style.width=(natW ? Math.min(_photoPx, natW) : _photoPx)+'px';
+        im.style.transform = invImg;
+        var bub=im.closest?im.closest('.g-bub'):null;
+        var rightSide=bub && (bub.classList.contains('send') || (bub.classList.contains('char-bub') && bub.classList.contains('right')));
+        im.style.transformOrigin = rightSide ? 'right center' : 'left center';
       });
     }
     var layer = el.querySelector('.g-bg-layer');
@@ -3992,6 +4036,7 @@
     canvas.innerHTML = '<div class="g-inner">' + buildHtml() + '</div>';
     renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); tagMsgGroupNeighbors(canvas); wrapParaGaps(canvas); stripLastGap(canvas); fitStage();
     setVal('font-size', $('font-size').value+'px');
+    if($('subtext-size')) setVal('subtext-size', $('subtext-size').value+'%');
     if($('stretch')) setVal('stretch', $('stretch').value+'%');
     if($('grad-angle')) setVal('grad-angle', angleLabel($('grad-angle').value));
     setVal('letter-spacing', parseFloat($('letter-spacing').value).toFixed(1));
@@ -4125,7 +4170,7 @@
     var e=$(id); if(e){ e.addEventListener('input', function(){ updateTitleSizeLabels(); render(); }); e.addEventListener('change', function(){ updateTitleSizeLabels(); render(); }); }
   });
 
-  ['name-pos','font','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w','opacity','bright'].forEach(function(id){
+  ['name-pos','font','font-size','subtext-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w','opacity','bright'].forEach(function(id){
     var e=$(id); if(e){ e.addEventListener('input', render); e.addEventListener('change', render); }
   });
 
@@ -4607,7 +4652,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','font-size','subtext-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
