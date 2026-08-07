@@ -723,8 +723,8 @@
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
   #editor .g-img.is-sel:hover::after{color:#fff;background:var(--danger);border-color:var(--danger);}
   #editor .g-bub-img{display:inline-block;vertical-align:bottom;max-width:100%;height:auto;border-radius:11px;margin:0;}
-  #editor .g-bub.has-img{max-width:var(--photo-w,60%);}
-  #editor .g-bub.has-img:not(.img-only) .g-bub-img{margin-right:6px;}
+  #editor .g-bub.img-only{max-width:var(--photo-w,60%);}
+  #editor .g-bub.has-img:not(.img-only) .g-bub-img{display:block;margin:0 0 2px;}
   #editor .g-bub.img-only{padding:0 !important;background:transparent !important;}
   #editor .g-bub.img-only .g-bub-img{border-radius:14px;}
   #editor .g-bub.img-only>svg.g-tail{display:none !important;}
@@ -883,8 +883,8 @@
   #canvas .g-bub.recv>svg.g-tail path,.canvas-clone .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea) !important;}
   #canvas .g-bub.send>svg.g-tail path,.canvas-clone .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5) !important;}
   #canvas .g-bub-img,.canvas-clone .g-bub-img{display:inline-block !important;vertical-align:bottom !important;max-width:100% !important;height:auto !important;border-radius:.72em !important;margin:0 !important;}
-  #canvas .g-bub.has-img,.canvas-clone .g-bub.has-img{max-width:var(--photo-w,60%) !important;}
-  #canvas .g-bub.has-img:not(.img-only) .g-bub-img,.canvas-clone .g-bub.has-img:not(.img-only) .g-bub-img{margin-right:.4em !important;}
+  #canvas .g-bub.img-only,.canvas-clone .g-bub.img-only{max-width:var(--photo-w,60%) !important;}
+  #canvas .g-bub.has-img:not(.img-only) .g-bub-img,.canvas-clone .g-bub.has-img:not(.img-only) .g-bub-img{display:block !important;margin:0 0 .13em !important;}
   #canvas .g-bub.img-only,.canvas-clone .g-bub.img-only{padding:0 !important;background:transparent !important;}
   #canvas .g-bub.img-only .g-bub-img,.canvas-clone .g-bub.img-only .g-bub-img{border-radius:1.15em !important;}
   #canvas .g-bub.img-only>svg.g-tail,.canvas-clone .g-bub.img-only>svg.g-tail{display:none !important;}
