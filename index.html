@@ -653,6 +653,12 @@
   .pchk input{margin:0;cursor:pointer;accent-color:var(--accent);width:14px;height:14px;}
   .pchk:hover{border-color:var(--line-strong);}
   .pchk:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--ink);font-weight:600;}
+  .pchk--block{display:flex;width:100%;box-sizing:border-box;justify-content:flex-start;}
+  .bpseg{display:flex;height:38px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:3px;}
+  .bpseg button{flex:1;min-width:0;border:none;background:transparent;cursor:pointer;border-radius:calc(var(--radius-sm) - 3px);font-size:12.5px;font-weight:600;color:var(--ink-2);transition:background .18s var(--ease),color .18s;}
+  .bpseg button[aria-pressed="true"]{background:var(--accent);color:var(--ink-on-accent);box-shadow:var(--shadow-1);}
+  .bpchars{display:flex;flex-wrap:wrap;gap:7px;}
+  .bpchars[hidden]{display:none;}
 
   /* 프리셋 칩 꾹 눌러 순서 바꾸기 (인물/입력/프리셋 공통) */
   .reorderable{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
@@ -1321,14 +1327,22 @@
               <p class="hint" style="margin:0 0 12px">인물을 누르면 아래 프리셋들이 떠요. 프리셋을 클릭하면 수정할 수 있어요.</p>
               <div class="mychips" id="bubpreset-list"></div>
               <div class="repform" id="bubpreset-form" hidden>
+                <div class="bpseg" id="bp-type-seg">
+                  <button type="button" data-bptype="normal" aria-pressed="true">일반</button>
+                  <button type="button" data-bptype="photo" aria-pressed="false">사진</button>
+                </div>
                 <input class="txt-input" id="bubpreset-name" type="text" placeholder="프리셋 이름 (예: 상대 기본)" maxlength="20" autocomplete="off">
                 <div class="bpchecks">
                   <label class="pchk"><input type="checkbox" id="bp-av"><span>프사</span></label>
                   <label class="pchk"><input type="checkbox" id="bp-nm"><span>이름</span></label>
-                  <label class="pchk"><input type="checkbox" id="bp-tail"><span>꼬리</span></label>
-                  <label class="pchk"><input type="checkbox" id="bp-photo"><span>사진</span></label>
-                  <label class="pchk"><input type="checkbox" id="bp-right"><span>오른쪽(나)</span></label>
+                  <label class="pchk" id="bp-tail-wrap"><input type="checkbox" id="bp-tail"><span>꼬리</span></label>
                 </div>
+                <div class="bpseg" id="bp-side-seg">
+                  <button type="button" data-bpside="left" aria-pressed="true">왼쪽 (상대)</button>
+                  <button type="button" data-bpside="right" aria-pressed="false">오른쪽 (나)</button>
+                </div>
+                <label class="pchk pchk--block" id="bp-perchar-wrap"><input type="checkbox" id="bp-perchar"><span>캐릭터마다 다르게 적용</span></label>
+                <div class="bpchars" id="bp-char-select" hidden></div>
                 <div class="repform__btns">
                   <button class="btn btn--ghost" id="bubpreset-cancel" type="button">취소</button>
                   <button class="btn btn--primary" id="bubpreset-confirm" type="button">저장</button>
@@ -2507,16 +2521,16 @@
   function openCharInsertSheet(charId){
     var c=findChar(charId); if(!c) return;
     var col=c.bub||'#e5e5ea';
-    var presets=loadBubPresets();
+    var presets=loadBubPresets().filter(function(p){ return !p.chars || !p.chars.length || p.chars.indexOf(charId)!==-1; });
     if(!presets.length){ insertCharBubbles(charId,'left',null,{av:false,nm:false,tail:false}); return; }
     openSheetDef({ title:(c.name||'인물')+' 말풍선', options: presets.map(function(p){
-      var side=p.right?'right':'left';
+      var side=p.side==='right'?'right':'left';
       return {
         label: p.name||'(이름 없음)',
         preview: p.photo ? photoBubIcon(side,col) : sideBubIcon(side,col),
         noFocus: !!p.photo,
         run: function(){
-          if(p.photo){ pickPhotoBubble({charId:charId, side:side, tail:!!p.tail, nm:!!p.nm, av:!!p.av}); }
+          if(p.photo){ pickPhotoBubble({charId:charId, side:side, tail:false, nm:!!p.nm, av:!!p.av}); }
           else { insertCharBubbles(charId, side, null, {av:!!p.av, nm:!!p.nm, tail:!!p.tail}); }
         }
       };
@@ -4780,17 +4794,25 @@
   /* ===== 말풍선 프리셋 (인물 시트에 뜨는 삽입 옵션) ===== */
   var BUBPRESET_KEY='logmaker-bubble-presets-v1';
   var DEFAULT_BUBPRESETS=[
-    {name:'이름+사진',av:true,nm:true,tail:true,photo:false,right:false},
-    {name:'말풍선만',av:false,nm:false,tail:false,photo:false,right:false},
-    {name:'사진',av:true,nm:true,tail:false,photo:true,right:false}
+    {name:'이름+사진',photo:false,av:true,nm:true,tail:true,side:'left',chars:[]},
+    {name:'말풍선만',photo:false,av:false,nm:false,tail:false,side:'left',chars:[]},
+    {name:'사진',photo:true,av:true,nm:true,tail:false,side:'left',chars:[]}
   ];
   function loadBubPresets(){
     var raw; try{ raw=localStorage.getItem(BUBPRESET_KEY); }catch(e){ raw=null; }
-    if(raw==null){ var seed=DEFAULT_BUBPRESETS.map(function(p){ return {name:p.name,av:p.av,nm:p.nm,tail:p.tail,photo:p.photo,right:p.right}; }); try{ localStorage.setItem(BUBPRESET_KEY, JSON.stringify(seed)); }catch(e){} return seed; }
-    try{ var a=JSON.parse(raw); return Array.isArray(a)?a:[]; }catch(e){ return []; }
+    var arr;
+    if(raw==null){ arr=DEFAULT_BUBPRESETS.map(function(p){ return {name:p.name,photo:p.photo,av:p.av,nm:p.nm,tail:p.tail,side:p.side,chars:[]}; }); try{ localStorage.setItem(BUBPRESET_KEY, JSON.stringify(arr)); }catch(e){} return arr; }
+    try{ arr=JSON.parse(raw); }catch(e){ return []; }
+    if(!Array.isArray(arr)) return [];
+    return arr.map(function(p){ return {
+      name:p.name||'', photo:!!p.photo, av:!!p.av, nm:!!p.nm,
+      tail: p.photo?false:!!p.tail,
+      side: p.side || (p.right?'right':'left'),
+      chars: Array.isArray(p.chars)?p.chars:[]
+    }; });
   }
   function saveBubPresets(list){ try{ localStorage.setItem(BUBPRESET_KEY, JSON.stringify(list)); }catch(e){} }
-  function bubPresetSummary(p){ var t=[]; if(p.photo) t.push('사진'); if(p.av) t.push('프사'); if(p.nm) t.push('이름'); if(p.tail) t.push('꼬리'); t.push(p.right?'오른쪽':'왼쪽'); return t.join(' · '); }
+  function bubPresetSummary(p){ var t=[]; t.push(p.photo?'사진':'일반'); if(p.av) t.push('프사'); if(p.nm) t.push('이름'); if(!p.photo && p.tail) t.push('꼬리'); t.push(p.side==='right'?'오른쪽':'왼쪽'); if(p.chars && p.chars.length) t.push('일부 인물'); return t.join(' · '); }
   var _editingBpIdx=-1;
   function renderBubPresets(){
     var wrap=$('bubpreset-list'); if(!wrap) return; var list=loadBubPresets(); wrap.innerHTML='';
@@ -4805,20 +4827,46 @@
       wrap.appendChild(chip);
     });
   }
+  function bpSetSeg(segId, val, attr){ var seg=$(segId); if(!seg) return; [].forEach.call(seg.querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', b.getAttribute(attr)===val?'true':'false'); }); }
+  function bpGetSeg(segId, attr){ var seg=$(segId); if(!seg) return null; var b=seg.querySelector('button[aria-pressed="true"]'); return b?b.getAttribute(attr):null; }
+  function bpApplyType(){ var isPhoto=bpGetSeg('bp-type-seg','data-bptype')==='photo'; var tw=$('bp-tail-wrap'); if(tw) tw.style.display=isPhoto?'none':''; if(isPhoto){ var t=$('bp-tail'); if(t) t.checked=false; } }
+  function renderBpCharSelect(selectedIds){
+    var wrap=$('bp-char-select'); if(!wrap) return; wrap.innerHTML='';
+    if(!characters.length){ var e=document.createElement('div'); e.className='mychips__empty'; e.textContent='인물이 없어요. 아래 인물에서 먼저 추가하세요.'; wrap.appendChild(e); return; }
+    characters.forEach(function(c){
+      var lb=document.createElement('label'); lb.className='pchk';
+      var cb=document.createElement('input'); cb.type='checkbox'; cb.className='bp-char-cb'; cb.value=c.id; cb.checked=!!(selectedIds && selectedIds.indexOf(c.id)!==-1);
+      var sp=document.createElement('span'); sp.textContent=c.name||'(이름 없음)';
+      lb.appendChild(cb); lb.appendChild(sp); wrap.appendChild(lb);
+    });
+  }
   function openBpForm(idx){
     var form=$('bubpreset-form'),addBtn=$('bubpreset-add'),okBtn=$('bubpreset-confirm');
-    var nameIn=$('bubpreset-name'),avC=$('bp-av'),nmC=$('bp-nm'),tailC=$('bp-tail'),phC=$('bp-photo'),rtC=$('bp-right');
+    var nameIn=$('bubpreset-name'),avC=$('bp-av'),nmC=$('bp-nm'),tailC=$('bp-tail'),perC=$('bp-perchar');
     if(!form) return;
     _editingBpIdx=(typeof idx==='number')?idx:-1;
-    if(_editingBpIdx>=0){ var p=loadBubPresets()[_editingBpIdx]||{}; nameIn.value=p.name||''; avC.checked=!!p.av; nmC.checked=!!p.nm; tailC.checked=!!p.tail; phC.checked=!!p.photo; rtC.checked=!!p.right; okBtn.textContent='저장'; }
-    else { nameIn.value=''; avC.checked=false; nmC.checked=false; tailC.checked=false; phC.checked=false; rtC.checked=false; okBtn.textContent='추가'; }
+    var p=_editingBpIdx>=0 ? (loadBubPresets()[_editingBpIdx]||{}) : {name:'',photo:false,av:false,nm:false,tail:false,side:'left',chars:[]};
+    nameIn.value=p.name||'';
+    bpSetSeg('bp-type-seg', p.photo?'photo':'normal','data-bptype');
+    avC.checked=!!p.av; nmC.checked=!!p.nm; tailC.checked=!!p.tail;
+    bpSetSeg('bp-side-seg', p.side==='right'?'right':'left','data-bpside');
+    var hasChars=!!(p.chars && p.chars.length);
+    perC.checked=hasChars;
+    var csel=$('bp-char-select'); if(csel) csel.hidden=!hasChars;
+    renderBpCharSelect(p.chars||[]);
+    bpApplyType();
+    okBtn.textContent=_editingBpIdx>=0?'저장':'추가';
     form.hidden=false; addBtn.hidden=true; nameIn.focus();
   }
   function closeBpForm(){ var form=$('bubpreset-form'),addBtn=$('bubpreset-add'); if(form) form.hidden=true; if(addBtn) addBtn.hidden=false; _editingBpIdx=-1; }
   function confirmBpSave(){
-    var nameIn=$('bubpreset-name'),avC=$('bp-av'),nmC=$('bp-nm'),tailC=$('bp-tail'),phC=$('bp-photo'),rtC=$('bp-right');
+    var nameIn=$('bubpreset-name'),avC=$('bp-av'),nmC=$('bp-nm'),tailC=$('bp-tail'),perC=$('bp-perchar');
     var name=(nameIn.value||'').trim(); if(!name){ nameIn.focus(); return; }
-    var p={name:name,av:avC.checked,nm:nmC.checked,tail:tailC.checked,photo:phC.checked,right:rtC.checked};
+    var photo=bpGetSeg('bp-type-seg','data-bptype')==='photo';
+    var side=bpGetSeg('bp-side-seg','data-bpside')||'left';
+    var chars=[];
+    if(perC.checked){ [].forEach.call(document.querySelectorAll('#bp-char-select .bp-char-cb'), function(cb){ if(cb.checked) chars.push(cb.value); }); }
+    var p={ name:name, photo:photo, av:avC.checked, nm:nmC.checked, tail: photo?false:tailC.checked, side:side, chars:chars };
     var list=loadBubPresets();
     if(_editingBpIdx>=0 && _editingBpIdx<list.length) list[_editingBpIdx]=p; else list.push(p);
     saveBubPresets(list); renderBubPresets(); closeBpForm();
@@ -4828,6 +4876,9 @@
     $('bubpreset-cancel').addEventListener('click', closeBpForm);
     $('bubpreset-confirm').addEventListener('click', confirmBpSave);
     $('bubpreset-name').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); confirmBpSave(); } else if(e.key==='Escape'){ e.preventDefault(); closeBpForm(); } });
+    [].forEach.call($('bp-type-seg').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ bpSetSeg('bp-type-seg', b.getAttribute('data-bptype'),'data-bptype'); bpApplyType(); }); });
+    [].forEach.call($('bp-side-seg').querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ bpSetSeg('bp-side-seg', b.getAttribute('data-bpside'),'data-bpside'); }); });
+    $('bp-perchar').addEventListener('change', function(){ var csel=$('bp-char-select'); if(csel) csel.hidden=!this.checked; if(this.checked) renderBpCharSelect([]); });
   }
 
   /* ============================================================
