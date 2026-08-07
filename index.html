@@ -1042,7 +1042,7 @@
         <div class="panel is-active" data-panel="content" role="tabpanel">
           <details class="fold" id="fold-body">
             <summary>
-              본문
+              본문 · 본문 사진
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
@@ -1113,17 +1113,9 @@
                 <span class="label">문단 간격 <span class="val" id="para-gap-val">20px</span></span>
                 <div class="rangewrap"><input id="para-gap" type="range" min="0" max="48" step="1" value="20"></div>
               </div>
-            </div>
-          </details>
 
-          <details class="fold" id="fold-logimg">
-            <summary>
-              본문 사진
-              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="fold__body">
-              <p class="hint" style="margin:0 0 12px"><b>＋</b>로 넣는 본문 사진에 적용돼요. (비율은 유지)</p>
-              <div class="grid-2">
+              <p class="section__head" style="margin-top:24px">(＋로 넣는) 본문 사진</p>
+              <div class="grid-2" style="margin-top:2px">
                 <div class="field">
                   <span class="label">사진 크기 <span class="val" id="logimg-size-val">100%</span></span>
                   <div class="rangewrap"><input id="logimg-size" type="range" min="20" max="100" step="5" value="100"></div>
@@ -1356,7 +1348,7 @@
 
           <details class="fold" id="fold-presets" style="margin-top:14px" open>
             <summary>
-              인물 · 말풍선 삽입 설정
+              인물 · 말풍선 삽입
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
@@ -1398,8 +1390,8 @@
                 </div>
               </div>
 
-              <p class="section__head" style="margin-top:24px">말풍선 삽입 설정</p>
-              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 삽입 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향 · 프사 유무 등을 추가 조정 가능해요.</p>
+              <p class="section__head" style="margin-top:24px">말풍선 삽입</p>
+              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 삽입 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향·프사 등을 추가 조정 가능해요.</p>
               <div class="mychips" id="bubpreset-list"></div>
               <div class="repform" id="bubpreset-form" hidden>
                 <div class="field">
@@ -1660,7 +1652,7 @@
           </div>
 
           <div class="section" style="margin-top:20px">
-            <p class="section__head">프리셋</p>
+            <p class="section__head">내 프리셋</p>
             <p class="hint" style="margin:0 0 12px">지금의 설정을 저장해 두고 언제든 다시 불러올 수 있어요.<br>단, 배경 이미지는 프리셋에 저장되지 않아요.</p>
             <div class="mychips" id="my-presets"></div>
             <button class="btn btn--ghost" id="preset-save" type="button" style="height:40px;font-size:12.5px;width:100%">＋ 현재 설정 저장</button>
@@ -1668,18 +1660,18 @@
 
           <div class="section" style="margin-top:20px">
             <p class="section__head">초기화</p>
-            <p class="hint" style="margin:0 0 12px">인물, 프리셋을 제외한 모든 설정과 입력을 처음 상태로 되돌려요.</p>
+            <p class="hint" style="margin:0 0 12px">프리셋(인물·삽입·입력·내)을 제외한 모든 설정과 입력을 처음 상태로 되돌려요.</p>
             <button class="btn btn--ghost" id="t-reset" type="button" style="width:100%;height:42px;font-size:13px;color:var(--danger,#d9534f)">전체 초기화</button>
           </div>
 
           <div class="section" style="margin-top:20px">
             <p class="section__head">특수 초기화</p>
-            <p class="hint" style="margin:0 0 12px">항목별로 따로 초기화해요. (입력 내용·설정은 그대로 유지)</p>
+            <p class="hint" style="margin:0 0 12px">현재 프리셋에 저장된 내용을 초기화해요.</p>
             <div class="grid-2">
-              <button class="btn btn--ghost" id="reset-chars" type="button" style="height:40px;font-size:12px">인물</button>
-              <button class="btn btn--ghost" id="reset-bubpreset" type="button" style="height:40px;font-size:12px">말풍선 삽입 설정</button>
-              <button class="btn btn--ghost" id="reset-replace" type="button" style="height:40px;font-size:12px">입력 프리셋</button>
-              <button class="btn btn--ghost" id="reset-mypreset" type="button" style="height:40px;font-size:12px">프리셋</button>
+              <button class="btn btn--ghost" id="reset-chars" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">인물</button>
+              <button class="btn btn--ghost" id="reset-bubpreset" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">말풍선 삽입</button>
+              <button class="btn btn--ghost" id="reset-replace" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">입력 프리셋</button>
+              <button class="btn btn--ghost" id="reset-mypreset" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">내 프리셋</button>
             </div>
           </div>
 
@@ -4682,7 +4674,7 @@
     render();
   });
   if($('reset-bubpreset')) $('reset-bubpreset').addEventListener('click', function(){
-    if(!confirm('말풍선 삽입 설정을 기본값으로 되돌릴까요?')) return;
+    if(!confirm('말풍선 삽입 프리셋을 기본값으로 되돌릴까요?')) return;
     try{ localStorage.removeItem(BUBPRESET_KEY); }catch(e){}
     if(typeof closeBpForm==='function') closeBpForm();
     renderBubPresets();
