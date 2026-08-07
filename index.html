@@ -2788,6 +2788,21 @@
   editor.addEventListener('keydown', function(e){
     if((e.key==='Backspace'||e.key==='Delete') && _selImg && editor.contains(_selImg)){ e.preventDefault(); removeImg(_selImg); }
   });
+  // 사진 말풍선(말풍선 안 이미지) 클릭: 커서를 사진 오른쪽(말풍선 안)에 두고 말풍선 도구 표시
+  editor.addEventListener('click', function(e){
+    var t=e.target;
+    if(!(t && t.classList && t.classList.contains('g-bub-img'))) return;
+    var host=closestBubble(t); if(!host) return;
+    e.preventDefault();
+    editor.focus();
+    var after=t.nextSibling;
+    var tn=(after && after.nodeType===3) ? after : null;
+    if(!tn){ tn=document.createTextNode('\u200b'); if(after) host.insertBefore(tn, after); else host.appendChild(tn); }
+    var sel=window.getSelection(), r=document.createRange();
+    r.setStart(tn, tn.nodeValue.length); r.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r);
+    saveSel(); updateFormatButtons();
+  });
   function applyFormat(fmt, tail, side, withName, color){
     var sel0 = window.getSelection();
     var saved = (sel0 && sel0.rangeCount && editor.contains(sel0.getRangeAt(0).startContainer)) ? sel0.getRangeAt(0).cloneRange() : null;
@@ -3760,8 +3775,10 @@
       var w = baseW();
       meta.textContent = (sizeMode==='ratio') ? (w+' × '+Math.round(w*ratio.h/ratio.w)+' px') : (w+' px');
     }
-    saveState();
+    scheduleSave();
   }
+  var _renderRAF=0;
+  function renderSoon(){ if(_renderRAF) return; _renderRAF=requestAnimationFrame(function(){ _renderRAF=0; render(); }); }
   var _fr, _lastFitW=0;
   function fitStage(fromObserver){
     if(_fr) cancelAnimationFrame(_fr);
@@ -3780,7 +3797,7 @@
   }
   if(window.ResizeObserver){ new ResizeObserver(function(){ fitStage(true); }).observe(document.querySelector('.preview__scroll')); }
   window.addEventListener('resize', function(){ fitStage(); });
-  editor.addEventListener('input', render);
+  editor.addEventListener('input', renderSoon);
 
   if(nameEd){
     nameEd.addEventListener('input', render);
@@ -4355,6 +4372,13 @@
       catch(e){ try{ data.photoData=null; localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e2){} }
     }catch(e){}
   }
+  // 저장은 무겁다(사진 base64 포함 JSON 직렬화 + localStorage). 타이핑 경로에서 빼고 잠깐 멈춘 뒤 한 번만.
+  var _saveT=null;
+  function scheduleSave(){ if(_restoring) return; if(_saveT) clearTimeout(_saveT); _saveT=setTimeout(function(){ _saveT=null; saveState(); }, 600); }
+  function flushSave(){ if(_saveT){ clearTimeout(_saveT); _saveT=null; } saveState(); }
+  window.addEventListener('pagehide', flushSave);
+  window.addEventListener('beforeunload', flushSave);
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) flushSave(); });
   function safeRestoreValue(id, val){
     var e=$(id); if(!e) return;
     if(e.type==='range'){
