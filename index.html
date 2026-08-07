@@ -721,6 +721,7 @@
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
   #editor .g-img.is-sel:hover::after{color:#fff;background:var(--danger);border-color:var(--danger);}
   #editor .g-bub-img{display:inline-block;vertical-align:bottom;max-width:100%;height:auto;border-radius:11px;margin:0;}
+  #editor .g-bub.has-img{max-width:var(--photo-w,60%);}
   #editor .g-bub.has-img:not(.img-only) .g-bub-img{margin-right:6px;}
   #editor .g-bub.img-only{padding:0 !important;background:transparent !important;}
   #editor .g-bub.img-only .g-bub-img{border-radius:14px;}
@@ -878,6 +879,7 @@
   #canvas .g-bub.recv>svg.g-tail path,.canvas-clone .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea) !important;}
   #canvas .g-bub.send>svg.g-tail path,.canvas-clone .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5) !important;}
   #canvas .g-bub-img,.canvas-clone .g-bub-img{display:inline-block !important;vertical-align:bottom !important;max-width:100% !important;height:auto !important;border-radius:.72em !important;margin:0 !important;}
+  #canvas .g-bub.has-img,.canvas-clone .g-bub.has-img{max-width:var(--photo-w,60%) !important;}
   #canvas .g-bub.has-img:not(.img-only) .g-bub-img,.canvas-clone .g-bub.has-img:not(.img-only) .g-bub-img{margin-right:.4em !important;}
   #canvas .g-bub.img-only,.canvas-clone .g-bub.img-only{padding:0 !important;background:transparent !important;}
   #canvas .g-bub.img-only .g-bub-img,.canvas-clone .g-bub.img-only .g-bub-img{border-radius:1.15em !important;}
@@ -1332,18 +1334,18 @@
               <div class="mychips" id="bubpreset-list"></div>
               <div class="repform" id="bubpreset-form" hidden>
                 <div class="bpseg" id="bp-type-seg">
-                  <button type="button" data-bptype="normal" aria-pressed="true">일반</button>
+                  <button type="button" data-bptype="normal" aria-pressed="true">일반 (글자만)</button>
                   <button type="button" data-bptype="photo" aria-pressed="false">사진</button>
+                </div>
+                <div class="bpseg" id="bp-side-seg">
+                  <button type="button" data-bpside="left" aria-pressed="true">왼쪽 (상대)</button>
+                  <button type="button" data-bpside="right" aria-pressed="false">오른쪽 (나)</button>
                 </div>
                 <input class="txt-input" id="bubpreset-name" type="text" placeholder="프리셋 이름 (예: 상대 기본)" maxlength="20" autocomplete="off">
                 <div class="bpchecks">
                   <label class="pchk"><input type="checkbox" id="bp-av"><span>프사</span></label>
                   <label class="pchk"><input type="checkbox" id="bp-nm"><span>이름</span></label>
                   <label class="pchk" id="bp-tail-wrap"><input type="checkbox" id="bp-tail"><span>꼬리</span></label>
-                </div>
-                <div class="bpseg" id="bp-side-seg">
-                  <button type="button" data-bpside="left" aria-pressed="true">왼쪽 (상대)</button>
-                  <button type="button" data-bpside="right" aria-pressed="false">오른쪽 (나)</button>
                 </div>
                 <label class="pchk pchk--block" id="bp-perchar-wrap"><input type="checkbox" id="bp-perchar"><span>캐릭터마다 다르게 적용</span></label>
                 <div class="bpchars" id="bp-char-select" hidden></div>
@@ -1415,6 +1417,11 @@
                   <button type="button" data-shape="simple" aria-pressed="false" style="padding:7px 2px;line-height:1.35">네모<br><span style="font-size:10px;opacity:.8">(꼬리 없음)</span></button>
                   <span class="seg__thumb"></span>
                 </div>
+              </div>
+
+              <div class="field" style="margin-top:16px">
+                <span class="label">말풍선 사진 크기 <span class="val" id="photo-size-val">60%</span></span>
+                <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="1" value="60"></div>
               </div>
 
               <div class="grid-2" style="margin-top:16px">
@@ -3254,10 +3261,11 @@
     var charBubShown = !!(cbub && cbub.classList.contains('char-bub'));
     var cbTools = $('charbub-tools'); if(cbTools){ cbTools.hidden = !charBubShown; }
     var low = document.querySelector('.editor-fixed .lowtools'); if(low){ low.hidden = !charBubShown; }
-    // 사진 말풍선(이미지 포함)이면 꼬리 버튼 숨김 + 도구줄 5칸
-    var isPhotoBub = !!(cbub && cbub.querySelector && cbub.querySelector('img'));
-    var cbTail = $('cb-tail'); if(cbTail){ cbTail.hidden = isPhotoBub; }
-    if(cbTools){ cbTools.style.gridTemplateColumns = 'repeat('+(isPhotoBub?5:6)+',1fr)'; }
+    // 사진만 있는 말풍선(캡션 없음)이면 꼬리 버튼 숨김 + 도구줄 5칸. 사진+캡션이면 꼬리 표시.
+    var hasImg = !!(cbub && cbub.querySelector && cbub.querySelector('img'));
+    var imgOnly = hasImg && cbub && (cbub.textContent||'').replace(/\u200b/g,'').trim()==='';
+    var cbTail = $('cb-tail'); if(cbTail){ cbTail.hidden = imgOnly; }
+    if(cbTools){ cbTools.style.gridTemplateColumns = 'repeat('+(imgOnly?5:6)+',1fr)'; }
   }
   editor.addEventListener('keyup', updateFormatButtons);
   editor.addEventListener('mouseup', updateFormatButtons);
@@ -3626,6 +3634,7 @@
     if(bbg){ el.style.setProperty('--bub-body-gap', parseFloat(bbg.value)+'px'); }
     if(pg){ el.style.setProperty('--para-gap', parseFloat(pg.value)+'px'); }
     if(sg){ el.style.setProperty('--stack-gap', parseFloat(sg.value)+'px'); }
+    var psz=$('photo-size'); if(psz){ el.style.setProperty('--photo-w', parseFloat(psz.value)+'%'); }
     var tf=$('title-font'), nf=$('name-font');
     el.style.setProperty('--title-font', (tf && tf.value) ? tf.value : $('font').value);
     el.style.setProperty('--name-font', (nf && nf.value) ? nf.value : $('font').value);
@@ -3864,6 +3873,7 @@
   }
   function render(){
     bgValue = effectiveBg();
+    var _psz=$('photo-size'); if(_psz) editor.style.setProperty('--photo-w', parseFloat(_psz.value)+'%');
     cleanOrphanNames();
     updateEmptyBubbles();
     styleCharBubbles(editor);
@@ -3994,8 +4004,10 @@
     if(sg){ var sgv=$('stack-gap-val'); if(sgv) sgv.textContent=parseFloat(sg.value)+'px'; }
     var barg=$('bar-body-gap');
     if(barg){ var bargv=$('bar-body-gap-val'); if(bargv) bargv.textContent=parseFloat(barg.value)+'px'; }
+    var psz=$('photo-size');
+    if(psz){ var pszv=$('photo-size-val'); if(pszv) pszv.textContent=parseFloat(psz.value)+'%'; }
   }
-  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','title-font','name-font'].forEach(function(id){
+  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','title-font','name-font'].forEach(function(id){
     var e=$(id); if(e){ e.addEventListener('input', function(){ updateTitleSizeLabels(); render(); }); e.addEventListener('change', function(){ updateTitleSizeLabels(); render(); }); }
   });
 
@@ -4470,7 +4482,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
