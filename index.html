@@ -2670,8 +2670,30 @@
           }
           saveSel(); render(); return;
         }
+        // 말풍선 바로 뒤 빈 줄(제로폭/빈 텍스트)에서 백스페이스: 한 번에 지우고 커서를 말풍선 끝으로
+        var sc2=sel.getRangeAt(0).startContainer;
+        if(sc2 && sc2.nodeType===3 && sc2.nodeValue.replace(/\u200b/g,'')==='' && !isBubbleSeparatorZwsp(sc2)){
+          var pv2=sc2.previousSibling;
+          while(pv2 && ((pv2.nodeType===1 && pv2.tagName==='BR') || (pv2.nodeType===3 && pv2.nodeValue.replace(/\u200b/g,'')==='' && !isBubbleSeparatorZwsp(pv2)))){ pv2=pv2.previousSibling; }
+          if(pv2 && pv2.nodeType===1 && pv2.classList && pv2.classList.contains('g-bub')){
+            e.preventDefault();
+            var del=sc2;
+            while(del && del!==pv2){
+              var prevD=del.previousSibling;
+              if((del.nodeType===3 && del.nodeValue.replace(/\u200b/g,'')==='' && !isBubbleSeparatorZwsp(del)) || (del.nodeType===1 && del.tagName==='BR')){ if(del.parentNode) del.parentNode.removeChild(del); }
+              else break;
+              del=prevD;
+            }
+            var tn3=null, wk3=document.createTreeWalker(pv2, NodeFilter.SHOW_TEXT, null, false), xx3;
+            while(xx3=wk3.nextNode()){ tn3=xx3; }
+            var rr3=document.createRange();
+            if(tn3){ rr3.setStart(tn3, tn3.nodeValue.length); rr3.collapse(true); } else { rr3.selectNodeContents(pv2); rr3.collapse(false); }
+            sel.removeAllRanges(); sel.addRange(rr3);
+            saveSel(); render(); return;
+          }
+        }
         var eb=caretInBubble();
-        if(eb && eb.classList.contains('char-bub') && (eb.textContent||'').replace(/\u200b/g,'')===''){
+        if(eb && eb.classList.contains('char-bub') && !eb.querySelector('img') && (eb.textContent||'').replace(/\u200b/g,'')===''){
           e.preventDefault(); removeEmptyCharBub(eb); return;
         }
       }
@@ -2742,11 +2764,11 @@
     }
     var im=document.createElement('img'); im.className='g-bub-img'; im.src=url; im.alt='';
     bub.appendChild(im);
-    var capNode=document.createTextNode('\u200b');   // 캡션 커서 자리(정리에서 보존)
-    bub.appendChild(capNode);
     out.appendChild(bub);
     range.collapse(false); range.insertNode(out);
-    var r=document.createRange(); r.setStart(capNode, capNode.nodeValue.length); r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
+    if(bub.nextSibling && bub.nextSibling.nodeType===1 && bub.nextSibling.tagName==='BR'){ bub.nextSibling.parentNode.removeChild(bub.nextSibling); }
+    // 커서를 말풍선 안(사진 오른쪽) 끝에 — 제로폭 앵커 없이
+    var r=document.createRange(); r.selectNodeContents(bub); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
     cleanEditor(); if(typeof absorbBubBreak==='function') absorbBubBreak(bub); styleCharBubbles(editor); render(); saveSel(); updateFormatButtons();
   }
   if(_imgFile){
@@ -3307,7 +3329,7 @@
       var sel=window.getSelection();
       if(sel && sel.rangeCount && sel.isCollapsed){
         var eb=caretInBubble();
-        if(eb && eb.classList.contains('char-bub') && (eb.textContent||'').replace(/\u200b/g,'')===''){
+        if(eb && eb.classList.contains('char-bub') && !eb.querySelector('img') && (eb.textContent||'').replace(/\u200b/g,'')===''){
           e.preventDefault(); removeEmptyCharBub(eb); return;
         }
       }
