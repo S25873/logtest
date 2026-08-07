@@ -714,6 +714,8 @@
   #editor .g-hr.dots{letter-spacing:.4em;color:var(--ink-3);height:auto;}
   #editor .g-hr.short:before{content:"";display:block;width:40px;height:1px;background:var(--ink-3);}
   #editor .g-img{display:block;margin:6px 0;text-align:center;position:relative;cursor:pointer;border-radius:10px;}
+  #editor .g-img.al-left{text-align:left;}
+  #editor .g-img.al-right{text-align:right;}
   #editor .g-img img{max-width:100%;height:auto;border-radius:10px;display:inline-block;vertical-align:top;}
   #editor .g-img.is-sel{box-shadow:0 0 0 2px var(--accent);}
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
@@ -850,6 +852,8 @@
   #canvas .g-hr.dots,.canvas-clone .g-hr.dots{letter-spacing:.4em !important;font-size:.9em !important;height:auto !important;color:var(--hr-color,rgba(140,140,140,.55)) !important;}
   #canvas .g-hr.short:before,.canvas-clone .g-hr.short:before{content:"" !important;display:block !important;width:12% !important;height:2px !important;background:var(--hr-color,rgba(140,140,140,.6)) !important;}
   #canvas .g-img,.canvas-clone .g-img{display:block !important;margin:.5em 0 !important;text-align:center !important;}
+  #canvas .g-img.al-left,.canvas-clone .g-img.al-left{text-align:left !important;}
+  #canvas .g-img.al-right,.canvas-clone .g-img.al-right{text-align:right !important;}
   #canvas .g-img img,.canvas-clone .g-img img{max-width:100% !important;height:auto !important;border-radius:.5em !important;display:inline-block !important;vertical-align:top !important;}
   #canvas .g-name,.canvas-clone .g-name{display:block !important;margin-top:var(--name-gap,1.6em) !important;font-size:var(--name-size,.7em) !important;font-weight:400 !important;font-family:var(--name-font,inherit) !important;color:var(--name-color,#5a5a5a) !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-name.right,.canvas-clone .g-name.right{text-align:right !important;}
@@ -2760,8 +2764,17 @@
        용량 폭주 방지를 위해 긴 변 1400px로 축소해 저장.
      ============================================================ */
   var _imgFile = $('img-file');
-  var _imgMode = null;   // null → 로그 이미지 블록, {side,charId,tail,withName} → 사진 말풍선
-  function pickLogImage(){ _imgMode=null; if(_imgFile) _imgFile.click(); }
+  var _imgMode = null;   // null → 로그 이미지 블록, {side,charId,tail,...} → 사진 말풍선
+  var _imgAlign = 'center';
+  function pickLogImage(align){ _imgMode=null; _imgAlign=align||'center'; if(_imgFile) _imgFile.click(); }
+  function photoAlignSheet(){
+    var al=function(t){ var pos={left:'4 12',center:'8 12',right:'12 12'}; return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="'+(t==='left'?4:(t==='right'?10:6))+'" y1="12" x2="'+(t==='left'?14:(t==='right'?20:18))+'" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></span>'; };
+    openSheetDef({ title:'사진 정렬', options:[
+      { label:'왼쪽', preview:al('left'), noFocus:true, run:function(){ pickLogImage('left'); } },
+      { label:'가운데', preview:al('center'), noFocus:true, run:function(){ pickLogImage('center'); } },
+      { label:'오른쪽', preview:al('right'), noFocus:true, run:function(){ pickLogImage('right'); } }
+    ]});
+  }
   function pickPhotoBubble(desc){ _imgMode=desc||{side:'left'}; saveSel(); if(_imgFile) _imgFile.click(); }
   function downscaleImage(src, maxDim, cb){
     var img=new Image();
@@ -2784,7 +2797,7 @@
   function insertLogImage(url){
     editor.focus(); restoreSel();
     var sel=window.getSelection();
-    var box=document.createElement('div'); box.className='g-img'; box.setAttribute('contenteditable','false');
+    var box=document.createElement('div'); box.className='g-img al-'+(_imgAlign||'center'); box.setAttribute('contenteditable','false');
     var im=document.createElement('img'); im.src=url; im.alt=''; box.appendChild(im);
     if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)){
       var range=sel.getRangeAt(0); range.collapse(false); range.insertNode(box);
@@ -2980,7 +2993,7 @@
   var removeSwatchHtml = '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.8"/><line x1="6.5" y1="17.5" x2="17.5" y2="6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>';
   var SHEETS = {
     insert: { title: '삽입', options: [
-      { label: '사진', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="10" r="1.6" fill="currentColor"/><path d="M4 17l4.5-4.5 3.5 3.5 3-3L20 16.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>', noFocus:true, run: function(){ pickLogImage(); } },
+      { label: '사진', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="10" r="1.6" fill="currentColor"/><path d="M4 17l4.5-4.5 3.5 3.5 3-3L20 16.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>', noFocus:true, run: function(){ photoAlignSheet(); } },
       { label: '인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="10" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', noFocus:true, run: function(){ openSheet('quote'); } },
       { label: '구분선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', noFocus:true, run: function(){ openSheet('hr'); } }
     ]},
@@ -3700,8 +3713,9 @@
         if(spBlk){
           if(spBlk==='g-img'){
             var _im0=ch.querySelector('img'); var _isrc=_im0?(_im0.getAttribute('src')||''):'';
+            var _al=ch.classList.contains('al-left')?' al-left':(ch.classList.contains('al-right')?' al-right':(ch.classList.contains('al-center')?' al-center':''));
             for(var ki=ch.attributes.length-1;ki>=0;ki--){ ch.removeAttribute(ch.attributes[ki].name); }
-            ch.className='g-img'; ch.setAttribute('contenteditable','false'); ch.innerHTML='';
+            ch.className='g-img'+_al; ch.setAttribute('contenteditable','false'); ch.innerHTML='';
             if(_isrc){ var _ni=document.createElement('img'); _ni.setAttribute('src',_isrc); _ni.setAttribute('alt',''); ch.appendChild(_ni); }
             return;
           }
