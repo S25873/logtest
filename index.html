@@ -2895,6 +2895,18 @@
     sel.removeAllRanges(); sel.addRange(r);
     saveSel(); updateFormatButtons();
   });
+  // 이름표(편집 불가) 클릭: 커서를 이름 바로 앞에 둬서 위쪽 빈 줄을 백스페이스로 지울 수 있게
+  editor.addEventListener('click', function(e){
+    var t=e.target;
+    var nameEl=(t && t.closest) ? t.closest('.g-bub-name') : null;
+    if(!nameEl || !editor.contains(nameEl)) return;
+    e.preventDefault();
+    editor.focus();
+    var sel=window.getSelection(), r=document.createRange();
+    r.setStartBefore(nameEl); r.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r);
+    saveSel(); updateFormatButtons();
+  });
   function applyFormat(fmt, tail, side, withName, color){
     var sel0 = window.getSelection();
     var saved = (sel0 && sel0.rangeCount && editor.contains(sel0.getRangeAt(0).startContainer)) ? sel0.getRangeAt(0).cloneRange() : null;
