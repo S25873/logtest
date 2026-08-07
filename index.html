@@ -4433,8 +4433,8 @@
   /* ===== 큰따옴표 → 인물 말풍선 ===== */
   function currentCharId(){ return (characters && characters.length) ? characters[0].id : null; }
   // mode: 'plain'(말풍선만) | 'named'(사진+이름: 말풍선마다 각각 이름+아바타)
-  function quoteToBubbles(mode){
-    var cid=currentCharId();
+  function quoteToBubbles(mode, cid){
+    if(cid===undefined) cid=currentCharId();
     var re=/[\u201C\u201D\u201E\u201F\u2033"]([^\u201C\u201D\u201E\u201F\u2033"\n]*)[\u201C\u201D\u201E\u201F\u2033"]/g;
     replaceInText(re, function(m){
       var inner=m[1]; var out=document.createDocumentFragment();
@@ -4452,12 +4452,18 @@
       return out;
     }, isBubEl, true);
   }
-  function openQuoteBubbleSheet(){
-    var cid=currentCharId(), c=cid?findChar(cid):null, col=c?c.bub:'#e5e5ea';
+  function openQuoteStyleSheet(cid){
+    var c=cid?findChar(cid):null, col=c?c.bub:'#e5e5ea';
     openSheetDef({ title:'따옴표 → 말풍선'+((c&&c.name)?(' · '+c.name):''), options:[
-      { label:'말풍선만', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles('plain'); } },
-      { label:'사진+이름', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles('named'); } }
+      { label:'말풍선만', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles('plain', cid); } },
+      { label:'사진+이름', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles('named', cid); } }
     ]});
+  }
+  function openQuoteBubbleSheet(){
+    if(!characters || !characters.length){ openQuoteStyleSheet(null); return; }
+    openSheetDef({ title:'따옴표 → 말풍선 · 인물 선택', options: characters.map(function(c){
+      return { label:c.name||'(이름 없음)', preview:function(){ return '<span class="s-preview"><i style="display:block;width:20px;height:20px;border-radius:50%;background:'+c.bub+'"></i></span>'; }, noFocus:true, run:function(){ openQuoteStyleSheet(c.id); } };
+    }) });
   }
 
   /* ============================================================
