@@ -645,6 +645,8 @@
     padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;
   }
   .repform[hidden]{display:none;}
+  #bubpreset-form{gap:0;}
+  #bubpreset-form .repform__btns{margin-top:16px;}
   .repform__arrow{text-align:center;color:var(--ink-3);font-size:15px;line-height:1;user-select:none;}
   .repform__btns{display:flex;gap:8px;justify-content:flex-end;margin-top:2px;}
   .repform__btns .btn{flex:none;height:36px;padding:0 18px;font-size:12.5px;border-radius:var(--radius-sm);}
@@ -754,8 +756,10 @@
   #editor .g-bub-name:empty:before{content:"이름";color:var(--ink-3);opacity:.7;}
   /* 말풍선 모양: 심플(각지고 꼬리 없음) */
   #editor.bub-simple .g-bub{border-radius:6px;}
+  #editor.bub-simple .g-bub-img,#editor.bub-simple .g-bub.img-only .g-bub-img{border-radius:5px;}
   #editor.bub-simple .g-bub>svg.g-tail{display:none;}
   #canvas.bub-simple .g-bub,.canvas-clone.bub-simple .g-bub{border-radius:.4em !important;}
+  #canvas.bub-simple .g-bub-img,.canvas-clone.bub-simple .g-bub-img,#canvas.bub-simple .g-bub.img-only .g-bub-img,.canvas-clone.bub-simple .g-bub.img-only .g-bub-img{border-radius:.32em !important;}
   #canvas.bub-simple .g-bub>svg.g-tail,.canvas-clone.bub-simple .g-bub>svg.g-tail{display:none !important;}
   /* 말풍선 모양: 심플(둥근 말풍선. 기본은 꼬리 없음=완전 둥글게, '꼬리'(.tail)가 켜진 칸만 이미지(아바타) 쪽 위 모서리를 각지게) */
   #editor.bub-soft .g-bub>svg.g-tail{display:none;}
@@ -1324,46 +1328,13 @@
             <p class="hint" id="char-insert-empty" style="margin:0">아직 인물이 없어요. 아래 <b>인물</b>에서 먼저 추가하세요.</p>
           </div>
 
-          <details class="fold" id="fold-bubpreset" style="margin-top:14px" open>
+          <details class="fold" id="fold-presets" style="margin-top:14px" open>
             <summary>
-              말풍선 프리셋
+              인물 · 말풍선 삽입 설정
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
-              <p class="hint" style="margin:0 0 12px">인물을 누르면 아래 프리셋들이 떠요. 프리셋을 클릭하면 수정할 수 있어요.</p>
-              <div class="mychips" id="bubpreset-list"></div>
-              <div class="repform" id="bubpreset-form" hidden>
-                <div class="bpseg" id="bp-type-seg">
-                  <button type="button" data-bptype="normal" aria-pressed="true">일반 (글자만)</button>
-                  <button type="button" data-bptype="photo" aria-pressed="false">사진</button>
-                </div>
-                <div class="bpseg" id="bp-side-seg">
-                  <button type="button" data-bpside="left" aria-pressed="true">왼쪽 (상대)</button>
-                  <button type="button" data-bpside="right" aria-pressed="false">오른쪽 (나)</button>
-                </div>
-                <input class="txt-input" id="bubpreset-name" type="text" placeholder="프리셋 이름 (예: 상대 기본)" maxlength="20" autocomplete="off">
-                <div class="bpchecks">
-                  <label class="pchk"><input type="checkbox" id="bp-av"><span>프사</span></label>
-                  <label class="pchk"><input type="checkbox" id="bp-nm"><span>이름</span></label>
-                  <label class="pchk" id="bp-tail-wrap"><input type="checkbox" id="bp-tail"><span>꼬리</span></label>
-                </div>
-                <label class="pchk pchk--block" id="bp-perchar-wrap"><input type="checkbox" id="bp-perchar"><span>캐릭터마다 다르게 적용</span></label>
-                <div class="bpchars" id="bp-char-select" hidden></div>
-                <div class="repform__btns">
-                  <button class="btn btn--ghost" id="bubpreset-cancel" type="button">취소</button>
-                  <button class="btn btn--primary" id="bubpreset-confirm" type="button">저장</button>
-                </div>
-              </div>
-              <button class="btn btn--ghost" id="bubpreset-add" type="button" style="height:40px;font-size:12.5px;width:100%">＋ 프리셋 추가</button>
-            </div>
-          </details>
-
-          <details class="fold" id="fold-char" style="margin-top:14px">
-            <summary>
-              인물
-              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="fold__body">
+              <p class="section__head">인물</p>
               <p class="hint" style="margin:0 0 12px">만들어 둔 인물을 말풍선 생성에 사용할 수 있어요.</p>
               <div class="char-list" id="char-list"></div>
               <button class="btn btn--ghost" id="char-add" type="button" style="height:40px;font-size:12.5px;width:100%">+ 인물 추가</button>
@@ -1400,6 +1371,48 @@
                   <button class="btn btn--primary" id="char-save" type="button" style="height:42px;font-size:12.5px;flex:none;width:76px;padding:0">저장</button>
                 </div>
               </div>
+
+              <p class="section__head" style="margin-top:24px">말풍선 삽입 설정</p>
+              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 삽입 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장해둘 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향 · 프사 유무 등을 추가 조정할 수 있어요.</p>
+              <div class="mychips" id="bubpreset-list"></div>
+              <div class="repform" id="bubpreset-form" hidden>
+                <div class="field">
+                  <span class="label">종류</span>
+                  <div class="bpseg" id="bp-type-seg">
+                    <button type="button" data-bptype="normal" aria-pressed="true">일반 (글자만)</button>
+                    <button type="button" data-bptype="photo" aria-pressed="false">사진</button>
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="label">방향</span>
+                  <div class="bpseg" id="bp-side-seg">
+                    <button type="button" data-bpside="left" aria-pressed="true">왼쪽 (상대)</button>
+                    <button type="button" data-bpside="right" aria-pressed="false">오른쪽 (나)</button>
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="label">이름</span>
+                  <input class="txt-input" id="bubpreset-name" type="text" placeholder="프리셋 이름" maxlength="20" autocomplete="off">
+                </div>
+                <div class="field">
+                  <span class="label">표시 항목</span>
+                  <div class="bpchecks">
+                    <label class="pchk"><input type="checkbox" id="bp-av"><span>프사</span></label>
+                    <label class="pchk"><input type="checkbox" id="bp-nm"><span>이름</span></label>
+                    <label class="pchk" id="bp-tail-wrap"><input type="checkbox" id="bp-tail"><span>꼬리</span></label>
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="label">적용 대상</span>
+                  <label class="pchk pchk--block" id="bp-perchar-wrap"><input type="checkbox" id="bp-perchar"><span>캐릭터마다 다르게 적용</span></label>
+                  <div class="bpchars" id="bp-char-select" hidden></div>
+                </div>
+                <div class="repform__btns">
+                  <button class="btn btn--ghost" id="bubpreset-cancel" type="button">취소</button>
+                  <button class="btn btn--primary" id="bubpreset-confirm" type="button">저장</button>
+                </div>
+              </div>
+              <button class="btn btn--ghost" id="bubpreset-add" type="button" style="height:40px;font-size:12.5px;width:100%">＋ 프리셋 추가</button>
             </div>
           </details>
 
@@ -1417,11 +1430,6 @@
                   <button type="button" data-shape="simple" aria-pressed="false" style="padding:7px 2px;line-height:1.35">네모<br><span style="font-size:10px;opacity:.8">(꼬리 없음)</span></button>
                   <span class="seg__thumb"></span>
                 </div>
-              </div>
-
-              <div class="field" style="margin-top:16px">
-                <span class="label">말풍선 사진 크기 <span class="val" id="photo-size-val">60%</span></span>
-                <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="1" value="60"></div>
               </div>
 
               <div class="grid-2" style="margin-top:16px">
@@ -1443,6 +1451,11 @@
                   <span class="label">상하단바 ↔ 본문 <span class="val" id="bar-body-gap-val">32px</span></span>
                   <div class="rangewrap"><input id="bar-body-gap" type="range" min="0" max="72" step="1" value="32"></div>
                 </div>
+              </div>
+
+              <div class="field" style="margin-top:16px">
+                <span class="label">말풍선 사진 크기 <span class="val" id="photo-size-val">60%</span></span>
+                <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="1" value="60"></div>
               </div>
 
               <p class="section__head" style="margin-top:18px">아이메시지 상하단바</p>
@@ -2521,16 +2534,23 @@
   // 말풍선 방향 아이콘: 굵은 세로 막대를 해당 방향 가장자리에 두고 말풍선을 그쪽에 붙여 방향만 강조
   function sideBubIcon(side, color){
     var L = side==='left';
-    var bar = '<rect x="'+(L?2:19)+'" y="3.5" width="3" height="17" rx="1.5" fill="currentColor"/>';
-    var bub = '<rect x="'+(L?7:6)+'" y="8" width="11" height="8" rx="4" fill="'+color+'" stroke="rgba(0,0,0,.14)" stroke-width="1"/>';
-    return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+bar+bub+'</svg></span>';
+    var st = 'stroke="rgba(0,0,0,.1)" stroke-width="0.8"';
+    var tail = L ? '<path d="M6.5 15 L4.3 18 L10 15 Z" fill="'+color+'"/>'
+                 : '<path d="M17.5 15 L19.7 18 L14 15 Z" fill="'+color+'"/>';
+    var rect = '<rect x="'+(L?3:6)+'" y="6.5" width="15" height="9" rx="4.2" fill="'+color+'" '+st+'/>';
+    return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+tail+rect+'</svg></span>';
   }
   function photoBubIcon(side, color){
     var L = side==='left';
-    var bar = '<rect x="'+(L?2:19)+'" y="3.5" width="3" height="17" rx="1.5" fill="currentColor"/>';
-    var frame = '<rect x="'+(L?7:6)+'" y="7" width="11" height="10" rx="2.4" fill="'+color+'" stroke="rgba(0,0,0,.16)" stroke-width="1"/>';
-    var pic = '<circle cx="'+(L?10.5:9.5)+'" cy="10.5" r="1.1" fill="rgba(255,255,255,.9)"/><path d="M'+(L?7.6:6.6)+' 16l2.4-2.6 1.7 1.7 1.9-2.1 2.4 3z" fill="rgba(255,255,255,.9)"/>';
-    return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+bar+frame+pic+'</svg></span>';
+    var st = 'stroke="rgba(0,0,0,.1)" stroke-width="0.8"';
+    var bx = L ? 3 : 6;
+    var tail = L ? '<path d="M6.5 15 L4.3 18 L10 15 Z" fill="'+color+'"/>'
+                 : '<path d="M17.5 15 L19.7 18 L14 15 Z" fill="'+color+'"/>';
+    var rect = '<rect x="'+bx+'" y="6.5" width="15" height="9" rx="2.6" fill="'+color+'" '+st+'/>';
+    var gx = bx+3;
+    var pic = '<circle cx="'+(gx+1)+'" cy="9.6" r="0.95" fill="rgba(255,255,255,.92)"/>'
+            + '<path d="M'+gx+' 13.4 l2.3-2.4 1.7 1.7 1.6-1.8 2.1 2.5 z" fill="rgba(255,255,255,.92)"/>';
+    return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+tail+rect+pic+'</svg></span>';
   }
   function openCharInsertSheet(charId){
     var c=findChar(charId); if(!c) return;
@@ -2888,11 +2908,21 @@
     if((e.key==='Backspace'||e.key==='Delete') && _selImg && editor.contains(_selImg)){ e.preventDefault(); removeImg(_selImg); }
   });
   // 사진 말풍선(말풍선 안 이미지) 클릭: 커서를 사진 오른쪽(말풍선 안)에 두고 말풍선 도구 표시
+  var _activeBub=null;   // 터치에서 포커스(키보드) 없이 도구가 대상으로 삼을 말풍선
   editor.addEventListener('click', function(e){
     var t=e.target;
-    if(!(t && t.classList && t.classList.contains('g-bub-img'))) return;
+    var isBubImg = t && t.classList && t.classList.contains('g-bub-img');
+    if(!isBubImg){ if(_activeBub){ _activeBub=null; updateFormatButtons(); } return; }
     var host=closestBubble(t); if(!host) return;
     e.preventDefault();
+    if(IS_TOUCH){
+      // 모바일: 키보드 안 뜨게 포커스/캡션 커서 없이 대상 말풍선만 기억하고 도구 표시
+      _activeBub=host;
+      var s=window.getSelection(); if(s) s.removeAllRanges();
+      editor.blur();
+      updateFormatButtons();
+      return;
+    }
     editor.focus();
     var after=t.nextSibling;
     var tn=(after && after.nodeType===3) ? after : null;
@@ -3175,9 +3205,11 @@
     if(!btn) return;
     bindTap(btn, function(e){
       if(e){ e.preventDefault(); e.stopPropagation(); }
-      editor.focus(); restoreSel();
-      var b = caretInBubble();
+      var b = caretInBubble() || ((_activeBub && editor.contains(_activeBub)) ? _activeBub : null);
+      var isPhoto = !!(b && b.querySelector && b.querySelector('img'));
+      if(!(IS_TOUCH && isPhoto)){ editor.focus(); restoreSel(); b = caretInBubble() || b; }
       if(isCharBub(b)){ action(b); cleanEditor(); styleCharBubbles(editor); render(); saveSel(); }
+      if(IS_TOUCH){ _activeBub = (b && editor.contains(b)) ? b : null; }
       updateFormatButtons();
     });
   }
@@ -3189,8 +3221,9 @@
   if($('cb-char')){
     bindTap($('cb-char'), function(e){
       if(e){ e.preventDefault(); e.stopPropagation(); }
-      editor.focus(); restoreSel();
-      var b = caretInBubble();
+      var b = caretInBubble() || ((_activeBub && editor.contains(_activeBub)) ? _activeBub : null);
+      var isPhoto = !!(b && b.querySelector && b.querySelector('img'));
+      if(!(IS_TOUCH && isPhoto)){ editor.focus(); restoreSel(); b = caretInBubble() || b; }
       if(!isCharBub(b) || !characters.length) return;
       openSheetDef({ title:'인물 변경', options: characters.map(function(c){
         return { label:c.name||'(이름 없음)', preview:function(){ return '<span class="s-preview"><i style="display:block;width:20px;height:20px;border-radius:50%;background:'+c.bub+'"></i></span>'; },
@@ -3258,6 +3291,7 @@
       btn.classList.toggle('is-active', node ? hasFormat(node, fmt) : false);
     });
     var cbub = node ? closestBubble(node) : null;
+    if(!node && _activeBub && editor.contains(_activeBub)) cbub = _activeBub;   // 터치: 포커스 없이 사진 말풍선 도구 유지
     var charBubShown = !!(cbub && cbub.classList.contains('char-bub'));
     var cbTools = $('charbub-tools'); if(cbTools){ cbTools.hidden = !charBubShown; }
     var low = document.querySelector('.editor-fixed .lowtools'); if(low){ low.hidden = !charBubShown; }
@@ -4904,7 +4938,7 @@
     renderBpCharSelect(p.chars||[]);
     bpApplyType();
     okBtn.textContent=_editingBpIdx>=0?'저장':'추가';
-    form.hidden=false; addBtn.hidden=true; nameIn.focus();
+    form.hidden=false; addBtn.hidden=true; if(!IS_TOUCH) nameIn.focus();
   }
   function closeBpForm(){ var form=$('bubpreset-form'),addBtn=$('bubpreset-add'); if(form) form.hidden=true; if(addBtn) addBtn.hidden=false; _editingBpIdx=-1; }
   function confirmBpSave(){
