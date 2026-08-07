@@ -421,6 +421,7 @@
   }
   .fbtn:hover{background:var(--surface-2);border-color:var(--line-strong);}
   .fbtn:active{transform:scale(.95);}
+  .fbtn[hidden]{display:none;}
   .fbtn.is-active{background:var(--accent);border-color:var(--accent);color:var(--ink-on-accent);}
   /* 모든 서식 글자를 동일 기준으로 통일 */
   .fbtn b,.fbtn i,.fbtn .u,.fbtn s,.fbtn .c-ic,.fbtn .h-ic,.fbtn .sub-ic,.fbtn .hr-ic{
@@ -706,7 +707,7 @@
   #editor .g-img.is-sel{box-shadow:0 0 0 2px var(--accent);}
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
   #editor .g-img.is-sel:hover::after{color:#fff;background:var(--danger);border-color:var(--danger);}
-  #editor .g-bub-img{display:inline-block;vertical-align:top;max-width:100%;height:auto;border-radius:11px;margin:0;}
+  #editor .g-bub-img{display:inline-block;vertical-align:bottom;max-width:100%;height:auto;border-radius:11px;margin:0;}
   #editor .g-bub.has-img:not(.img-only) .g-bub-img{margin-right:6px;}
   #editor .g-bub.img-only{padding:0 !important;background:transparent !important;}
   #editor .g-bub.img-only .g-bub-img{border-radius:14px;}
@@ -847,7 +848,7 @@
   #canvas .g-name.s-bar.left,.canvas-clone .g-name.s-bar.left{border-left:.16em solid var(--bar-color,rgba(140,140,140,.4)) !important;padding-left:.55em !important;}
   #canvas .g-name.s-bar.right,.canvas-clone .g-name.s-bar.right{border-right:.16em solid var(--bar-color,rgba(140,140,140,.4)) !important;padding-right:.55em !important;}
   #canvas .g-bub,.canvas-clone .g-bub{display:block !important;position:relative !important;max-width:75% !important;width:fit-content !important;margin:var(--stack-gap,.15em) 0 !important;padding:.5em .875em !important;border-radius:1.15em !important;text-align:left !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;word-break:normal !important;line-height:1.25 !important;}
-  #canvas .g-bub.cont + .g-bub,.canvas-clone .g-bub.cont + .g-bub,#canvas .g-bub + .g-bub.cont,.canvas-clone .g-bub + .g-bub.cont{margin-top:.15em !important;}
+  #canvas .g-bub.cont + .g-bub,.canvas-clone .g-bub.cont + .g-bub,#canvas .g-bub + .g-bub.cont,.canvas-clone .g-bub + .g-bub.cont{margin-top:var(--stack-gap,.15em) !important;}
   #canvas .g-bub:first-child,.canvas-clone .g-bub:first-child{margin-top:0 !important;}
   #canvas .g-bub.recv,.canvas-clone .g-bub.recv{margin-right:auto !important;margin-left:.4em !important;background:var(--bub-recv,#e5e5ea) !important;color:var(--bub-recv-ink,#000) !important;}
   #canvas .g-bub.send,.canvas-clone .g-bub.send{margin-left:auto !important;margin-right:.4em !important;background:var(--bub-send,#248bf5) !important;color:var(--bub-send-ink,#fff) !important;}
@@ -861,7 +862,7 @@
   #canvas .g-bub.send>svg.g-tail,.canvas-clone .g-bub.send>svg.g-tail{right:-.42em !important;transform:scaleX(-1) !important;}
   #canvas .g-bub.recv>svg.g-tail path,.canvas-clone .g-bub.recv>svg.g-tail path{fill:var(--bub-recv,#e5e5ea) !important;}
   #canvas .g-bub.send>svg.g-tail path,.canvas-clone .g-bub.send>svg.g-tail path{fill:var(--bub-send,#248bf5) !important;}
-  #canvas .g-bub-img,.canvas-clone .g-bub-img{display:inline-block !important;vertical-align:top !important;max-width:100% !important;height:auto !important;border-radius:.72em !important;margin:0 !important;}
+  #canvas .g-bub-img,.canvas-clone .g-bub-img{display:inline-block !important;vertical-align:bottom !important;max-width:100% !important;height:auto !important;border-radius:.72em !important;margin:0 !important;}
   #canvas .g-bub.has-img:not(.img-only) .g-bub-img,.canvas-clone .g-bub.has-img:not(.img-only) .g-bub-img{margin-right:.4em !important;}
   #canvas .g-bub.img-only,.canvas-clone .g-bub.img-only{padding:0 !important;background:transparent !important;}
   #canvas .g-bub.img-only .g-bub-img,.canvas-clone .g-bub.img-only .g-bub-img{border-radius:1.15em !important;}
@@ -2476,10 +2477,10 @@
     openSheetDef({ title:(c.name||'인물')+' 말풍선', options:[
       { label:'이름+사진', preview:sideBubIcon('left',col), run:function(){ insertCharBubbles(charId,'left','tail'); } },
       { label:'말풍선만', preview:sideBubIcon('left',col), run:function(){ insertCharBubbles(charId,'left','cont'); } },
-      { label:'사진 메시지', preview:photoBubIcon('left',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'left', tail:true, withName:true}); } },
+      { label:'사진 메시지', preview:photoBubIcon('left',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'left', tail:false, withName:true}); } },
       { label:'이름+사진', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','tail'); } },
       { label:'말풍선만', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','cont'); } },
-      { label:'사진 메시지', preview:photoBubIcon('right',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'right', tail:true, withName:true}); } }
+      { label:'사진 메시지', preview:photoBubIcon('right',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'right', tail:false, withName:true}); } }
     ]});
   }
   function applyBubble(kind, tail, withName){
@@ -3150,6 +3151,10 @@
     var charBubShown = !!(cbub && cbub.classList.contains('char-bub'));
     var cbTools = $('charbub-tools'); if(cbTools){ cbTools.hidden = !charBubShown; }
     var low = document.querySelector('.editor-fixed .lowtools'); if(low){ low.hidden = !charBubShown; }
+    // 사진 말풍선(이미지 포함)이면 꼬리 버튼 숨김 + 도구줄 5칸
+    var isPhotoBub = !!(cbub && cbub.querySelector && cbub.querySelector('img'));
+    var cbTail = $('cb-tail'); if(cbTail){ cbTail.hidden = isPhotoBub; }
+    if(cbTools){ cbTools.style.gridTemplateColumns = 'repeat('+(isPhotoBub?5:6)+',1fr)'; }
   }
   editor.addEventListener('keyup', updateFormatButtons);
   editor.addEventListener('mouseup', updateFormatButtons);
