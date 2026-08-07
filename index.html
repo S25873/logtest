@@ -2178,6 +2178,7 @@
     var nm = bubNameBefore(bub);
     if(nm){ nm.className = 'g-bub-name ' + kind; return nm; }
     nm = document.createElement('span'); nm.className = 'g-bub-name ' + kind;
+    nm.setAttribute('contenteditable','false');
     nm.appendChild(document.createTextNode('\u200b'));
     bub.parentNode.insertBefore(nm, bub);
     return nm;
@@ -2222,6 +2223,7 @@
     var n=document.createElement('span');
     n.className='g-bub-name char-name '+sideCls;
     n.setAttribute('data-char', charId);
+    n.setAttribute('contenteditable','false');
     n.textContent=(c&&c.name)?c.name:'\u200b';
     return n;
   }
@@ -2251,6 +2253,7 @@
     });
     [].forEach.call(root.querySelectorAll('.g-bub-name.char-name'), function(n){
       var c=findChar(n.getAttribute('data-char')); if(!c) return;
+      if(root===editor) n.setAttribute('contenteditable','false');
       if(c.name) n.textContent=c.name;
       n.style.setProperty('color', c.nameColor, 'important');
     });
