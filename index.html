@@ -648,6 +648,11 @@
   .repform__arrow{text-align:center;color:var(--ink-3);font-size:15px;line-height:1;user-select:none;}
   .repform__btns{display:flex;gap:8px;justify-content:flex-end;margin-top:2px;}
   .repform__btns .btn{flex:none;height:36px;padding:0 18px;font-size:12.5px;border-radius:var(--radius-sm);}
+  .bpchecks{display:flex;flex-wrap:wrap;gap:7px;}
+  .pchk{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 11px;font-size:12px;color:var(--ink-2);user-select:none;transition:background .14s var(--ease),border-color .14s,color .14s;}
+  .pchk input{margin:0;cursor:pointer;accent-color:var(--accent);width:14px;height:14px;}
+  .pchk:hover{border-color:var(--line-strong);}
+  .pchk:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--ink);font-weight:600;}
 
   /* 프리셋 칩 꾹 눌러 순서 바꾸기 (인물/입력/프리셋 공통) */
   .reorderable{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
@@ -1306,6 +1311,32 @@
             <div class="char-list" id="char-insert-list"></div>
             <p class="hint" id="char-insert-empty" style="margin:0">아직 인물이 없어요. 아래 <b>인물</b>에서 먼저 추가하세요.</p>
           </div>
+
+          <details class="fold" id="fold-bubpreset" style="margin-top:14px" open>
+            <summary>
+              말풍선 프리셋
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <p class="hint" style="margin:0 0 12px">인물을 누르면 아래 프리셋들이 떠요. 프리셋을 클릭하면 수정할 수 있어요.</p>
+              <div class="mychips" id="bubpreset-list"></div>
+              <div class="repform" id="bubpreset-form" hidden>
+                <input class="txt-input" id="bubpreset-name" type="text" placeholder="프리셋 이름 (예: 상대 기본)" maxlength="20" autocomplete="off">
+                <div class="bpchecks">
+                  <label class="pchk"><input type="checkbox" id="bp-av"><span>프사</span></label>
+                  <label class="pchk"><input type="checkbox" id="bp-nm"><span>이름</span></label>
+                  <label class="pchk"><input type="checkbox" id="bp-tail"><span>꼬리</span></label>
+                  <label class="pchk"><input type="checkbox" id="bp-photo"><span>사진</span></label>
+                  <label class="pchk"><input type="checkbox" id="bp-right"><span>오른쪽(나)</span></label>
+                </div>
+                <div class="repform__btns">
+                  <button class="btn btn--ghost" id="bubpreset-cancel" type="button">취소</button>
+                  <button class="btn btn--primary" id="bubpreset-confirm" type="button">저장</button>
+                </div>
+              </div>
+              <button class="btn btn--ghost" id="bubpreset-add" type="button" style="height:40px;font-size:12.5px;width:100%">＋ 프리셋 추가</button>
+            </div>
+          </details>
 
           <details class="fold" id="fold-char" style="margin-top:14px">
             <summary>
@@ -2392,7 +2423,7 @@
       }
     }catch(e){}
   }
-  function insertCharBubbles(charId, side, tailMode){
+  function insertCharBubbles(charId, side, tailMode, opts){
     var c=findChar(charId); if(!c) return;
     editor.focus();
     var sel=window.getSelection();
@@ -2402,12 +2433,14 @@
     }
     var range=sel.getRangeAt(0);
     var sideCls=(side==='right')?'right':'left';
-    var withName=(tailMode==='tail');
+    var wantName = opts ? !!opts.nm : (tailMode==='tail');
+    var wantAv   = opts ? !!opts.av : (tailMode==='tail');
+    var wantTail = opts ? !!opts.tail : (tailMode==='tail');
     var out=document.createDocumentFragment();
     var insBub=null;
     if(range.collapsed){
-      if(withName) out.appendChild(makeCharName(charId, sideCls));
-      var eb=makeCharBub(charId, sideCls, tailMode==='tail'); if(withName) eb.setAttribute('data-av','1'); eb.appendChild(document.createTextNode('\u200b'));
+      if(wantName) out.appendChild(makeCharName(charId, sideCls));
+      var eb=makeCharBub(charId, sideCls, wantTail); if(wantAv) eb.setAttribute('data-av','1'); eb.appendChild(document.createTextNode('\u200b'));
       out.appendChild(eb);
       range.insertNode(out);
       var r=document.createRange(); r.selectNodeContents(eb); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
@@ -2416,8 +2449,8 @@
       trimRangeTrailingBreaks(range);
       if(range.collapsed){
         // 트림 결과 선택이 비면(줄바꿈만 골랐던 경우) 빈 말풍선 하나로 처리
-        var eb2=makeCharBub(charId, sideCls, withName); if(withName) eb2.setAttribute('data-av','1'); eb2.appendChild(document.createTextNode('\u200b'));
-        if(withName) out.appendChild(makeCharName(charId, sideCls));
+        var eb2=makeCharBub(charId, sideCls, wantTail); if(wantAv) eb2.setAttribute('data-av','1'); eb2.appendChild(document.createTextNode('\u200b'));
+        if(wantName) out.appendChild(makeCharName(charId, sideCls));
         out.appendChild(eb2); range.insertNode(out);
         var rr=document.createRange(); rr.selectNodeContents(eb2); rr.collapse(false); sel.removeAllRanges(); sel.addRange(rr);
         insBub=eb2;
@@ -2429,13 +2462,13 @@
       var groups=splitFragByBlank(contents);
       if(!groups.length){ var g0=[document.createTextNode('\u200b')]; groups=[g0]; }
       var multi = groups.length > 1;
-      if(withName && !multi) out.appendChild(makeCharName(charId, sideCls));
+      if(wantName && !multi) out.appendChild(makeCharName(charId, sideCls));
       var lastBub=null;
       groups.forEach(function(g, i){
         var isLast=(i===groups.length-1);
-        var tail = (!multi) && (tailMode==='tail') && isLast;
+        var tail = (!multi) && wantTail && isLast;
         var bub=makeCharBub(charId, sideCls, tail);
-        if(!multi && withName && i===0) bub.setAttribute('data-av','1');
+        if(!multi && wantAv && i===0) bub.setAttribute('data-av','1');
         g.forEach(function(n){ bub.appendChild(n); });
         trimBubbleTail(bub);
         out.appendChild(bub); lastBub=bub;
@@ -2474,14 +2507,20 @@
   function openCharInsertSheet(charId){
     var c=findChar(charId); if(!c) return;
     var col=c.bub||'#e5e5ea';
-    openSheetDef({ title:(c.name||'인물')+' 말풍선', options:[
-      { label:'이름+사진', preview:sideBubIcon('left',col), run:function(){ insertCharBubbles(charId,'left','tail'); } },
-      { label:'말풍선만', preview:sideBubIcon('left',col), run:function(){ insertCharBubbles(charId,'left','cont'); } },
-      { label:'사진 메시지', preview:photoBubIcon('left',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'left', tail:false, withName:true}); } },
-      { label:'이름+사진', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','tail'); } },
-      { label:'말풍선만', preview:sideBubIcon('right',col), run:function(){ insertCharBubbles(charId,'right','cont'); } },
-      { label:'사진 메시지', preview:photoBubIcon('right',col), noFocus:true, run:function(){ pickPhotoBubble({charId:charId, side:'right', tail:false, withName:true}); } }
-    ]});
+    var presets=loadBubPresets();
+    if(!presets.length){ insertCharBubbles(charId,'left',null,{av:false,nm:false,tail:false}); return; }
+    openSheetDef({ title:(c.name||'인물')+' 말풍선', options: presets.map(function(p){
+      var side=p.right?'right':'left';
+      return {
+        label: p.name||'(이름 없음)',
+        preview: p.photo ? photoBubIcon(side,col) : sideBubIcon(side,col),
+        noFocus: !!p.photo,
+        run: function(){
+          if(p.photo){ pickPhotoBubble({charId:charId, side:side, tail:!!p.tail, nm:!!p.nm, av:!!p.av}); }
+          else { insertCharBubbles(charId, side, null, {av:!!p.av, nm:!!p.nm, tail:!!p.tail}); }
+        }
+      };
+    }) });
   }
   function applyBubble(kind, tail, withName){
     var sel = window.getSelection();
@@ -2755,9 +2794,9 @@
     var side=(desc.side==='right')?'right':'left';
     var out=document.createDocumentFragment(), bub;
     if(desc.charId && findChar(desc.charId)){
-      if(desc.withName) out.appendChild(makeCharName(desc.charId, side));
+      if(desc.nm) out.appendChild(makeCharName(desc.charId, side));
       bub=makeCharBub(desc.charId, side, !!desc.tail);
-      if(desc.withName) bub.setAttribute('data-av','1');
+      if(desc.av) bub.setAttribute('data-av','1');
     } else {
       bub=document.createElement('span');
       bub.className='g-bub '+(side==='right'?'send':'recv')+' '+(desc.tail?'tail':'cont');
@@ -4738,6 +4777,59 @@
     });
   })();
 
+  /* ===== 말풍선 프리셋 (인물 시트에 뜨는 삽입 옵션) ===== */
+  var BUBPRESET_KEY='logmaker-bubble-presets-v1';
+  var DEFAULT_BUBPRESETS=[
+    {name:'이름+사진',av:true,nm:true,tail:true,photo:false,right:false},
+    {name:'말풍선만',av:false,nm:false,tail:false,photo:false,right:false},
+    {name:'사진',av:true,nm:true,tail:false,photo:true,right:false}
+  ];
+  function loadBubPresets(){
+    var raw; try{ raw=localStorage.getItem(BUBPRESET_KEY); }catch(e){ raw=null; }
+    if(raw==null){ var seed=DEFAULT_BUBPRESETS.map(function(p){ return {name:p.name,av:p.av,nm:p.nm,tail:p.tail,photo:p.photo,right:p.right}; }); try{ localStorage.setItem(BUBPRESET_KEY, JSON.stringify(seed)); }catch(e){} return seed; }
+    try{ var a=JSON.parse(raw); return Array.isArray(a)?a:[]; }catch(e){ return []; }
+  }
+  function saveBubPresets(list){ try{ localStorage.setItem(BUBPRESET_KEY, JSON.stringify(list)); }catch(e){} }
+  function bubPresetSummary(p){ var t=[]; if(p.photo) t.push('사진'); if(p.av) t.push('프사'); if(p.nm) t.push('이름'); if(p.tail) t.push('꼬리'); t.push(p.right?'오른쪽':'왼쪽'); return t.join(' · '); }
+  var _editingBpIdx=-1;
+  function renderBubPresets(){
+    var wrap=$('bubpreset-list'); if(!wrap) return; var list=loadBubPresets(); wrap.innerHTML='';
+    if(!list.length){ var em=document.createElement('div'); em.className='mychips__empty'; em.textContent='프리셋이 없어요. 아래에서 추가하세요.'; wrap.appendChild(em); return; }
+    list.forEach(function(p,idx){
+      var chip=document.createElement('div'); chip.className='mychip reorderable'; chip.title='클릭하면 수정합니다';
+      var nm=document.createElement('span'); nm.textContent=p.name||'(이름 없음)'; chip.appendChild(nm);
+      var sub=document.createElement('span'); sub.style.cssText='margin-left:6px;color:var(--ink-3);font-size:10.5px'; sub.textContent=bubPresetSummary(p); chip.appendChild(sub);
+      var x=document.createElement('span'); x.className='mychip__x'; x.textContent='×'; x.title='삭제'; chip.appendChild(x);
+      x.addEventListener('click',function(e){ e.stopPropagation(); if(!confirm('"'+(p.name||'')+'" 프리셋을 삭제할까요?')) return; var cur=loadBubPresets(); cur.splice(idx,1); saveBubPresets(cur); renderBubPresets(); });
+      chip.addEventListener('click',function(){ openBpForm(idx); });
+      wrap.appendChild(chip);
+    });
+  }
+  function openBpForm(idx){
+    var form=$('bubpreset-form'),addBtn=$('bubpreset-add'),okBtn=$('bubpreset-confirm');
+    var nameIn=$('bubpreset-name'),avC=$('bp-av'),nmC=$('bp-nm'),tailC=$('bp-tail'),phC=$('bp-photo'),rtC=$('bp-right');
+    if(!form) return;
+    _editingBpIdx=(typeof idx==='number')?idx:-1;
+    if(_editingBpIdx>=0){ var p=loadBubPresets()[_editingBpIdx]||{}; nameIn.value=p.name||''; avC.checked=!!p.av; nmC.checked=!!p.nm; tailC.checked=!!p.tail; phC.checked=!!p.photo; rtC.checked=!!p.right; okBtn.textContent='저장'; }
+    else { nameIn.value=''; avC.checked=false; nmC.checked=false; tailC.checked=false; phC.checked=false; rtC.checked=false; okBtn.textContent='추가'; }
+    form.hidden=false; addBtn.hidden=true; nameIn.focus();
+  }
+  function closeBpForm(){ var form=$('bubpreset-form'),addBtn=$('bubpreset-add'); if(form) form.hidden=true; if(addBtn) addBtn.hidden=false; _editingBpIdx=-1; }
+  function confirmBpSave(){
+    var nameIn=$('bubpreset-name'),avC=$('bp-av'),nmC=$('bp-nm'),tailC=$('bp-tail'),phC=$('bp-photo'),rtC=$('bp-right');
+    var name=(nameIn.value||'').trim(); if(!name){ nameIn.focus(); return; }
+    var p={name:name,av:avC.checked,nm:nmC.checked,tail:tailC.checked,photo:phC.checked,right:rtC.checked};
+    var list=loadBubPresets();
+    if(_editingBpIdx>=0 && _editingBpIdx<list.length) list[_editingBpIdx]=p; else list.push(p);
+    saveBubPresets(list); renderBubPresets(); closeBpForm();
+  }
+  if($('bubpreset-add')){
+    $('bubpreset-add').addEventListener('click',function(){ openBpForm(-1); });
+    $('bubpreset-cancel').addEventListener('click', closeBpForm);
+    $('bubpreset-confirm').addEventListener('click', confirmBpSave);
+    $('bubpreset-name').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); confirmBpSave(); } else if(e.key==='Escape'){ e.preventDefault(); closeBpForm(); } });
+  }
+
   /* ============================================================
      프리셋 칩 꾹 눌러 순서 바꾸기 (인물 / 입력 / 프리셋 공통)
      · 꾹 누르면(롱프레스) 드래그 모드 → 끌어서 순서 변경 (마우스·터치 공통)
@@ -5140,6 +5232,8 @@
   });
   enableChipReorder($('replace-presets'), loadReplacePresets, function(nl){ saveReplacePresets(nl); renderReplacePresets(); });
   enableChipReorder($('my-presets'), loadMyPresets, function(nl){ saveMyPresets(nl); renderMyPresets(); });
+  renderBubPresets();
+  enableChipReorder($('bubpreset-list'), loadBubPresets, function(nl){ saveBubPresets(nl); renderBubPresets(); });
   updateEditorHl();
   updateEditorBub();
   render();
