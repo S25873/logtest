@@ -132,7 +132,7 @@
 
   .workspace{
     display:grid;
-    grid-template-columns:minmax(380px,440px) 1fr;
+    grid-template-columns:minmax(420px,500px) 1fr;
     min-height:0;overflow:hidden;height:100dvh;
   }
 
@@ -3906,6 +3906,7 @@
   }
   if(window.ResizeObserver){ new ResizeObserver(function(){ fitStage(true); }).observe(document.querySelector('.preview__scroll')); }
   window.addEventListener('resize', function(){ fitStage(); });
+
   editor.addEventListener('input', renderSoon);
 
   if(nameEd){
