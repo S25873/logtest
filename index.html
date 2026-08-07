@@ -4544,15 +4544,17 @@
   /* ===== 큰따옴표 → 인물 말풍선 ===== */
   function currentCharId(){ return (characters && characters.length) ? characters[0].id : null; }
   // mode: 'plain'(말풍선만) | 'named'(사진+이름: 말풍선마다 각각 이름+아바타)
-  function quoteToBubbles(mode, cid){
+  function quoteToBubbles(opts, cid){
     if(cid===undefined) cid=currentCharId();
+    opts=opts||{};
+    var side=(opts.side==='right')?'right':'left';
     var re=/[\u201C\u201D\u201E\u201F\u2033"]([^\u201C\u201D\u201E\u201F\u2033"\n]*)[\u201C\u201D\u201E\u201F\u2033"]/g;
     replaceInText(re, function(m){
       var inner=m[1]; var out=document.createDocumentFragment();
       if(cid){
-        if(mode==='named'){ out.appendChild(makeCharName(cid,'left')); }
-        var bub=makeCharBub(cid,'left',false);
-        if(mode==='named'){ bub.setAttribute('data-av','1'); }
+        if(opts.nm){ out.appendChild(makeCharName(cid, side)); }
+        var bub=makeCharBub(cid, side, !!opts.tail);
+        if(opts.av){ bub.setAttribute('data-av','1'); }
         bub.appendChild(document.createTextNode(inner===''?'\u200b':inner));
         out.appendChild(bub);
       } else {
@@ -4565,10 +4567,19 @@
   }
   function openQuoteStyleSheet(cid){
     var c=cid?findChar(cid):null, col=c?c.bub:'#e5e5ea';
-    openSheetDef({ title:'따옴표 → 말풍선'+((c&&c.name)?(' · '+c.name):''), options:[
-      { label:'말풍선만', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles('plain', cid); } },
-      { label:'사진+이름', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles('named', cid); } }
-    ]});
+    // 따옴표는 글자 변환이라 '사진' 타입 프리셋은 제외하고, 해당 인물에 적용되는 프리셋만
+    var presets=loadBubPresets().filter(function(p){ return !p.photo && (!p.chars || !p.chars.length || (cid && p.chars.indexOf(cid)!==-1)); });
+    if(!presets.length){
+      openSheetDef({ title:'따옴표 → 말풍선'+((c&&c.name)?(' · '+c.name):''), options:[
+        { label:'말풍선만', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles({side:'left'}, cid); } },
+        { label:'이름+프사', preview:sideBubIcon('left',col), noFocus:true, run:function(){ quoteToBubbles({av:true,nm:true,side:'left'}, cid); } }
+      ]});
+      return;
+    }
+    openSheetDef({ title:'따옴표 → 말풍선'+((c&&c.name)?(' · '+c.name):''), options: presets.map(function(p){
+      var side=(p.side==='right')?'right':'left';
+      return { label:p.name||'(이름 없음)', preview:sideBubIcon(side,col), noFocus:true, run:function(){ quoteToBubbles({av:!!p.av,nm:!!p.nm,tail:!!p.tail,side:side}, cid); } };
+    }) });
   }
   function openQuoteBubbleSheet(){
     if(!characters || !characters.length){ openQuoteStyleSheet(null); return; }
