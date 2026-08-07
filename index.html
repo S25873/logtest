@@ -1673,6 +1673,17 @@
           </div>
 
           <div class="section" style="margin-top:20px">
+            <p class="section__head">특수 초기화</p>
+            <p class="hint" style="margin:0 0 12px">항목별로 따로 초기화해요. (입력 내용·설정은 그대로 유지)</p>
+            <div class="grid-2">
+              <button class="btn btn--ghost" id="reset-chars" type="button" style="height:40px;font-size:12px">인물</button>
+              <button class="btn btn--ghost" id="reset-bubpreset" type="button" style="height:40px;font-size:12px">말풍선 삽입 설정</button>
+              <button class="btn btn--ghost" id="reset-replace" type="button" style="height:40px;font-size:12px">입력 프리셋</button>
+              <button class="btn btn--ghost" id="reset-mypreset" type="button" style="height:40px;font-size:12px">프리셋</button>
+            </div>
+          </div>
+
+          <div class="section" style="margin-top:20px">
             <p class="section__head">팁</p>
             <details class="fold" id="fold-tips">
             <summary>
@@ -4656,9 +4667,35 @@
   }
   $('t-reset').addEventListener('click', function(){
     if(!confirm('모든 설정과 입력 내용을 기본값으로 되돌릴까요?')) return;
+    _restoring=true;                                  // 언로드 시 flushSave가 다시 저장하는 것 방지
+    if(_saveT){ clearTimeout(_saveT); _saveT=null; }
     try{ localStorage.removeItem(STORE_KEY); }catch(e){}
     try{ localStorage.removeItem(UI_KEY); }catch(e){}
     location.reload();
+  });
+  // 특수 초기화 — 항목별 (입력 내용·설정은 유지, 리로드 없이 즉시)
+  if($('reset-chars')) $('reset-chars').addEventListener('click', function(){
+    if(!confirm('저장된 인물을 모두 삭제할까요?')) return;
+    characters.length=0; saveChars();
+    if(typeof closeCharEditor==='function') closeCharEditor();
+    renderCharList(); renderCharInsert(); if(typeof renderTopbarCharList==='function') renderTopbarCharList();
+    render();
+  });
+  if($('reset-bubpreset')) $('reset-bubpreset').addEventListener('click', function(){
+    if(!confirm('말풍선 삽입 설정을 기본값으로 되돌릴까요?')) return;
+    try{ localStorage.removeItem(BUBPRESET_KEY); }catch(e){}
+    if(typeof closeBpForm==='function') closeBpForm();
+    renderBubPresets();
+  });
+  if($('reset-replace')) $('reset-replace').addEventListener('click', function(){
+    if(!confirm('입력 프리셋을 기본값으로 되돌릴까요?')) return;
+    try{ localStorage.removeItem(REPLACE_KEY); }catch(e){}
+    renderReplacePresets();
+  });
+  if($('reset-mypreset')) $('reset-mypreset').addEventListener('click', function(){
+    if(!confirm('저장된 프리셋을 모두 삭제할까요?')) return;
+    try{ localStorage.removeItem(PRESET_KEY); }catch(e){}
+    renderMyPresets();
   });
 
   /* ============================================================
