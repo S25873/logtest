@@ -718,7 +718,7 @@
   #editor .g-img{display:block;margin:6px 0;text-align:center;position:relative;cursor:pointer;border-radius:10px;}
   #editor .g-img.al-left{text-align:left;}
   #editor .g-img.al-right{text-align:right;}
-  #editor .g-img img{max-width:100%;height:auto;border-radius:10px;display:inline-block;vertical-align:top;}
+  #editor .g-img img{max-width:var(--logimg-w,100%);height:auto;border-radius:var(--logimg-radius,10px);display:inline-block;vertical-align:top;}
   #editor .g-img.is-sel{box-shadow:0 0 0 2px var(--accent);}
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
   #editor .g-img.is-sel:hover::after{color:#fff;background:var(--danger);border-color:var(--danger);}
@@ -859,7 +859,7 @@
   #canvas .g-img,.canvas-clone .g-img{display:block !important;margin:.5em 0 !important;text-align:center !important;}
   #canvas .g-img.al-left,.canvas-clone .g-img.al-left{text-align:left !important;}
   #canvas .g-img.al-right,.canvas-clone .g-img.al-right{text-align:right !important;}
-  #canvas .g-img img,.canvas-clone .g-img img{max-width:100% !important;height:auto !important;border-radius:.5em !important;display:inline-block !important;vertical-align:top !important;}
+  #canvas .g-img img,.canvas-clone .g-img img{max-width:var(--logimg-w,100%) !important;height:auto !important;border-radius:var(--logimg-radius,10px) !important;display:inline-block !important;vertical-align:top !important;}
   #canvas .g-name,.canvas-clone .g-name{display:block !important;margin-top:var(--name-gap,1.6em) !important;font-size:var(--name-size,.7em) !important;font-weight:400 !important;font-family:var(--name-font,inherit) !important;color:var(--name-color,#5a5a5a) !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-name.right,.canvas-clone .g-name.right{text-align:right !important;}
   #canvas .g-name.left,.canvas-clone .g-name.left{text-align:left !important;}
@@ -1027,6 +1027,12 @@
               <button class="fbtn" id="cb-tail" type="button" title="꼬리 켜기/끄기">꼬리</button>
               <button class="fbtn fbtn--del" id="cb-del" type="button" title="말풍선 해제(내용은 남김)">삭제</button>
             </div>
+            <div class="subtools" id="logimg-tools" hidden style="grid-template-columns:repeat(4,1fr)">
+              <button class="fbtn" id="li-left" type="button" title="왼쪽 정렬">왼쪽</button>
+              <button class="fbtn" id="li-center" type="button" title="가운데 정렬">가운데</button>
+              <button class="fbtn" id="li-right" type="button" title="오른쪽 정렬">오른쪽</button>
+              <button class="fbtn fbtn--del" id="li-del" type="button" title="사진 삭제">삭제</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1106,6 +1112,26 @@
               <div class="field" style="margin-top:16px">
                 <span class="label">문단 간격 <span class="val" id="para-gap-val">20px</span></span>
                 <div class="rangewrap"><input id="para-gap" type="range" min="0" max="48" step="1" value="20"></div>
+              </div>
+            </div>
+          </details>
+
+          <details class="fold" id="fold-logimg">
+            <summary>
+              본문 사진
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <p class="hint" style="margin:0 0 12px"><b>＋</b>로 넣는 본문 사진에 적용돼요. (비율은 유지)</p>
+              <div class="grid-2">
+                <div class="field">
+                  <span class="label">사진 크기 <span class="val" id="logimg-size-val">100%</span></span>
+                  <div class="rangewrap"><input id="logimg-size" type="range" min="20" max="100" step="5" value="100"></div>
+                </div>
+                <div class="field">
+                  <span class="label">모서리 둥글기 <span class="val" id="logimg-radius-val">10px</span></span>
+                  <div class="rangewrap"><input id="logimg-radius" type="range" min="0" max="20" step="1" value="10"></div>
+                </div>
               </div>
             </div>
           </details>
@@ -1335,7 +1361,7 @@
             </summary>
             <div class="fold__body">
               <p class="section__head">인물</p>
-              <p class="hint" style="margin:0 0 12px">만들어 둔 인물을 말풍선 생성에 사용할 수 있어요.</p>
+              <p class="hint" style="margin:0 0 12px">만들어 둔 인물을 말풍선 삽입에 사용할 수 있어요.</p>
               <div class="char-list" id="char-list"></div>
               <button class="btn btn--ghost" id="char-add" type="button" style="height:40px;font-size:12.5px;width:100%">+ 인물 추가</button>
 
@@ -1373,7 +1399,7 @@
               </div>
 
               <p class="section__head" style="margin-top:24px">말풍선 삽입 설정</p>
-              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 삽입 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장해둘 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향 · 프사 유무 등을 추가 조정할 수 있어요.</p>
+              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 삽입 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향 · 프사 유무 등을 추가 조정 가능해요.</p>
               <div class="mychips" id="bubpreset-list"></div>
               <div class="repform" id="bubpreset-form" hidden>
                 <div class="field">
@@ -1455,7 +1481,7 @@
 
               <div class="field" style="margin-top:16px">
                 <span class="label">말풍선 사진 크기 <span class="val" id="photo-size-val">60%</span></span>
-                <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="1" value="60"></div>
+                <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="5" value="60"></div>
               </div>
 
               <p class="section__head" style="margin-top:18px">아이메시지 상하단바</p>
@@ -2535,21 +2561,21 @@
   function sideBubIcon(side, color){
     var L = side==='left';
     var st = 'stroke="rgba(0,0,0,.1)" stroke-width="0.8"';
-    var tail = L ? '<path d="M6.5 15 L4.3 18 L10 15 Z" fill="'+color+'"/>'
-                 : '<path d="M17.5 15 L19.7 18 L14 15 Z" fill="'+color+'"/>';
-    var rect = '<rect x="'+(L?3:6)+'" y="6.5" width="15" height="9" rx="4.2" fill="'+color+'" '+st+'/>';
+    var tail = L ? '<path d="M7.5 14 L3.5 20 L12.5 14 Z" fill="'+color+'"/>'
+                 : '<path d="M16.5 14 L20.5 20 L11.5 14 Z" fill="'+color+'"/>';
+    var rect = '<rect x="'+(L?3:6)+'" y="6" width="15" height="9" rx="4.2" fill="'+color+'" '+st+'/>';
     return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+tail+rect+'</svg></span>';
   }
   function photoBubIcon(side, color){
     var L = side==='left';
     var st = 'stroke="rgba(0,0,0,.1)" stroke-width="0.8"';
     var bx = L ? 3 : 6;
-    var tail = L ? '<path d="M6.5 15 L4.3 18 L10 15 Z" fill="'+color+'"/>'
-                 : '<path d="M17.5 15 L19.7 18 L14 15 Z" fill="'+color+'"/>';
-    var rect = '<rect x="'+bx+'" y="6.5" width="15" height="9" rx="2.6" fill="'+color+'" '+st+'/>';
+    var tail = L ? '<path d="M7.5 14 L3.5 20 L12.5 14 Z" fill="'+color+'"/>'
+                 : '<path d="M16.5 14 L20.5 20 L11.5 14 Z" fill="'+color+'"/>';
+    var rect = '<rect x="'+bx+'" y="6" width="15" height="9" rx="2.6" fill="'+color+'" '+st+'/>';
     var gx = bx+3;
-    var pic = '<circle cx="'+(gx+1)+'" cy="9.6" r="0.95" fill="rgba(255,255,255,.92)"/>'
-            + '<path d="M'+gx+' 13.4 l2.3-2.4 1.7 1.7 1.6-1.8 2.1 2.5 z" fill="rgba(255,255,255,.92)"/>';
+    var pic = '<circle cx="'+(gx+1)+'" cy="9.1" r="0.95" fill="rgba(255,255,255,.92)"/>'
+            + '<path d="M'+gx+' 12.9 l2.3-2.4 1.7 1.7 1.6-1.8 2.1 2.5 z" fill="rgba(255,255,255,.92)"/>';
     return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none">'+tail+rect+pic+'</svg></span>';
   }
   function openCharInsertSheet(charId){
@@ -2883,8 +2909,34 @@
 
   /* 삽입 이미지 선택 · 삭제 (구분선과 동일한 방식) */
   var _selImg=null;
-  function clearImgSel(){ [].forEach.call(editor.querySelectorAll('.g-img.is-sel'), function(x){ x.classList.remove('is-sel'); }); _selImg=null; }
-  function selectImg(el){ clearImgSel(); if(el){ el.classList.add('is-sel'); _selImg=el; } }
+  function _logimgToolsShow(show, el){
+    var lit=$('logimg-tools'); if(lit) lit.hidden=!show;
+    var low=document.querySelector('.editor-fixed .lowtools');
+    var cbt=$('charbub-tools');
+    if(show && cbt) cbt.hidden=true;
+    if(low){ low.hidden = !(show || (cbt && !cbt.hidden)); }
+    if(show && el){
+      var al = el.classList.contains('al-left')?'left':(el.classList.contains('al-right')?'right':'center');
+      var map={left:'li-left',center:'li-center',right:'li-right'};
+      ['li-left','li-center','li-right'].forEach(function(id){ var b=$(id); if(b) b.classList.toggle('is-active', map[al]===id); });
+    }
+  }
+  function clearImgSel(){ [].forEach.call(editor.querySelectorAll('.g-img.is-sel'), function(x){ x.classList.remove('is-sel'); }); _selImg=null; _logimgToolsShow(false); }
+  function selectImg(el){ clearImgSel(); if(el){ el.classList.add('is-sel'); _selImg=el; _logimgToolsShow(true, el); } }
+  function setLogimgAlign(al){
+    if(!_selImg) return;
+    _selImg.classList.remove('al-left','al-center','al-right');
+    _selImg.classList.add('al-'+al);
+    _logimgToolsShow(true, _selImg);
+    render(); saveState();
+  }
+  if($('li-left')){
+    var _liTap=function(al){ return function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } setLogimgAlign(al); }; };
+    (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-left'), _liTap('left'));
+    (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-center'), _liTap('center'));
+    (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-right'), _liTap('right'));
+    (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-del'), function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } if(_selImg) removeImg(_selImg); });
+  }
   function removeImg(el){
     if(!el || !el.parentNode) return;
     var nx=el.nextSibling, pv=el.previousSibling;
@@ -3292,9 +3344,11 @@
     });
     var cbub = node ? closestBubble(node) : null;
     if(!node && _activeBub && editor.contains(_activeBub)) cbub = _activeBub;   // 터치: 포커스 없이 사진 말풍선 도구 유지
-    var charBubShown = !!(cbub && cbub.classList.contains('char-bub'));
+    var imgSel = !!(_selImg && editor.contains(_selImg));
+    var charBubShown = !imgSel && !!(cbub && cbub.classList.contains('char-bub'));
     var cbTools = $('charbub-tools'); if(cbTools){ cbTools.hidden = !charBubShown; }
-    var low = document.querySelector('.editor-fixed .lowtools'); if(low){ low.hidden = !charBubShown; }
+    var lit=$('logimg-tools'); if(lit){ lit.hidden = !imgSel; }
+    var low = document.querySelector('.editor-fixed .lowtools'); if(low){ low.hidden = !(charBubShown || imgSel); }
     // 사진만 있는 말풍선(캡션 없음)이면 꼬리 버튼 숨김 + 도구줄 5칸. 사진+캡션이면 꼬리 표시.
     var hasImg = !!(cbub && cbub.querySelector && cbub.querySelector('img'));
     var imgOnly = hasImg && cbub && (cbub.textContent||'').replace(/\u200b/g,'').trim()==='';
@@ -3669,6 +3723,8 @@
     if(pg){ el.style.setProperty('--para-gap', parseFloat(pg.value)+'px'); }
     if(sg){ el.style.setProperty('--stack-gap', parseFloat(sg.value)+'px'); }
     var psz=$('photo-size'); if(psz){ el.style.setProperty('--photo-w', parseFloat(psz.value)+'%'); }
+    var lisz=$('logimg-size'); if(lisz){ el.style.setProperty('--logimg-w', parseFloat(lisz.value)+'%'); }
+    var lirad=$('logimg-radius'); if(lirad){ el.style.setProperty('--logimg-radius', parseFloat(lirad.value)+'px'); }
     var tf=$('title-font'), nf=$('name-font');
     el.style.setProperty('--title-font', (tf && tf.value) ? tf.value : $('font').value);
     el.style.setProperty('--name-font', (nf && nf.value) ? nf.value : $('font').value);
@@ -3908,6 +3964,8 @@
   function render(){
     bgValue = effectiveBg();
     var _psz=$('photo-size'); if(_psz) editor.style.setProperty('--photo-w', parseFloat(_psz.value)+'%');
+    var _lisz=$('logimg-size'); if(_lisz) editor.style.setProperty('--logimg-w', parseFloat(_lisz.value)+'%');
+    var _lirad=$('logimg-radius'); if(_lirad) editor.style.setProperty('--logimg-radius', parseFloat(_lirad.value)+'px');
     cleanOrphanNames();
     updateEmptyBubbles();
     styleCharBubbles(editor);
@@ -4040,8 +4098,10 @@
     if(barg){ var bargv=$('bar-body-gap-val'); if(bargv) bargv.textContent=parseFloat(barg.value)+'px'; }
     var psz=$('photo-size');
     if(psz){ var pszv=$('photo-size-val'); if(pszv) pszv.textContent=parseFloat(psz.value)+'%'; }
+    var lisz=$('logimg-size'); if(lisz){ var liszv=$('logimg-size-val'); if(liszv) liszv.textContent=parseFloat(lisz.value)+'%'; }
+    var lirad=$('logimg-radius'); if(lirad){ var liradv=$('logimg-radius-val'); if(liradv) liradv.textContent=parseFloat(lirad.value)+'px'; }
   }
-  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','title-font','name-font'].forEach(function(id){
+  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','title-font','name-font'].forEach(function(id){
     var e=$(id); if(e){ e.addEventListener('input', function(){ updateTitleSizeLabels(); render(); }); e.addEventListener('change', function(){ updateTitleSizeLabels(); render(); }); }
   });
 
@@ -4516,7 +4576,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','font-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
@@ -4876,9 +4936,10 @@
   /* ===== 말풍선 프리셋 (인물 시트에 뜨는 삽입 옵션) ===== */
   var BUBPRESET_KEY='logmaker-bubble-presets-v1';
   var DEFAULT_BUBPRESETS=[
-    {name:'이름+사진',photo:false,av:true,nm:true,tail:true,side:'left',chars:[]},
     {name:'말풍선만',photo:false,av:false,nm:false,tail:false,side:'left',chars:[]},
-    {name:'사진',photo:true,av:true,nm:true,tail:false,side:'left',chars:[]}
+    {name:'말풍선만',photo:false,av:false,nm:false,tail:false,side:'right',chars:[]},
+    {name:'사진',photo:true,av:true,nm:true,tail:false,side:'left',chars:[]},
+    {name:'사진',photo:true,av:true,nm:true,tail:false,side:'right',chars:[]}
   ];
   function loadBubPresets(){
     var raw; try{ raw=localStorage.getItem(BUBPRESET_KEY); }catch(e){ raw=null; }
