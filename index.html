@@ -2849,7 +2849,14 @@
       var sel=window.getSelection();
       if(sel && sel.rangeCount && sel.isCollapsed){
         var _imgSide=caretImgSide();
-        if(_imgSide){ var _gi=_imgSide.img; if((_gi.textContent||'').replace(/\u200b/g,'')===''){ e.preventDefault(); removeImg(_gi); return; } }  // 사진 옆 빈 커서서 백스페이스 = 사진 삭제
+        if(_imgSide && (_imgSide.img.textContent||'').replace(/\u200b/g,'')===''){
+          var _gi=_imgSide.img;
+          // 커서가 사진 왼쪽이면 사진 '위'의 빈 줄(br), 오른쪽이면 '아래'의 빈 줄부터 제거(빈 텍스트노드는 건너뜀)
+          var _n=_imgSide.after ? _gi.nextSibling : _gi.previousSibling;
+          while(_n && _n.nodeType===3 && (_n.nodeValue||'').replace(/\u200b/g,'')===''){ _n=_imgSide.after ? _n.nextSibling : _n.previousSibling; }
+          if(_n && _n.nodeType===1 && _n.tagName==='BR'){ e.preventDefault(); _n.parentNode.removeChild(_n); saveSel(); render(); return; }  // 위/아래 빈 줄부터 제거
+          e.preventDefault(); removeImg(_gi); return;   // 빈 줄 없으면 사진 삭제
+        }
         var hrPrev=hrBeforeCaret(sel.getRangeAt(0));
         if(hrPrev){ e.preventDefault(); removeHr(hrPrev); return; }
         // 두 말풍선 사이 구분자(제로폭) 위에서 백스페이스: 한 번에 구분자 제거→합치고 커서를 위 말풍선 끝으로
