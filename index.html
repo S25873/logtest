@@ -2849,7 +2849,7 @@
       var sel=window.getSelection();
       if(sel && sel.rangeCount && sel.isCollapsed){
         var _imgSide=caretImgSide();
-        if(_imgSide){ e.preventDefault(); removeImg(_imgSide.img); return; }   // 사진 바로 옆(빈 앵커) 커서서 백스페이스 = 사진 삭제
+        if(_imgSide){ var _gi=_imgSide.img; if((_gi.textContent||'').replace(/\u200b/g,'')===''){ e.preventDefault(); removeImg(_gi); return; } }  // 사진 옆 빈 커서서 백스페이스 = 사진 삭제
         var hrPrev=hrBeforeCaret(sel.getRangeAt(0));
         if(hrPrev){ e.preventDefault(); removeHr(hrPrev); return; }
         // 두 말풍선 사이 구분자(제로폭) 위에서 백스페이스: 한 번에 구분자 제거→합치고 커서를 위 말풍선 끝으로
@@ -2962,8 +2962,8 @@
   function insertLogImage(url){
     editor.focus(); restoreSel();
     var sel=window.getSelection();
-    var box=document.createElement('div'); box.className='g-img al-'+(_imgAlign||'center'); box.setAttribute('contenteditable','false');
-    var im=document.createElement('img'); im.src=url; im.alt=''; box.appendChild(im);
+    var box=document.createElement('div'); box.className='g-img al-'+(_imgAlign||'center');
+    var im=document.createElement('img'); im.src=url; im.alt=''; im.setAttribute('contenteditable','false'); box.appendChild(im);
     if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)){
       var range=sel.getRangeAt(0); range.collapse(false); range.insertNode(box);
     } else { editor.appendChild(box); }
@@ -3048,46 +3048,45 @@
     (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-right'), _liTap('right'));
     (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-del'), function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } if(_selImg) removeImg(_selImg); });
   }
-  // 본문 사진 좌/우에 '보이는 커서' — 말풍선 사진과 동일하게 실제 앵커(zwsp) 텍스트노드를 사진 옆에 둔다.
-  //   블록 사진이라 이 앵커는 사진 옆(위/아래)의 얇은 한 줄에 놓이고 커서가 눈에 보인다. 안 쓰면 cleanEditor가 정리.
+  // 본문 사진 좌/우에 '보이는 커서' — 말풍선 사진처럼 앵커(zwsp)를 g-img '안쪽' 이미지 옆에 둔다.
+  //   그래야 커서가 사진과 같은 줄, 바로 옆에 보인다(바깥에 두면 블록이라 위/아래 빈 줄로 감). g-img는 편집가능·img는 편집불가.
   function caretAtImg(box, after){
     editor.focus();
-    var ref = after ? box.nextSibling : box.previousSibling;
+    box.removeAttribute('contenteditable');                 // g-img 내부 편집 가능(커서가 안에 들어가게)
+    var im=box.querySelector('img'); if(!im){ return; }
+    im.setAttribute('contenteditable','false');             // 이미지 자체는 편집 불가
+    var ref = after ? im.nextSibling : im.previousSibling;
     var tn = (ref && ref.nodeType===3) ? ref : null;
     if(!tn){
       tn=document.createTextNode('\u200b');
-      if(after){ if(ref){ box.parentNode.insertBefore(tn, ref); } else { box.parentNode.appendChild(tn); } }
-      else { box.parentNode.insertBefore(tn, box); }
+      if(after){ if(ref){ box.insertBefore(tn, ref); } else { box.appendChild(tn); } }
+      else { box.insertBefore(tn, im); }
     }
-    var r=document.createRange(); r.setStart(tn, after ? 0 : tn.nodeValue.length); r.collapse(true);
+    var r=document.createRange(); r.setStart(tn, after ? 0 : tn.nodeValue.length); r.collapse(true);  // 이미지에 붙는 쪽 끝에 커서
     var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
     _selImg=box; _logimgToolsShow(true, box);
     saveSel();
   }
-  // 커서가 본문 사진 바로 앞/뒤(부모레벨 또는 사진 옆 빈 앵커)에 있으면 {img, after} 반환 — 백스페이스 삭제 판정용
+  // 커서가 g-img '안쪽'(이미지 옆)에 있으면 {img:그 g-img, after:이미지 뒤인지} 반환 — 엔터/백스페이스 판정용
   function caretImgSide(){
     var sel=window.getSelection(); if(!sel.rangeCount) return null;
     var r=sel.getRangeAt(0); if(!r.collapsed) return null;
-    var c=r.startContainer, o=r.startOffset;
-    if(c.nodeType===1){
-      var af=c.childNodes[o], bf=c.childNodes[o-1];
-      if(af && af.nodeType===1 && af.classList && af.classList.contains('g-img')) return {img:af, after:false};
-      if(bf && bf.nodeType===1 && bf.classList && bf.classList.contains('g-img')) return {img:bf, after:true};
-    } else if(c.nodeType===3 && (c.nodeValue||'').replace(/\u200b/g,'')===''){
-      var pv=c.previousSibling, nx=c.nextSibling;
-      if(pv && pv.nodeType===1 && pv.classList && pv.classList.contains('g-img')) return {img:pv, after:true};
-      if(nx && nx.nodeType===1 && nx.classList && nx.classList.contains('g-img')) return {img:nx, after:false};
+    var c=r.startContainer;
+    var gi=(c.nodeType===1?c:c.parentNode); gi=(gi&&gi.closest)?gi.closest('.g-img'):null;
+    if(gi && editor.contains(gi)){
+      var im=gi.querySelector('img');
+      if(im){
+        var after=false; try{ after=!!(im.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING); }catch(e){}
+        return {img:gi, after:after};
+      }
     }
     return null;
   }
-  // 엔터: 커서가 사진 앞이면 사진 '위'에, 뒤면 '아래'에 빈 문단(빈 줄) 생성. 커서는 그 빈 줄로.
+  // 엔터: 커서가 사진 앞(왼쪽)이면 사진 '위'에, 뒤(오른쪽)면 '아래'에 빈 줄(br) 생성. 커서는 사진 옆에 유지.
   function insertBlankAtImg(side){
-    var img=side.img, parent=img.parentNode, br=document.createElement('br');
-    if(side.after){ parent.insertBefore(br, img.nextSibling); }   // 사진 아래 빈 줄
-    else { parent.insertBefore(br, img); }                        // 사진 위 빈 줄
-    var idx=[].indexOf.call(parent.childNodes, img);
-    var r=document.createRange(); r.setStart(parent, side.after ? idx+1 : idx); r.collapse(true);  // 커서 사진 옆 유지
-    var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    var gi=side.img, parent=gi.parentNode, br=document.createElement('br');
+    if(side.after){ parent.insertBefore(br, gi.nextSibling); }   // 사진 아래
+    else { parent.insertBefore(br, gi); }                        // 사진 위
     saveSel(); render();
   }
   function removeImg(el){
@@ -3630,6 +3629,7 @@
     var sel=window.getSelection(); if(!sel || sel.rangeCount===0) return false;
     var range=sel.getRangeAt(0);
     if(!editor.contains(range.startContainer)) return false;
+    if(!forceBreak){ var _imgS=caretImgSide(); if(_imgS){ insertBlankAtImg(_imgS); return true; } }  // 사진 옆 커서서 엔터 = 위/아래 빈 줄
     if(!forceBreak && inBub && inBub.classList.contains('char-bub') && isCaretAtBubEnd(inBub, range)){ exitCharBub(inBub); return true; }
     if(!forceBreak && inBub && inBub.classList.contains('char-bub') && isCaretAtBubStart(inBub, range)){ exitCharBubUp(inBub); return true; }
     range.deleteContents();
