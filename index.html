@@ -1098,8 +1098,8 @@
                   <div class="rangewrap"><input id="font-size" type="range" min="20" max="50" value="32"></div>
                 </div>
                 <div class="field">
-                  <span class="label">서브 글자 크기 <span class="val">80%</span></span>
-                  <div class="rangewrap"><input id="subtext-size" type="range" min="50" max="100" step="5" value="80"></div>
+                  <span class="label">서브 글자 크기 <span class="val">26px</span></span>
+                  <div class="rangewrap"><input id="subtext-size" type="range" min="12" max="36" step="1" value="26"></div>
                 </div>
               </div>
               <div class="grid-2" style="margin-top:16px">
@@ -2352,6 +2352,57 @@
       inner.insertBefore(group, ref);
     });
   }
+  // 장평(inner scaleX) 역보정: 아바타(프사)·말풍선 삽입 사진을 장평 영향에서 완전히 제외한다.
+  //   ★반드시 groupAvatars 이후에 호출(그 전엔 아바타가 아직 생성되지 않아 못 잡음).
+  function neutralizeStretch(root){
+    if(!root) return;
+    var inner = root.querySelector('.g-inner'); if(!inner) return;
+    var st = parseFloat($('stretch') ? $('stretch').value : 100); if(isNaN(st)) st=100;
+    var s = st/100;
+    var _natMap={};
+    [].forEach.call(editor.querySelectorAll('img'), function(e){ if(e.naturalWidth){ _natMap[e.src]=[e.naturalWidth, e.naturalHeight]; } });
+    function _nat(im){ var w=im.naturalWidth||0,h=im.naturalHeight||0; if(!w){ var m=_natMap[im.src]; if(m){ w=m[0]; h=m[1]; } } return [w,h]; }
+    function _fixRadius(im){
+      im.style.removeProperty('border-radius');
+      if(s===1) return;
+      var R=parseFloat(getComputedStyle(im).borderTopLeftRadius)||0;
+      if(R>0) im.style.borderRadius=(R/s)+'px / '+R+'px';
+    }
+    // ── 삽입 사진(말풍선 g-bub-img + 본문 g-img>img) 크기 고정: 장평이 크기·비율·둥글기에 영향 못 주게.
+    //   ★추정 금지: 말풍선 종류마다 CSS 폭 기준(%/px·어느 컨테이너)이 달라 계속 빗나갔음.
+    //   → 매 렌더에서 inner 폭 인플레이션(width:100/s%)을 잠깐 100%로 되돌려(=장평 100% 레이아웃) 각 사진의
+    //     '진짜 폭'을 offsetWidth로 직접 측정하고(offsetWidth는 transform 무관·inner width에만 반응),
+    //     폭=W/s(→시각폭 W 고정)·높이=W*비율(→시각높이 고정)로 못박는다. 종류·컨테이너 불문 정확.
+    //   (캔버스는 매 렌더 새로 그려져 사진에 이전 인라인이 없어 측정이 깨끗함.)
+    var photos=[].slice.call(inner.querySelectorAll('.g-bub-img, .g-img > img'));
+    if(s!==1 && photos.length){
+      var _sw=inner.style.width, _stf=inner.style.transform;
+      inner.style.width='100%'; inner.style.transform='none';   // 장평 100% 레이아웃으로 잠깐 되돌림
+      var w1=photos.map(function(im){ return im.offsetWidth; }); // 각 사진의 s=1 실제 폭
+      inner.style.width=_sw; inner.style.transform=_stf;         // 원복
+      photos.forEach(function(im,i){
+        im.style.transform=''; im.style.transformOrigin='';
+        var W=w1[i]; if(!W){ im.style.removeProperty('width'); im.style.removeProperty('max-width'); im.style.removeProperty('height'); _fixRadius(im); return; }
+        var nn=_nat(im), natW=nn[0], natH=nn[1];
+        im.style.setProperty('width', (W/s)+'px', 'important');       // 시각폭 = (W/s)*s = W (장평 100%와 동일)
+        im.style.setProperty('max-width', (W/s)+'px', 'important');
+        if(natW && natH) im.style.setProperty('height', (W*(natH/natW))+'px', 'important');  // 시각높이 = W*비율 고정
+        else im.style.removeProperty('height');
+        _fixRadius(im);
+      });
+    } else {
+      photos.forEach(function(im){ im.style.transform=''; im.style.transformOrigin=''; im.style.removeProperty('width'); im.style.removeProperty('max-width'); im.style.removeProperty('height'); im.style.removeProperty('border-radius'); });
+    }
+    // 아바타: scaleX(1/s)로 원·글자·사진 복구 + 좌우 마진으로 레이아웃 슬롯 보정(겹침 방지)
+    var invAv = (s===1) ? '' : 'scaleX('+(1/s)+')';
+    var mAv = (s===1) ? '' : (1.25*(1/s-1))+'em';
+    [].forEach.call(inner.querySelectorAll('.g-avatar'), function(av){
+      av.style.transform = invAv;
+      av.style.transformOrigin = 'center';
+      av.style.marginLeft = mAv;
+      av.style.marginRight = mAv;
+    });
+  }
   // 캔버스 후처리 1: 각 말풍선 그룹의 위/아래 이웃이 '말풍선 그룹'인지 '본문'인지 표시.
   //   → 말풍선-말풍선 간격(--msg-gap)과 말풍선-본문 간격(--bub-body-gap)을 CSS에서 따로 적용.
   //   말풍선 내부/구조는 전혀 건드리지 않고 .g-msg-group에 클래스만 부여(안전).
@@ -2378,6 +2429,31 @@
       g.classList.remove('gmg-top-bub','gmg-top-body','gmg-bot-bub','gmg-bot-body');
       g.classList.add(isGroup(meaningfulSib(g,-1)) ? 'gmg-top-bub' : 'gmg-top-body');
       g.classList.add(isGroup(meaningfulSib(g, 1)) ? 'gmg-bot-bub' : 'gmg-bot-body');
+    });
+  }
+  // 캔버스 후처리: 본문 사진(.g-img)의 위/아래에 '실제 내용'이 있는지 감지해 마진(.5em)을 조건부로 제거.
+  //   - 위에 내용 없음 → margin-top 0(바깥 패딩과 겹쳐 넓어지는 것 방지)
+  //   - 아래 내용 없음 → margin-bottom 0
+  //   - 있으면 그대로(.5em 유지=인접 요소/사진과의 간격 역할). 사진만 있으면 위·아래 둘 다 0.
+  function trimImgMargins(root){
+    var inner = root.querySelector('.g-inner'); if(!inner) return;
+    function meaningful(node){
+      if(!node) return false;
+      if(node.nodeType===3) return (node.nodeValue||'').replace(/\u200b/g,'').trim()!=='';
+      if(node.nodeType===1){
+        if(node.tagName==='BR') return false;
+        if(node.classList && node.classList.contains('g-para-gap')) return false; // 문단 간격 스페이서는 내용 아님
+        var t=(node.textContent||'').replace(/\u200b/g,'').trim();
+        if(t==='' && !node.querySelector('img,svg,hr')) return false;             // 빈 요소 무시(단 이미지/구분선 등은 내용)
+        return true;
+      }
+      return false;
+    }
+    [].forEach.call(inner.querySelectorAll('.g-img'), function(gi){
+      var up=false, n=gi.previousSibling; while(n){ if(meaningful(n)){ up=true; break; } n=n.previousSibling; }
+      var dn=false; n=gi.nextSibling;      while(n){ if(meaningful(n)){ dn=true; break; } n=n.nextSibling; }
+      if(up) gi.style.removeProperty('margin-top');    else gi.style.setProperty('margin-top','0','important');
+      if(dn) gi.style.removeProperty('margin-bottom'); else gi.style.setProperty('margin-bottom','0','important');
     });
   }
   // 캔버스 후처리 2: 본문 빈 줄(=.g-inner 직속의 연속 <br> 2개 이상)을 문단 간격 스페이서로 치환.
@@ -2772,6 +2848,8 @@
     if(e.key==='Backspace' && !e.isComposing && e.keyCode!==229){
       var sel=window.getSelection();
       if(sel && sel.rangeCount && sel.isCollapsed){
+        var _imgSide=caretImgSide();
+        if(_imgSide){ e.preventDefault(); removeImg(_imgSide.img); return; }   // 사진 바로 옆(빈 앵커) 커서서 백스페이스 = 사진 삭제
         var hrPrev=hrBeforeCaret(sel.getRangeAt(0));
         if(hrPrev){ e.preventDefault(); removeHr(hrPrev); return; }
         // 두 말풍선 사이 구분자(제로폭) 위에서 백스페이스: 한 번에 구분자 제거→합치고 커서를 위 말풍선 끝으로
@@ -2810,6 +2888,23 @@
             if(tn3){ rr3.setStart(tn3, tn3.nodeValue.length); rr3.collapse(true); } else { rr3.selectNodeContents(pv2); rr3.collapse(false); }
             sel.removeAllRanges(); sel.addRange(rr3);
             saveSel(); render(); return;
+          }
+        }
+        // 말풍선 맨 앞에서 백스페이스: 이름표는 보호하고 그룹 위의 빈 줄(br/빈 텍스트)만 지운다.
+        var bubAtStart = caretInBubble();
+        if(bubAtStart && bubAtStart.classList.contains('char-bub') && typeof isCaretAtBubStart==='function' && isCaretAtBubStart(bubAtStart, sel.getRangeAt(0))){
+          var nmH = (typeof bubNameBefore==='function') ? bubNameBefore(bubAtStart) : null;
+          var headH = nmH || bubAtStart;
+          var pvH = headH.previousSibling;
+          var pvBlank = pvH && ((pvH.nodeType===1 && pvH.tagName==='BR') || (pvH.nodeType===3 && pvH.nodeValue.replace(/\u200b/g,'')==='' && !isBubbleSeparatorZwsp(pvH)));
+          if(pvBlank){
+            e.preventDefault();
+            if(pvH.parentNode) pvH.parentNode.removeChild(pvH);   // 위 빈 줄 하나 제거, 커서는 말풍선 맨 앞 유지
+            saveSel(); render(); return;
+          }
+          if(nmH){
+            var emptyH = !bubAtStart.querySelector('img') && (bubAtStart.textContent||'').replace(/\u200b/g,'')==='';
+            if(!emptyH){ e.preventDefault(); return; }   // 지울 빈 줄 없고 내용 있으면 이름 보호(기본 병합 차단)
           }
         }
         var eb=caretInBubble();
@@ -2857,6 +2952,13 @@
     img.onerror=function(){ cb(src); };
     img.src=src;
   }
+  // 삽입 직후 이미지는 아직 디코드 전(naturalWidth=0)이라 장평 보정(비율)이 안 잡힘 → 디코드 끝나면 한 번 더 렌더.
+  function reRenderOnDecode(im){
+    if(!im) return;
+    var done=false; function go(){ if(done) return; done=true; render(); }
+    if(im.decode){ im.decode().then(go).catch(function(){ im.addEventListener('load', go, {once:true}); }); }
+    else { im.addEventListener('load', go, {once:true}); }
+  }
   function insertLogImage(url){
     editor.focus(); restoreSel();
     var sel=window.getSelection();
@@ -2868,6 +2970,7 @@
     if(box.nextSibling && box.nextSibling.nodeType===1 && box.nextSibling.tagName==='BR'){ box.nextSibling.parentNode.removeChild(box.nextSibling); }
     var r=document.createRange(); r.setStartAfter(box); r.collapse(true); sel.removeAllRanges(); sel.addRange(r);
     cleanEditor(); render(); saveSel(); updateFormatButtons();
+    reRenderOnDecode(im);
   }
   // 사진 말풍선: 이미지가 들어있는 말풍선(char-bub 또는 plain recv/send). 캡션은 말풍선 안에 이어서 입력.
   function insertPhotoBubbleImg(desc, url){
@@ -2899,6 +3002,7 @@
     // 커서를 말풍선 안(사진 오른쪽) 끝에 — 제로폭 앵커 없이
     var r=document.createRange(); r.selectNodeContents(bub); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
     cleanEditor(); if(typeof absorbBubBreak==='function') absorbBubBreak(bub); styleCharBubbles(editor); render(); saveSel(); updateFormatButtons();
+    reRenderOnDecode(im);
   }
   if(_imgFile){
     _imgFile.addEventListener('change', function(e){
@@ -2944,6 +3048,48 @@
     (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-right'), _liTap('right'));
     (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})($('li-del'), function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } if(_selImg) removeImg(_selImg); });
   }
+  // 본문 사진 좌/우에 '보이는 커서' — 말풍선 사진과 동일하게 실제 앵커(zwsp) 텍스트노드를 사진 옆에 둔다.
+  //   블록 사진이라 이 앵커는 사진 옆(위/아래)의 얇은 한 줄에 놓이고 커서가 눈에 보인다. 안 쓰면 cleanEditor가 정리.
+  function caretAtImg(box, after){
+    editor.focus();
+    var ref = after ? box.nextSibling : box.previousSibling;
+    var tn = (ref && ref.nodeType===3) ? ref : null;
+    if(!tn){
+      tn=document.createTextNode('\u200b');
+      if(after){ if(ref){ box.parentNode.insertBefore(tn, ref); } else { box.parentNode.appendChild(tn); } }
+      else { box.parentNode.insertBefore(tn, box); }
+    }
+    var r=document.createRange(); r.setStart(tn, after ? 0 : tn.nodeValue.length); r.collapse(true);
+    var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    _selImg=box; _logimgToolsShow(true, box);
+    saveSel();
+  }
+  // 커서가 본문 사진 바로 앞/뒤(부모레벨 또는 사진 옆 빈 앵커)에 있으면 {img, after} 반환 — 백스페이스 삭제 판정용
+  function caretImgSide(){
+    var sel=window.getSelection(); if(!sel.rangeCount) return null;
+    var r=sel.getRangeAt(0); if(!r.collapsed) return null;
+    var c=r.startContainer, o=r.startOffset;
+    if(c.nodeType===1){
+      var af=c.childNodes[o], bf=c.childNodes[o-1];
+      if(af && af.nodeType===1 && af.classList && af.classList.contains('g-img')) return {img:af, after:false};
+      if(bf && bf.nodeType===1 && bf.classList && bf.classList.contains('g-img')) return {img:bf, after:true};
+    } else if(c.nodeType===3 && (c.nodeValue||'').replace(/\u200b/g,'')===''){
+      var pv=c.previousSibling, nx=c.nextSibling;
+      if(pv && pv.nodeType===1 && pv.classList && pv.classList.contains('g-img')) return {img:pv, after:true};
+      if(nx && nx.nodeType===1 && nx.classList && nx.classList.contains('g-img')) return {img:nx, after:false};
+    }
+    return null;
+  }
+  // 엔터: 커서가 사진 앞이면 사진 '위'에, 뒤면 '아래'에 빈 문단(빈 줄) 생성. 커서는 그 빈 줄로.
+  function insertBlankAtImg(side){
+    var img=side.img, parent=img.parentNode, br=document.createElement('br');
+    if(side.after){ parent.insertBefore(br, img.nextSibling); }   // 사진 아래 빈 줄
+    else { parent.insertBefore(br, img); }                        // 사진 위 빈 줄
+    var idx=[].indexOf.call(parent.childNodes, img);
+    var r=document.createRange(); r.setStart(parent, side.after ? idx+1 : idx); r.collapse(true);  // 커서 사진 옆 유지
+    var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    saveSel(); render();
+  }
   function removeImg(el){
     if(!el || !el.parentNode) return;
     var nx=el.nextSibling, pv=el.previousSibling;
@@ -2956,16 +3102,14 @@
     var t=e.target, box=(t && t.closest)?t.closest('.g-img'):null;
     if(box && editor.contains(box)){
       e.preventDefault();
-      var rect=box.getBoundingClientRect();
-      if(box.classList.contains('is-sel') && e.clientX>=rect.right-24 && e.clientY<=rect.top+24){ removeImg(box); }
-      else { selectImg(box); }
+      // 좌/우 반반(사진 img 기준): 왼쪽=사진 앞 커서, 오른쪽=사진 뒤 커서. 선택박스·✕ 없음.
+      var _im=box.querySelector('img'); var irect=_im?_im.getBoundingClientRect():box.getBoundingClientRect();
+      caretAtImg(box, e.clientX > (irect.left + irect.width/2));
       return;
     }
     clearImgSel();
   });
-  editor.addEventListener('keydown', function(e){
-    if((e.key==='Backspace'||e.key==='Delete') && _selImg && editor.contains(_selImg)){ e.preventDefault(); removeImg(_selImg); }
-  });
+  // (백스페이스가 선택된 본문 사진을 통째로 지우던 동작 제거 — 사진 옆에 커서를 두고 편집할 수 있게. 삭제는 ✕ 또는 삭제 버튼)
   // 사진 말풍선(말풍선 안 이미지) 클릭: 사진을 좌우 반반으로 나눠, 왼쪽을 누르면 사진 앞·오른쪽을 누르면 사진 뒤에 커서를 둠(모바일 포함). 데스크톱·모바일 동일하게 실제 커서를 붙여 바로 편집(앞 띄우기 등) 가능.
   var _activeBub=null;   // (호환용) 도구가 대상으로 삼는 말풍선 — 이제는 실제 커서로 판별되지만 남겨둠
   editor.addEventListener('click', function(e){
@@ -3760,7 +3904,7 @@
     if(bbg){ el.style.setProperty('--bub-body-gap', parseFloat(bbg.value)+'px'); }
     if(pg){ el.style.setProperty('--para-gap', parseFloat(pg.value)+'px'); }
     if(sg){ el.style.setProperty('--stack-gap', parseFloat(sg.value)+'px'); }
-    var subsz=$('subtext-size'); if(subsz){ var _ss=parseFloat(subsz.value); if(isNaN(_ss)) _ss=80; el.style.setProperty('--sub-size', (_ss/100)+'em'); }
+    var subsz=$('subtext-size'); if(subsz){ var _ss=parseFloat(subsz.value); if(isNaN(_ss)) _ss=26; el.style.setProperty('--sub-size', _ss+'px'); }
     var psz=$('photo-size'); if(psz){ var _pp=parseFloat(psz.value); el.style.setProperty('--photo-w', _pp+'%'); el.style.setProperty('--photo-w-px', Math.round(w*_pp/100)+'px'); }
     var lisz=$('logimg-size'); if(lisz){ el.style.setProperty('--logimg-w', parseFloat(lisz.value)+'%'); }
     var lirad=$('logimg-radius'); if(lirad){ el.style.setProperty('--logimg-radius', parseFloat(lirad.value)+'px'); }
@@ -3810,31 +3954,7 @@
       var s = st/100;
       if(s===1){ inner.style.width='100%'; inner.style.transform=''; inner.style.transformOrigin=''; }
       else { inner.style.width=(100/s)+'%'; inner.style.transform='scaleX('+s+')'; inner.style.transformOrigin='left top'; }
-      // 장평은 본문 글자에만 적용. 아바타(프사)의 원·이니셜 글자·사진은 눌리면 안 되므로 scaleX(1/s)로 되돌린다.
-      // 그냥 되돌리면 레이아웃 가로 슬롯(=2.5em)이 시각 크기와 어긋나 말풍선과 겹치므로, 좌우 마진으로 슬롯도 보정.
-      var invAv = (s===1) ? '' : 'scaleX('+(1/s)+')';
-      var mAv = (s===1) ? '' : (1.25*(1/s-1))+'em';
-      [].forEach.call(inner.querySelectorAll('.g-avatar'), function(av){
-        av.style.transform = invAv;
-        av.style.transformOrigin = 'center';
-        av.style.marginLeft = mAv;
-        av.style.marginRight = mAv;
-      });
-      // 말풍선 삽입 사진(g-bub-img)도 장평 영향 제거 — 장평 100%일 때의 크기·비율 그대로 유지.
-      //   폭을 고정 px(photo-w-px, 단 원본보다 크게 확대 안 되게 natural로 상한)로 못박아 %인플레이션을 없애고,
-      //   scaleX(1/s)로 가로 압축을 되돌린다(높이는 scaleX 무관이라 자동으로 자연 비율). 사진은 아바타 반대쪽(본문 안쪽)으로 펴지게 방향별 origin.
-      var _pw=$('photo-size'); var _ppv=_pw?parseFloat(_pw.value):60; if(isNaN(_ppv))_ppv=60;
-      var _photoPx=Math.round(w*_ppv/100);
-      var invImg = (s===1) ? '' : 'scaleX('+(1/s)+')';
-      [].forEach.call(inner.querySelectorAll('.g-bub-img'), function(im){
-        if(s===1){ im.style.transform=''; im.style.transformOrigin=''; im.style.width=''; return; }
-        var natW=im.naturalWidth||0;
-        im.style.width=(natW ? Math.min(_photoPx, natW) : _photoPx)+'px';
-        im.style.transform = invImg;
-        var bub=im.closest?im.closest('.g-bub'):null;
-        var rightSide=bub && (bub.classList.contains('send') || (bub.classList.contains('char-bub') && bub.classList.contains('right')));
-        im.style.transformOrigin = rightSide ? 'right center' : 'left center';
-      });
+      // 아바타·삽입 사진의 장평 역보정은 groupAvatars 이후 neutralizeStretch()에서 처리(여기선 아바타가 아직 생성 전이라 안 잡힘)
     }
     var layer = el.querySelector('.g-bg-layer');
     if(photoOn && photoData){
@@ -4034,9 +4154,9 @@
     updateEmptyBubbles();
     styleCharBubbles(editor);
     canvas.innerHTML = '<div class="g-inner">' + buildHtml() + '</div>';
-    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); tagMsgGroupNeighbors(canvas); wrapParaGaps(canvas); stripLastGap(canvas); fitStage();
+    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); neutralizeStretch(canvas); tagMsgGroupNeighbors(canvas); wrapParaGaps(canvas); stripLastGap(canvas); trimImgMargins(canvas); fitStage();
     setVal('font-size', $('font-size').value+'px');
-    if($('subtext-size')) setVal('subtext-size', $('subtext-size').value+'%');
+    if($('subtext-size')) setVal('subtext-size', $('subtext-size').value+'px');
     if($('stretch')) setVal('stretch', $('stretch').value+'%');
     if($('grad-angle')) setVal('grad-angle', angleLabel($('grad-angle').value));
     setVal('letter-spacing', parseFloat($('letter-spacing').value).toFixed(1));
@@ -4698,7 +4818,7 @@
     try{
       if(data.vals){ TEXT_IDS.forEach(function(id){ if(data.vals[id]!=null){ safeRestoreValue(id, data.vals[id]); } }); }
       ensureFontValid();
-      if(typeof data.editorHtml==='string'){ editor.innerHTML=data.editorHtml; syncTails(editor); clearHrSel(); }
+      if(typeof data.editorHtml==='string'){ editor.innerHTML=data.editorHtml; syncTails(editor); clearHrSel(); [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode); }
       if(nameEd && typeof data.nameHtml==='string'){ nameEd.innerHTML=data.nameHtml; }
       if($('title-ed') && typeof data.titleHtml==='string'){ $('title-ed').innerHTML=data.titleHtml; }
       if($('subtitle-ed') && typeof data.subtitleHtml==='string'){ $('subtitle-ed').innerHTML=data.subtitleHtml; }
