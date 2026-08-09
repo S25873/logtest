@@ -1028,9 +1028,9 @@
             <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 (색)의 색깔로">(색)</button>
             <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(I)</button>
             <button class="mini" id="t-paren-sub" type="button" title="괄호(포함)를 작은 글자 크기로">(Aa)</button>
+            <button class="mini" id="t-quote-add" type="button" title="기호가 없는 문단 앞뒤에 큰따옴표 넣기">&quot;넣&quot;</button>
             <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말&quot;</button>
             <button class="mini" id="t-quote-line" type="button" title="큰따옴표로 감싼 부분을 인용선으로">&quot;인&quot;</button>
-            <button class="mini" id="t-quote-add" type="button" title="기호가 없는 문단 앞뒤에 큰따옴표 넣기">&quot;넣&quot;</button>
             <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
           </div>
         </div>
@@ -5097,9 +5097,8 @@
   }
   // ===== 따옴표 넣기 (미니 도구 '"넣"') =====
   //   각 문단(줄)을 훑어 앞뒤에 " 를 붙인다. 단, 아래는 건너뜀:
-  //   ① 줄 앞/뒤 글자가 " ' * ( ) 인 줄  ② 줄 안에 따옴표가 섞인 줄  ③ 빈 줄
+  //   ① 줄 '앞/뒤 글자'가 따옴표(큰·작은, 곧은/휜 것) 또는 * ( ) 인 줄  ② 빈 줄. 중간에 있는 기호는 무시.
   //   말풍선·인용선 '안쪽' 줄도 대상(단 위 조건은 동일). 사진·구분선·이름표 등 블록은 건너뜀.
-  var _QMARK=/["'\u201C\u201D\u201E\u201F\u2018\u2019\u201B\u2032\u2033]/;
   var _EDGE_SKIP='*()（）"\'\u201C\u201D\u201E\u201F\u2018\u2019\u201B\u2032\u2033';   // 앞뒤 글자로 오면 건너뛸 기호(큰·작은따옴표는 휜 것/곧은 것 모두)
   function _isBlockish(n){
     return n.nodeType===1 && n.classList && (n.classList.contains('g-img')||n.classList.contains('g-hr')||
@@ -5113,7 +5112,6 @@
     var txt=''; seg.forEach(function(n){ txt += (n.textContent||''); });
     txt = txt.replace(/\u200b/g,'').trim();
     if(!txt) return;
-    if(_QMARK.test(txt)) return;                                    // 따옴표가 섞인 줄
     if(_EDGE_SKIP.indexOf(txt.charAt(0))>-1) return;                // 앞이 * ( )
     if(_EDGE_SKIP.indexOf(txt.charAt(txt.length-1))>-1) return;     // 뒤가 * ( )
     parent.insertBefore(document.createTextNode('"'), seg[0]);      // 서식 '바깥'에 붙음
