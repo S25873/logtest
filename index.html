@@ -497,7 +497,7 @@
     .sheet{
       border-radius:var(--radius-lg);
       box-shadow:0 24px 60px -18px rgba(0,0,0,.45);
-      padding:8px 16px 16px;
+      padding:18px 16px 18px;
       transform:translateY(10px) scale(.98);opacity:0;
       transition:transform .2s var(--ease), opacity .2s var(--ease);
     }
@@ -727,8 +727,8 @@
   #editor .g-title-main:empty:before{content:"제목";color:var(--ink-3);}
   #editor .g-title-sub:empty:before{content:"소제목";color:var(--ink-3);}
   #editor .g-quote{display:block;white-space:pre-wrap;}
-  #editor .g-quote.left{border-left:2px solid var(--line-strong);padding-left:8px;}
-  #editor .g-quote.right{border-right:2px solid var(--line-strong);padding-right:8px;text-align:right;}
+  #editor .g-quote.left{border-left:2px solid var(--quote-color,var(--line-strong));padding-left:8px;}
+  #editor .g-quote.right{border-right:2px solid var(--quote-color,var(--line-strong));padding-right:8px;text-align:right;}
   #editor .g-hr{display:flex;align-items:center;justify-content:center;margin:5px 0;height:1.2em;line-height:1;color:transparent;position:relative;cursor:pointer;border-radius:8px;transition:background .14s var(--ease);}
   #editor .g-hr:hover{background:var(--surface-2);}
   #editor .g-hr.is-sel{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);height:auto;min-height:20px;padding:6px 12px;overflow:visible;}
@@ -1305,7 +1305,6 @@
                 <div class="cchip"><label>(색깔)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
                 <div class="cchip"><label>제목</label><div class="cchip__box"><input id="c-title" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-title-txt" type="text" value="#1a1a1a"></div></div>
                 <div class="cchip"><label>소제목</label><div class="cchip__box"><input id="c-subtitle" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-subtitle-txt" type="text" value="#1a1a1a"></div></div>
-                <div class="cchip"><label>인용선</label><div class="cchip__box"><input id="c-quote" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-quote-txt" type="text" value="#c8c8c8"></div></div>
                 <div class="cchip"><label>구분선</label><div class="cchip__box"><input id="c-hr" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-hr-txt" type="text" value="#c8c8c8"></div></div>
                 <div class="cchip"><label>하단 글자</label><div class="cchip__box"><input id="c-name" type="color" value="#6c6c6c"><input class="cchip__hex" id="c-name-txt" type="text" value="#6c6c6c"></div></div>
                 <div class="cchip"><label>하단 인용선</label><div class="cchip__box"><input id="c-bar" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-bar-txt" type="text" value="#c8c8c8"></div></div>
@@ -1368,6 +1367,36 @@
                   </div>
                 </div>
                 <div class="dots" id="hl-presets"></div>
+                <p class="hint">프리셋을 누르면 위에서 고른 슬롯에 색이 들어가요.</p>
+              </div>
+            </div>
+          </details>
+
+          <details class="fold" id="fold-quote">
+            <summary>
+              인용선
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <div class="cgrid cgrid--2">
+                <div class="cchip"><label>인용선 1</label><div class="cchip__box"><input id="c-quote" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-quote-txt" type="text" value="#c8c8c8"></div></div>
+                <div class="cchip"><label>인용선 2</label><div class="cchip__box"><input id="c-quote2" type="color" value="#b4d3ec"><input class="cchip__hex" id="c-quote2-txt" type="text" value="#b4d3ec"></div></div>
+                <div class="cchip"><label>인용선 3</label><div class="cchip__box"><input id="c-quote3" type="color" value="#efbcd3"><input class="cchip__hex" id="c-quote3-txt" type="text" value="#efbcd3"></div></div>
+                <div class="cchip"><label>인용선 4</label><div class="cchip__box"><input id="c-quote4" type="color" value="#c4e1ac"><input class="cchip__hex" id="c-quote4-txt" type="text" value="#c4e1ac"></div></div>
+              </div>
+              <div class="section">
+                <p class="section__head">프리셋</p>
+                <div class="field" style="margin-bottom:14px">
+                  <span class="label">적용할 색 <span class="val" id="quote-slot-val">인용선 1</span></span>
+                  <div class="seg" id="quote-slot-seg">
+                    <button type="button" data-slot="1" aria-pressed="true">1</button>
+                    <button type="button" data-slot="2" aria-pressed="false">2</button>
+                    <button type="button" data-slot="3" aria-pressed="false">3</button>
+                    <button type="button" data-slot="4" aria-pressed="false">4</button>
+                    <span class="seg__thumb"></span>
+                  </div>
+                </div>
+                <div class="dots" id="quote-presets"></div>
                 <p class="hint">프리셋을 누르면 위에서 고른 슬롯에 색이 들어가요.</p>
               </div>
             </div>
@@ -1802,7 +1831,9 @@
   var bubbleShape = 'imessage';  // 'imessage' | 'simple'
 
   /* 형광펜·강조색: 슬롯 1/2/3 (슬롯1은 기존 c-hl / c-em 을 그대로 사용) */
-  var hlSlot = 1, emSlot = 1;
+  var hlSlot = 1, emSlot = 1, quoteSlot = 1;
+  function quoteInput(slot){ return $(slot===1 ? 'c-quote' : 'c-quote'+slot); }
+  function quoteTxt(slot){ return $((slot===1 ? 'c-quote' : 'c-quote'+slot)+'-txt'); }
   function hlInput(slot){ return $(slot===1 ? 'c-hl' : 'c-hl'+slot); }
   function emInput(slot){ return $(slot===1 ? 'c-em' : 'c-em'+slot); }
   function hlTxt(slot){ return $((slot===1 ? 'c-hl' : 'c-hl'+slot)+'-txt'); }
@@ -1968,6 +1999,22 @@
     emWrap.appendChild(b);
   });
 
+  var quoteWrap = $('quote-presets');
+  hlPresets.forEach(function(p){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'dot'; b.title = p.label; b.setAttribute('aria-label', p.label);
+    var i = document.createElement('i'); i.style.background = p.c; b.appendChild(i);
+    b.addEventListener('click', function(){
+      [].forEach.call(quoteWrap.children, function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      var ci=quoteInput(quoteSlot), ti=quoteTxt(quoteSlot);
+      if(ci) ci.value = p.c; if(ti) ti.value = p.c;
+      recolorQuoteSlot(quoteSlot, p.c);
+      render();
+    });
+    quoteWrap.appendChild(b);
+  });
+
   /* 말풍선 프리셋 — recv배경/send배경/recv글자/send글자 */
   var bubPresets = [
     {label:'아이메시지', br:'#e9e9eb', bs:'#248bf5', bri:'#000000', bsi:'#ffffff'},
@@ -2110,7 +2157,10 @@
   linkColor('c-sub','c-sub-txt',false,false);
   linkColor('c-star','c-star-txt',false,false);
   linkColor('c-paren','c-paren-txt',false,false);
-  linkColor('c-quote','c-quote-txt',false,false);
+  linkColor('c-quote','c-quote-txt',false,false, function(){ recolorQuoteSlot(1, $('c-quote').value); });
+  linkColor('c-quote2','c-quote2-txt',false,false, function(){ recolorQuoteSlot(2, $('c-quote2').value); });
+  linkColor('c-quote3','c-quote3-txt',false,false, function(){ recolorQuoteSlot(3, $('c-quote3').value); });
+  linkColor('c-quote4','c-quote4-txt',false,false, function(){ recolorQuoteSlot(4, $('c-quote4').value); });
   linkColor('c-hr','c-hr-txt',false,false);
   linkColor('c-brecv-name','c-brecv-name-txt',false,false,updateEditorBub);
   linkColor('c-bsend-name','c-bsend-name-txt',false,false,updateEditorBub);
@@ -2804,7 +2854,19 @@
     while(el && el!==editor && el.nodeType===1){ if(el.classList && el.classList.contains('g-quote')) return el; el = el.parentNode; }
     return null;
   }
-  function applyQuote(side){
+  // slot(1~4): 인용선 색 슬롯. 요소에 data-qslot과 인라인 --quote-color를 넣어
+  //   나중에 해당 슬롯 색을 바꿔도 이미 그린 인용선에 반영되게 한다(형광펜·강조와 같은 방식).
+  function quoteSlotColor(slot){ var el=$(slot>1?('c-quote'+slot):'c-quote'); return el?el.value:''; }
+  function paintQuote(el, slot){
+    if(!el) return;
+    slot = slot||1;
+    el.setAttribute('data-qslot', String(slot));
+    var c=quoteSlotColor(slot); if(c) el.style.setProperty('--quote-color', c);
+  }
+  function recolorQuoteSlot(slot, color){
+    [].forEach.call(editor.querySelectorAll('.g-quote[data-qslot="'+slot+'"]'), function(q){ q.style.setProperty('--quote-color', color); });
+  }
+  function applyQuote(side, slot){
     var sel = window.getSelection(); if(!sel || sel.rangeCount===0) return;
     var range = sel.getRangeAt(0); if(!editor.contains(range.startContainer)) return;
     var existing = closestQuote(range.startContainer) || closestQuote(range.endContainer);
@@ -2815,16 +2877,16 @@
         while(existing.firstChild){ pr.insertBefore(existing.firstChild, existing); }
         var nx=existing.nextSibling; if(nx && !(nx.nodeType===1 && nx.tagName==='BR')){ pr.insertBefore(document.createElement('br'), existing); }
         pr.removeChild(existing);
-      } else { existing.className = 'g-quote ' + side; }
+      } else { existing.className = 'g-quote ' + side; paintQuote(existing, slot); }
       return;
     }
     if(range.collapsed){
-      var qE=document.createElement('div'); qE.className='g-quote '+side; qE.appendChild(document.createTextNode('\u200b'));
+      var qE=document.createElement('div'); qE.className='g-quote '+side; paintQuote(qE, slot); qE.appendChild(document.createTextNode('\u200b'));
       range.insertNode(qE); var r0=document.createRange(); r0.selectNodeContents(qE); r0.collapse(false); sel.removeAllRanges(); sel.addRange(r0); return;
     }
     var frag = range.extractContents();
     [].forEach.call(frag.querySelectorAll('.g-quote'), function(b){ var p=b.parentNode; while(b.firstChild){ p.insertBefore(b.firstChild,b); } p.removeChild(b); });
-    var q=document.createElement('div'); q.className='g-quote '+side; q.appendChild(frag);
+    var q=document.createElement('div'); q.className='g-quote '+side; paintQuote(q, slot); q.appendChild(frag);
     function edgeStrippable(n){ return (n.nodeType===1 && n.tagName==='BR') || (n.nodeType===3 && n.nodeValue.replace(/\u200b/g,'')===''); }
     while(q.firstChild && edgeStrippable(q.firstChild)){ q.removeChild(q.firstChild); }
     while(q.lastChild && edgeStrippable(q.lastChild)){ q.removeChild(q.lastChild); }
@@ -3253,7 +3315,7 @@
       if(existingS && rangeWithin(rangeS, existingS)){ var prS=existingS.parentNode; while(existingS.firstChild){prS.insertBefore(existingS.firstChild,existingS);} prS.removeChild(existingS); }
       else { paintUnion(rangeS, 'sub', null, null); }
     }
-    else if(fmt==='quote'){ applyQuote(side==='right'?'right':'left'); }
+    else if(fmt==='quote'){ applyQuote(side==='right'?'right':'left', color||1); }   // color 인자를 인용선 슬롯(1~4)으로 사용
     else if(fmt==='bub-recv' || fmt==='bub-send'){
       var newBub = applyBubble(fmt==='bub-send'?'send':'recv', !!tail, !!withName);
       cleanEditor(); render();
@@ -3334,10 +3396,29 @@
       { label: '강조 4', preview: function(){ return swatchHtml(emColorOf(4)); }, run: function(){ applyFormat('emph', null, null, false, 4); } },
       { label: '강조 지우기', preview: removeSwatchHtml, run: function(){ applyFormat('emph', null, null, false, '__remove__'); } }
     ]},
-    quote: { title: '인용선', options: [
-      { label: '왼쪽 인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="10" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ applyFormat('quote', null, 'left'); } },
-      { label: '오른쪽 인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="17.6" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="4" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="7" y1="16" x2="14" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ applyFormat('quote', null, 'right'); } }
-    ]},
+    quote: { title: '인용선', options: (function(){
+      // 4색 슬롯 × 좌/우 = 8칸. 미리보기 세로선에 각 슬롯 색을 실제로 칠해 보여준다.
+      function qIcon(side, col){
+        var bar = side==='left'
+          ? '<rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="'+col+'"/>'
+          : '<rect x="17.6" y="4" width="2.4" height="16" rx="1.2" fill="'+col+'"/>';
+        var lines = side==='left'
+          ? '<line x1="10" y1="8" x2="20" y2="8"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="16" x2="17" y2="16"/>'
+          : '<line x1="4" y1="8" x2="14" y2="8"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="7" y1="16" x2="14" y2="16"/>';
+        return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'+bar+lines+'</svg></span>';
+      }
+      var out=[];
+      [1,2,3,4].forEach(function(n){
+        ['left','right'].forEach(function(side){
+          out.push({
+            label: '인용선 '+n+' · '+(side==='left'?'왼쪽':'오른쪽'),
+            preview: qIcon(side, quoteSlotColor(n) || '#c8c8c8'),
+            run: (function(sd, slot){ return function(){ applyFormat('quote', null, sd, false, slot); }; })(side, n)
+          });
+        });
+      });
+      return out;
+    }) },
     hr: { title: '구분선', options: [
       { label: '가로 구분선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ applyHr('line'); } },
       { label: '점 세 개', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><circle cx="7" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="17" cy="12" r="1.5" fill="currentColor"/></svg></span>', run: function(){ applyHr('dots'); } },
@@ -3368,7 +3449,8 @@
     _sheetSavedRange = (sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)) ? sel.getRangeAt(0).cloneRange() : (_savedRange ? _savedRange.cloneRange() : null);
     sheetTitle.textContent = def.title;
     sheetList.innerHTML = '';
-    def.options.forEach(function(opt){
+    var _opts = (typeof def.options==='function') ? def.options() : def.options;   // 함수면 열 때마다 생성(색 최신 반영)
+    _opts.forEach(function(opt){
       var b = document.createElement('button'); b.type='button';
       var pv = (typeof opt.preview==='function') ? opt.preview() : (opt.preview||'');
       b.innerHTML = pv + '<span>'+opt.label+'</span>';
@@ -3806,7 +3888,7 @@
     thumb.style.width = aRect.width + 'px';
     thumb.style.transform = 'translateX(' + (aRect.left - segRect.left - pad) + 'px)';
   }
-  function moveAllThumbs(){ moveThumb($('align-seg')); moveThumb($('size-seg')); moveThumb($('ratio-seg')); moveThumb($('hl-slot-seg')); moveThumb($('em-slot-seg')); moveThumb($('bg-mode-seg')); moveThumb($('char-shape-seg')); moveThumb($('bub-shape-seg')); moveThumb($('topbar-src-seg')); }
+  function moveAllThumbs(){ moveThumb($('align-seg')); moveThumb($('size-seg')); moveThumb($('ratio-seg')); moveThumb($('hl-slot-seg')); moveThumb($('em-slot-seg')); moveThumb($('quote-slot-seg')); moveThumb($('bg-mode-seg')); moveThumb($('char-shape-seg')); moveThumb($('bub-shape-seg')); moveThumb($('topbar-src-seg')); }
 
   document.querySelectorAll('#align-seg button').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -3844,6 +3926,16 @@
       markDot(hlWrap, hlPresets, hlColorOf(hlSlot));
     });
   });
+  document.querySelectorAll('#quote-slot-seg button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#quote-slot-seg button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+      btn.setAttribute('aria-pressed','true');
+      quoteSlot = parseInt(btn.getAttribute('data-slot'),10) || 1;
+      var lbl=$('quote-slot-val'); if(lbl){ lbl.textContent = '인용선 '+quoteSlot; }
+      moveThumb($('quote-slot-seg'));
+      markDot(quoteWrap, hlPresets, quoteSlotColor(quoteSlot));
+    });
+  });
   document.querySelectorAll('#em-slot-seg button').forEach(function(btn){
     btn.addEventListener('click', function(){
       document.querySelectorAll('#em-slot-seg button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
@@ -3859,6 +3951,8 @@
   var _foldEmph=$('fold-emph'), _foldHl=$('fold-hl');
   if(_foldEmph){ _foldEmph.addEventListener('toggle', function(){ if(_foldEmph.open){ requestAnimationFrame(function(){ moveThumb($('em-slot-seg')); }); } }); }
   if(_foldHl){ _foldHl.addEventListener('toggle', function(){ if(_foldHl.open){ requestAnimationFrame(function(){ moveThumb($('hl-slot-seg')); }); } }); }
+  var _foldQuote=$('fold-quote');
+  if(_foldQuote){ _foldQuote.addEventListener('toggle', function(){ if(_foldQuote.open){ requestAnimationFrame(function(){ moveThumb($('quote-slot-seg')); }); } }); }
   var _foldSize=$('fold-size');
   if(_foldSize){ _foldSize.addEventListener('toggle', function(){ if(_foldSize.open){ requestAnimationFrame(moveAllThumbs); } }); }
   var _foldBg=$('fold-bg');
@@ -4097,8 +4191,11 @@
             return;
           }
           var isHrBlk = spBlk.indexOf('g-hr')===0;
+          var _qslot = (spBlk.indexOf('g-quote')===0) ? (ch.getAttribute('data-qslot')||'') : '';   // 인용선 색 슬롯 보존
+          var _qcol  = _qslot ? ch.style.getPropertyValue('--quote-color') : '';
           for(var k=ch.attributes.length-1;k>=0;k--){ ch.removeAttribute(ch.attributes[k].name); }
           ch.className = spBlk;
+          if(_qslot){ ch.setAttribute('data-qslot', _qslot); if(_qcol) ch.style.setProperty('--quote-color', _qcol); }
           if(isHrBlk){ ch.setAttribute('contenteditable','false'); if(spBlk.indexOf('dots')>-1 && ch.textContent.replace(/\u200b/g,'').trim()===''){ ch.textContent='•  •  •'; } }
           walk(ch); return;
         }
@@ -4894,7 +4991,7 @@
   var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','font-size','subtext-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
-    'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
+    'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-quote2','c-quote2-txt','c-quote3','c-quote3-txt','c-quote4','c-quote4-txt','c-hr','c-hr-txt',
     'c-brecv-name','c-brecv-name-txt','c-bsend-name','c-bsend-name-txt','c-bar-bg','c-bar-bg-txt','c-bar-accent','c-bar-accent-txt','c-bar-name','c-bar-name-txt','c-bar-avatar','c-bar-avatar-txt','c-bar-plus','c-bar-plus-txt','c-bar-arrow','c-bar-arrow-txt','opacity','bright','c-grad1','c-grad1-txt','c-grad2','c-grad2-txt','grad-angle'];
   var _restoring=false;
 
@@ -5146,7 +5243,7 @@
     bubbleShape = ({imessage:1,simple:1,soft:1})[s.bubbleShape] ? s.bubbleShape : 'imessage';
     syncShapeSeg();
     applyBubbleShape();
-    ['c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-em','c-em2','c-em3','c-em4','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
+    ['c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-em','c-em2','c-em3','c-em4','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-quote2','c-quote3','c-quote4','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
       var t=$(cid+'-txt'); if(t){ var v=t.value.trim(); if(v.indexOf('gradient')===-1 && /^#?[0-9a-fA-F]{3,8}$/.test(v)){ $(cid).value = v.charAt(0)==='#'?v:'#'+v; } }
     });
     if(typeof moveAllThumbs==='function'){ requestAnimationFrame(moveAllThumbs); }
