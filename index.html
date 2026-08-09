@@ -490,6 +490,21 @@
   .help-body b{color:inherit;font-weight:600;}
   .help-cat{font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line);}
   .help-cat:first-child{margin-top:2px;}
+  /* 넓은 화면(데스크톱)에선 아래에서 올라오는 시트 대신 화면 가운데 모달로 — 시선·마우스 이동 최소화.
+     좁은 화면(모바일)은 그대로 바텀시트(한 손 조작에 유리). */
+  @media (min-width:901px){
+    .sheet-overlay{align-items:center;}
+    .sheet{
+      border-radius:var(--radius-lg);
+      box-shadow:0 24px 60px -18px rgba(0,0,0,.45);
+      padding:8px 16px 16px;
+      transform:translateY(10px) scale(.98);opacity:0;
+      transition:transform .2s var(--ease), opacity .2s var(--ease);
+    }
+    .sheet-overlay.is-open .sheet{transform:translateY(0) scale(1);opacity:1;}
+    .sheet__grip{display:none;}
+    .help-body{max-height:min(70vh,620px);}
+  }
   .sheet__grip{width:38px;height:4px;border-radius:99px;background:var(--line-strong);margin:6px auto 12px;}
   .sheet__title{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.02em;padding:0 4px 10px;}
   .sheet__list{display:flex;flex-direction:column;gap:6px;}
@@ -704,7 +719,8 @@
   #editor mark.em{color:var(--em,inherit) !important;background:transparent;}
   #editor mark.ul{background:transparent;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;}
   #editor mark.sub{color:var(--sub-color,#8a8a8a) !important;background:transparent;font-size:.8em !important;}
-  #editor mark.gray{color:var(--sub-color,#8a8a8a) !important;background:transparent;}
+  #editor mark.gray{color:var(--star-color,var(--sub-color,#8a8a8a)) !important;background:transparent;}
+  #editor mark.gray.paren{color:var(--paren-color,var(--sub-color,#8a8a8a)) !important;}
   #editor .g-title-blk{display:block;margin:0 0 8px;}
   #editor .g-title-main{display:block !important;font-size:1.6em !important;font-weight:700 !important;line-height:1.25 !important;}
   #editor .g-title-sub{display:block !important;font-size:1.15em !important;font-weight:400 !important;margin-top:2px;line-height:1.3 !important;}
@@ -853,7 +869,8 @@
   #canvas mark.ul,.canvas-clone mark.ul{color:inherit !important;background:transparent !important;display:inline !important;
     text-decoration:underline !important;text-decoration-thickness:.05em !important;text-underline-offset:.12em !important;}
   #canvas mark.sub,.canvas-clone mark.sub{color:var(--sub-color,#8a8a8a) !important;background:transparent !important;display:inline !important;font-size:var(--sub-size,.8em) !important;}
-  #canvas mark.gray,.canvas-clone mark.gray{color:var(--sub-color,#8a8a8a) !important;background:transparent !important;display:inline !important;}
+  #canvas mark.gray,.canvas-clone mark.gray{color:var(--star-color,var(--sub-color,#8a8a8a)) !important;background:transparent !important;display:inline !important;}
+  #canvas mark.gray.paren,.canvas-clone mark.gray.paren{color:var(--paren-color,var(--sub-color,#8a8a8a)) !important;}
   #canvas .g-title-blk,.canvas-clone .g-title-blk{display:block !important;margin:0 0 var(--titleblk-gap,.8em) !important;}
   #canvas .g-title-main,.canvas-clone .g-title-main{display:block !important;font-size:var(--title-size,1.6em) !important;font-weight:700 !important;font-family:var(--title-font,inherit) !important;color:var(--title-color,inherit) !important;line-height:1.25 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-title-sub,.canvas-clone .g-title-sub{display:block !important;font-size:var(--subtitle-size,1.15em) !important;font-weight:400 !important;font-family:var(--title-font,inherit) !important;color:var(--subtitle-color,inherit) !important;margin-top:var(--title-gap,.25em) !important;line-height:1.3 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
@@ -1284,6 +1301,8 @@
               <div class="cgrid cgrid--2">
                 <div class="cchip"><label>본문 글자</label><div class="cchip__box"><input id="c-fg" type="color" value="#2b2b2b"><input class="cchip__hex" id="c-fg-txt" type="text" value="#2b2b2b"></div></div>
                 <div class="cchip"><label>서브 글자</label><div class="cchip__box"><input id="c-sub" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-sub-txt" type="text" value="#8a8a8a"></div></div>
+                <div class="cchip"><label>*색깔*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
+                <div class="cchip"><label>(색깔)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
                 <div class="cchip"><label>제목</label><div class="cchip__box"><input id="c-title" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-title-txt" type="text" value="#1a1a1a"></div></div>
                 <div class="cchip"><label>소제목</label><div class="cchip__box"><input id="c-subtitle" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-subtitle-txt" type="text" value="#1a1a1a"></div></div>
                 <div class="cchip"><label>인용선</label><div class="cchip__box"><input id="c-quote" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-quote-txt" type="text" value="#c8c8c8"></div></div>
@@ -2001,6 +2020,8 @@
     editor.style.setProperty('--bub-recv-ink', bubInkRecv());
     editor.style.setProperty('--bub-send-ink', bubInkSend());
     editor.style.setProperty('--sub-color', $('c-sub').value);
+    editor.style.setProperty('--star-color', $('c-star').value);
+    editor.style.setProperty('--paren-color', $('c-paren').value);
     editor.style.setProperty('--title-color', $('c-title').value);
     editor.style.setProperty('--subtitle-color', $('c-subtitle').value);
     editor.style.setProperty('--quote-color', $('c-quote').value);
@@ -2087,6 +2108,8 @@
   linkColor('c-title','c-title-txt',false,false);
   linkColor('c-subtitle','c-subtitle-txt',false,false);
   linkColor('c-sub','c-sub-txt',false,false);
+  linkColor('c-star','c-star-txt',false,false);
+  linkColor('c-paren','c-paren-txt',false,false);
   linkColor('c-quote','c-quote-txt',false,false);
   linkColor('c-hr','c-hr-txt',false,false);
   linkColor('c-brecv-name','c-brecv-name-txt',false,false,updateEditorBub);
@@ -2336,7 +2359,7 @@
       }
       b.style.setProperty('--bub', c.bub);
       // 인물별 괄호 색: 이 말풍선 안의 (색깔) 회색 마크가 참조하는 변수만 덮어씀(값을 박지 않아 위치에 따라 자동 반영)
-      if(c.subColor){ b.style.setProperty('--sub-color', c.subColor); } else { b.style.removeProperty('--sub-color'); }
+      if(c.subColor){ b.style.setProperty('--paren-color', c.subColor); } else { b.style.removeProperty('--paren-color'); }
       var path=b.querySelector('svg.g-tail path'); if(path){ path.style.setProperty('fill', c.bub, 'important'); }
     });
     [].forEach.call(root.querySelectorAll('.g-bub-name.char-name'), function(n){
@@ -3966,6 +3989,8 @@
     el.style.setProperty('--title-font', (tf && tf.value) ? tf.value : $('font').value);
     el.style.setProperty('--name-font', (nf && nf.value) ? nf.value : $('font').value);
     el.style.setProperty('--sub-color', $('c-sub').value);
+    el.style.setProperty('--star-color', $('c-star').value);
+    el.style.setProperty('--paren-color', $('c-paren').value);
     el.style.setProperty('--quote-color', $('c-quote').value);
     el.style.setProperty('--hr-color', $('c-hr').value);
     el.style.setProperty('--bub-name-recv', $('c-brecv-name').value);
@@ -4093,6 +4118,7 @@
           var isUl=(tag==='MARK') && ch.classList.contains('ul');
           var isSub=(tag==='MARK') && ch.classList.contains('sub');
           var isGray=(tag==='MARK') && ch.classList.contains('gray');
+          var isParen=isGray && ch.classList.contains('paren');
           var isCharBub = isBub && ch.classList.contains('char-bub');
           var isCharName = isBubName && ch.classList.contains('char-name');
           var bubKind = (isBub && !isCharBub) ? (ch.classList.contains('send')?'send':'recv') : '';
@@ -4115,7 +4141,7 @@
           else if(isEm){ ch.className='em'; if(emColor) ch.style.setProperty('--em', emColor); }
           else if(isUl){ ch.className='ul'; }
           else if(isSub){ ch.className='sub'; }
-          else if(isGray){ ch.className='gray'; }
+          else if(isGray){ ch.className='gray'+(isParen?' paren':''); }
           walk(ch);
         }
       });
@@ -4752,7 +4778,8 @@
     _absorbList.forEach(absorbBubBreak);
     render(); if(!IS_TOUCH) editor.focus();
   }
-  function grayMark(inner){ var mk=document.createElement('mark'); mk.className='gray'; mk.textContent=inner; return mk; }
+  // isParen=true면 'paren' 클래스를 붙여 (색깔)용으로 구분 — 별(*색깔*)과 색을 따로 지정하기 위함
+  function grayMark(inner, isParen){ var mk=document.createElement('mark'); mk.className='gray'+(isParen?' paren':''); mk.textContent=inner; return mk; }
   function isGrayEl(el){ return el.tagName==='MARK' && el.classList.contains('gray'); }
   function isItalicEl(el){ return el.tagName==='I' || el.tagName==='EM'; }
   function isBubEl(el){ return el.classList && (el.classList.contains('g-bub') || el.classList.contains('g-bub-name')); }
@@ -4785,7 +4812,7 @@
   });
   // ( ) 회색: 괄호(포함) 전체를 서브색(회색)으로
   $('t-paren-gray').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ return grayMark(m[0]); }, isGrayEl);
+    replaceInText(/\([^()\n]*\)/g, function(m){ return grayMark(m[0], true); }, isGrayEl);
   });
 
   /* ===== 큰따옴표 → 인물 말풍선 ===== */
@@ -4867,7 +4894,7 @@
   var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','font-size','subtext-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
-    'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
+    'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-hr','c-hr-txt',
     'c-brecv-name','c-brecv-name-txt','c-bsend-name','c-bsend-name-txt','c-bar-bg','c-bar-bg-txt','c-bar-accent','c-bar-accent-txt','c-bar-name','c-bar-name-txt','c-bar-avatar','c-bar-avatar-txt','c-bar-plus','c-bar-plus-txt','c-bar-arrow','c-bar-arrow-txt','opacity','bright','c-grad1','c-grad1-txt','c-grad2','c-grad2-txt','grad-angle'];
   var _restoring=false;
 
@@ -5119,7 +5146,7 @@
     bubbleShape = ({imessage:1,simple:1,soft:1})[s.bubbleShape] ? s.bubbleShape : 'imessage';
     syncShapeSeg();
     applyBubbleShape();
-    ['c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-em','c-em2','c-em3','c-em4','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-quote','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
+    ['c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-em','c-em2','c-em3','c-em4','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
       var t=$(cid+'-txt'); if(t){ var v=t.value.trim(); if(v.indexOf('gradient')===-1 && /^#?[0-9a-fA-F]{3,8}$/.test(v)){ $(cid).value = v.charAt(0)==='#'?v:'#'+v; } }
     });
     if(typeof moveAllThumbs==='function'){ requestAnimationFrame(moveAllThumbs); }
