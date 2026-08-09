@@ -719,6 +719,8 @@
   #editor mark.em{color:var(--em,inherit) !important;background:transparent;}
   #editor mark.ul{background:transparent;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;}
   #editor mark.sub{color:var(--sub-color,#8a8a8a) !important;background:transparent;font-size:.8em !important;}
+  /* (서브)=크기, (색깔)=색 — 겹칠 때 순서와 무관하게 색은 항상 별/괄호 색이 이기도록 */
+  #editor mark.gray mark.sub{color:inherit !important;}
   #editor mark.gray{color:var(--star-color,var(--sub-color,#8a8a8a)) !important;background:transparent;}
   #editor mark.gray.paren{color:var(--paren-color,var(--sub-color,#8a8a8a)) !important;}
   #editor .g-title-blk{display:block;margin:0 0 8px;}
@@ -869,6 +871,7 @@
   #canvas mark.ul,.canvas-clone mark.ul{color:inherit !important;background:transparent !important;display:inline !important;
     text-decoration:underline !important;text-decoration-thickness:.05em !important;text-underline-offset:.12em !important;}
   #canvas mark.sub,.canvas-clone mark.sub{color:var(--sub-color,#8a8a8a) !important;background:transparent !important;display:inline !important;font-size:var(--sub-size,.8em) !important;}
+  #canvas mark.gray mark.sub,.canvas-clone mark.gray mark.sub{color:inherit !important;}
   #canvas mark.gray,.canvas-clone mark.gray{color:var(--star-color,var(--sub-color,#8a8a8a)) !important;background:transparent !important;display:inline !important;}
   #canvas mark.gray.paren,.canvas-clone mark.gray.paren{color:var(--paren-color,var(--sub-color,#8a8a8a)) !important;}
   #canvas .g-title-blk,.canvas-clone .g-title-blk{display:block !important;margin:0 0 var(--titleblk-gap,.8em) !important;}
@@ -1020,9 +1023,10 @@
             <button class="histbtn" id="t-redo" type="button" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg></button>
           </div>
           <div class="mini-row">
-            <button class="mini" id="t-star-gray" type="button" title="*내용* 을 서브색(회색)으로">*색깔*</button>
-            <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">(색깔)</button>
+            <button class="mini" id="t-star-gray" type="button" title="*내용* 을 서브색(회색)으로">*색*</button>
+            <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">(색)</button>
             <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(이탤릭)</button>
+            <button class="mini" id="t-paren-sub" type="button" title="괄호(포함)를 서브 글자 크기로">(서브)</button>
             <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말풍선&quot;</button>
             <button class="mini" id="t-quote-line" type="button" title="큰따옴표로 감싼 부분을 인용선으로">&quot;인용선&quot;</button>
             <button class="mini" id="t-code" type="button" title="텍스트에 든 &lt;br&gt; &lt;sub&gt; &lt;/sub&gt; 삭제">코드</button>
@@ -1302,8 +1306,8 @@
               <div class="cgrid cgrid--2">
                 <div class="cchip"><label>본문 글자</label><div class="cchip__box"><input id="c-fg" type="color" value="#2b2b2b"><input class="cchip__hex" id="c-fg-txt" type="text" value="#2b2b2b"></div></div>
                 <div class="cchip"><label>서브 글자</label><div class="cchip__box"><input id="c-sub" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-sub-txt" type="text" value="#8a8a8a"></div></div>
-                <div class="cchip"><label>*색깔*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
-                <div class="cchip"><label>(색깔)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
+                <div class="cchip"><label>*색*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
+                <div class="cchip"><label>(색)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
                 <div class="cchip"><label>제목</label><div class="cchip__box"><input id="c-title" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-title-txt" type="text" value="#1a1a1a"></div></div>
                 <div class="cchip"><label>소제목</label><div class="cchip__box"><input id="c-subtitle" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-subtitle-txt" type="text" value="#1a1a1a"></div></div>
                 <div class="cchip"><label>구분선</label><div class="cchip__box"><input id="c-hr" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-hr-txt" type="text" value="#c8c8c8"></div></div>
@@ -1779,7 +1783,7 @@
     <div class="sheet__title">도움말</div>
     <div class="help-body">
       <p class="help-cat">입력 도구</p>
-      <p class="hint">· <b>*색깔*</b>: *지문* 영역을 * 포함 서브 글자 색으로 변경해요.<br>· <b>(색깔)</b>: (지문) 영역을 ( ) 포함 서브 글자 색으로 변경해요.<br>· <b>(이탤릭)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>&quot;말풍선&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 말풍선에 같이 들어가요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.<br>· <b>팁</b>: 특정 글자를 다른 글자로 변환·삭제하고 싶을 경우 프리셋 탭의 입력 프리셋을 사용해 주세요. 이 기능으로 ( )와 * 등도 깔끔히 삭제할 수 있어요.</p>
+      <p class="hint">· <b>*색*</b>: *지문* 영역을 * 포함 서브 글자 색으로 변경해요.<br>· <b>(색)</b>: (지문) 영역을 ( ) 포함 서브 글자 색으로 변경해요.<br>· <b>(이탤릭)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>&quot;말풍선&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 말풍선에 같이 들어가요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.<br>· <b>팁</b>: 특정 글자를 다른 글자로 변환·삭제하고 싶을 경우 프리셋 탭의 입력 프리셋을 사용해 주세요. 이 기능으로 ( )와 * 등도 깔끔히 삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
       <p class="hint">· <b>강조·형광펜</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.</p>
       <p class="help-cat">말풍선</p>
@@ -4977,6 +4981,12 @@
     replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[1]); }, isGrayEl);
   });
   // " 말풍선: 큰따옴표 안쪽을 인물 말풍선으로 (시트로 옵션 선택)
+  // (서브): 괄호 포함 내용을 서브 '크기'로. 색은 (색깔)이 맡음(겹치면 색은 괄호색 우선 — CSS로 처리)
+  function subMark(text){ var mk=document.createElement('mark'); mk.className='sub'; mk.textContent=text; return mk; }
+  function isSubEl(el){ return el.tagName==='MARK' && el.classList.contains('sub'); }
+  $('t-paren-sub').addEventListener('click', function(){
+    replaceInText(/\([^()\n]*\)/g, function(m){ return subMark(m[0]); }, isSubEl);
+  });
   $('t-quote-line').addEventListener('click', function(){ openQuoteLineSheet(); });
   $('t-quote-bub').addEventListener('click', function(){
     if(!characters || !characters.length){ alert('먼저 말풍선 탭에서 인물을 등록해 주세요.'); return; }
