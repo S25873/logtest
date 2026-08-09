@@ -1024,6 +1024,7 @@
             <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">(색깔)</button>
             <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(이탤릭)</button>
             <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말풍선&quot;</button>
+            <button class="mini" id="t-quote-line" type="button" title="큰따옴표로 감싼 부분을 인용선으로">&quot;인용선&quot;</button>
             <button class="mini" id="t-code" type="button" title="텍스트에 든 &lt;br&gt; &lt;sub&gt; &lt;/sub&gt; 삭제">코드</button>
             <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
           </div>
@@ -3321,6 +3322,20 @@
     });
     return hit;
   }
+  // 선택(또는 커서)이 '전부' 같은 슬롯의 mark.cls 안에 들어 있으면 그 슬롯 번호 반환 — 같은 번호 재선택 시 해제 판정용
+  function sameSlotAtSel(cls, slot){
+    var el = caretMarkEl(cls);
+    if(el) return (parseInt(el.getAttribute('data-slot')||'1',10)===slot) ? el : null;
+    var sel=window.getSelection(), r=null;
+    if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)) r=sel.getRangeAt(0);
+    else if(_sheetSavedRange) r=_sheetSavedRange;
+    if(!r || r.collapsed) return null;
+    var sc=r.startContainer, ec=r.endContainer;
+    function up(n){ n=(n&&n.nodeType===1)?n:(n&&n.parentNode); while(n && n!==editor){ if(n.tagName==='MARK' && n.classList.contains(cls)) return n; n=n.parentNode; } return null; }
+    var a=up(sc), b=up(ec);
+    if(a && a===b && parseInt(a.getAttribute('data-slot')||'1',10)===slot) return a;
+    return null;
+  }
   function stripMarkChain(el, cls){
     if(!el) return;
     function skipEmpty(node, dir){
@@ -3358,15 +3373,21 @@
     }
     else if(fmt==='hl'){
       var range=sel.getRangeAt(0);
+      var hs=(color!=null&&color!=='__remove__')?color:hlSlot;
+      var sameHl=(color==='__remove__')?null:sameSlotAtSel('hl', hs);
+      if(sameHl){ stripMarkChain(sameHl,'hl'); return; }   // 같은 번호 다시 선택 = 해제(토글)
       if(range.collapsed){ if(color==='__remove__'){ stripMarkChain(caretMarkEl('hl'),'hl'); } return; }   // 커서만 있을 때도 지우기 동작
       if(color==='__remove__'){ stripMarks(range, 'hl'); }
-      else { var hs=(color!=null?color:hlSlot); paintUnion(range, 'hl', '--hl', hlColorOf(hs), hs); }
+      else { paintUnion(range, 'hl', '--hl', hlColorOf(hs), hs); }
     }
     else if(fmt==='emph'){
       var range2=sel.getRangeAt(0);
+      var es=(color!=null&&color!=='__remove__')?color:emSlot;
+      var sameEm=(color==='__remove__')?null:sameSlotAtSel('em', es);
+      if(sameEm){ stripMarkChain(sameEm,'em'); return; }   // 같은 번호 다시 선택 = 해제
       if(range2.collapsed){ if(color==='__remove__'){ stripMarkChain(caretMarkEl('em'),'em'); } return; }
       if(color==='__remove__'){ stripMarks(range2, 'em'); }
-      else { var es=(color!=null?color:emSlot); paintUnion(range2, 'em', '--em', emColorOf(es), es); }
+      else { paintUnion(range2, 'em', '--em', emColorOf(es), es); }
     }
     else if(fmt==='sub'){
       var rangeS=sel.getRangeAt(0); if(rangeS.collapsed) return;
@@ -4956,6 +4977,7 @@
     replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[1]); }, isGrayEl);
   });
   // " 말풍선: 큰따옴표 안쪽을 인물 말풍선으로 (시트로 옵션 선택)
+  $('t-quote-line').addEventListener('click', function(){ openQuoteLineSheet(); });
   $('t-quote-bub').addEventListener('click', function(){
     if(!characters || !characters.length){ alert('먼저 말풍선 탭에서 인물을 등록해 주세요.'); return; }
     openQuoteBubbleSheet();
@@ -5019,6 +5041,54 @@
       }
       return out;
     }, isBubEl, true, mergeQuoteParens);
+  }
+  // ===== 따옴표 → 인용선 (미니 도구 '인용선') =====
+  //   " 말풍선과 같은 방식: 큰따옴표로 감싼 줄을 따옴표째 인용선 블록으로. 바로 아래(빈 줄 없이) 괄호 줄은 같은 인용선에 흡수.
+  //   말풍선과 달리 '연속' 개념 없음 — 각 인용선은 독립 블록.
+  function isQuoteEl(el){ return el.tagName==='DIV' && el.classList && el.classList.contains('g-quote'); }
+  function mergeQuoteLineParens(){
+    var PAREN=/^\s*[（(][\s\S]*[)）]\s*$/;
+    [].slice.call(editor.querySelectorAll('.g-quote[data-ql]')).forEach(function(q){
+      q.removeAttribute('data-ql');
+      while(true){
+        var n=q.nextSibling;
+        while(n && n.nodeType===3 && n.nodeValue.replace(/[\u200b\s]/g,'')===''){ n=n.nextSibling; }
+        if(!(n && n.nodeType===1 && n.tagName==='BR')) break;
+        var a=n.nextSibling;
+        while(a && a.nodeType===3 && a.nodeValue.replace(/[\u200b\s]/g,'')===''){ a=a.nextSibling; }
+        if(a && a.nodeType===1 && a.tagName==='BR') break;     // 빈 줄이면 다른 인용선으로 분리
+        if(!(a && a.nodeType===3)) break;
+        var txt=a.nodeValue.replace(/^\s+|\s+$/g,'');
+        if(!PAREN.test(txt)) break;
+        q.appendChild(document.createElement('br'));
+        q.appendChild(document.createTextNode(txt));
+        var rm=n; while(rm && rm!==a){ var nx=rm.nextSibling; rm.parentNode.removeChild(rm); rm=nx; }
+        if(a.parentNode) a.parentNode.removeChild(a);
+      }
+    });
+  }
+  function quoteToQuoteLines(side, slot){
+    side=(side==='right')?'right':'left';
+    var re=/[\u201C\u201D\u201E\u201F\u2033"]([^\u201C\u201D\u201E\u201F\u2033"\n]*)[\u201C\u201D\u201E\u201F\u2033"]/g;
+    replaceInText(re, function(m){
+      var q=document.createElement('div'); q.className='g-quote '+side;
+      paintQuote(q, slot||1);
+      q.setAttribute('data-ql','1');
+      q.appendChild(document.createTextNode(m[0]));   // 따옴표 기호 유지
+      return q;
+    }, isQuoteEl, true, mergeQuoteLineParens);
+  }
+  // 1단계 왼쪽/오른쪽 → 2단계 색 슬롯
+  function openQuoteLineSheet(){
+    openSheetDef({ title:'따옴표 → 인용선', noFocus:true, options:[
+      { label:'왼쪽 인용선', preview:'<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="currentColor" stroke="none"/><line x1="10" y1="8" x2="20" y2="8"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="16" x2="17" y2="16"/></svg></span>', run:function(){ openQuoteLineColorSheet('left'); } },
+      { label:'오른쪽 인용선', preview:'<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="17.6" y="4" width="2.4" height="16" rx="1.2" fill="currentColor" stroke="none"/><line x1="4" y1="8" x2="14" y2="8"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="7" y1="16" x2="14" y2="16"/></svg></span>', run:function(){ openQuoteLineColorSheet('right'); } }
+    ]});
+  }
+  function openQuoteLineColorSheet(side){
+    openSheetDef({ title:'인용선 색', noFocus:true, options:[1,2,3,4].map(function(n){
+      return { label:'인용선 '+n, preview:function(){ return swatchHtml(quoteSlotColor(n)); }, run:function(){ quoteToQuoteLines(side, n); } };
+    })});
   }
   function openQuoteStyleSheet(cid){
     var c=cid?findChar(cid):null, col=c?c.bub:'#e5e5ea';
