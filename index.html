@@ -1006,7 +1006,7 @@
             <button class="mini" id="t-star-gray" type="button" title="*내용* 을 서브색(회색)으로">*색깔*</button>
             <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">(색깔)</button>
             <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(이탤릭)</button>
-            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">말풍선</button>
+            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말풍선&quot;</button>
             <button class="mini" id="t-code" type="button" title="텍스트에 든 &lt;br&gt; &lt;sub&gt; &lt;/sub&gt; 삭제">코드</button>
             <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
           </div>
@@ -1054,7 +1054,7 @@
         <div class="panel is-active" data-panel="content" role="tabpanel">
           <details class="fold" id="fold-body">
             <summary>
-              본문 · 본문 사진
+              본문 · 사진
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
@@ -1132,7 +1132,7 @@
                 </div>
               </div>
 
-              <p class="section__head" style="margin-top:24px">(＋로 넣는) 본문 사진</p>
+              <p class="section__head" style="margin-top:24px">(＋로 넣는) 사진</p>
               <div class="grid-2" style="margin-top:2px">
                 <div class="field">
                   <span class="label">사진 크기 <span class="val" id="logimg-size-val">100%</span></span>
@@ -1726,7 +1726,7 @@
     <div class="sheet__title">도움말</div>
     <div class="help-body">
       <p class="help-cat">입력 도구</p>
-      <p class="hint">· <b>*색깔*</b>: * 사이의 지문을 서브 글자 색으로 변경해요.<br>· <b>(색깔)</b>: 괄호 포함 내용을 서브 글자 색으로 변경해요.<br>· <b>(이탤릭)</b>: 괄호 포함 내용을 이탤릭으로 변경해요.<br>· <b>말풍선</b>: 큰따옴표로 감싼 부분을 따옴표째 말풍선으로 바꿔요. (작은따옴표는 대상이 아니에요.) 말풍선 바로 아래 줄에 괄호로 된 지문이 있으면 같은 말풍선에 함께 들어가고, 빈 줄로 띄우면 따로 분리돼요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.<br>· <b>팁</b>: 특정 글자를 다른 글자로 변환·삭제하고 싶을 경우 프리셋 탭의 입력 프리셋 기능을 사용해 주세요. 이 기능으로 괄호도 깔끔히 삭제할 수 있어요.</p>
+      <p class="hint">· <b>*색깔*</b>: *지문* 영역을 * 포함 서브 글자 색으로 변경해요.<br>· <b>(색깔)</b>: (지문) 영역을 ( ) 포함 서브 글자 색으로 변경해요.<br>· <b>(이탤릭)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>&quot;말풍선&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 말풍선에 같이 들어가요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.<br>· <b>팁</b>: 특정 글자를 다른 글자로 변환·삭제하고 싶을 경우 프리셋 탭의 입력 프리셋을 사용해 주세요. 이 기능으로 ( )와 * 등도 깔끔히 삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
       <p class="hint">· <b>강조·형광펜</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.</p>
       <p class="help-cat">말풍선</p>
@@ -4754,7 +4754,7 @@
   });
   // * 회색: **내용** 을 감지 → 내용을 서브색(회색)으로, ** 기호는 제거
   $('t-star-gray').addEventListener('click', function(){
-    replaceInText(/\*\*([^\n]+?)\*\*/g, function(m){ return grayMark(m[1]); }, isGrayEl);
+    replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[1]); }, isGrayEl);
   });
   // " 말풍선: 큰따옴표 안쪽을 인물 말풍선으로 (시트로 옵션 선택)
   $('t-quote-bub').addEventListener('click', function(){ openQuoteBubbleSheet(); });
