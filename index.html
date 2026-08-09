@@ -659,6 +659,7 @@
 
   /* 입력 프리셋 (텍스트 대치·삭제 규칙) */
   .mychip--rep .mychip__arrow{color:var(--ink-3);font-weight:700;margin:0 1px;}
+  .mychip--rep .mychip__sep{color:var(--ink-3);opacity:.65;margin:0 1px;}   /* 여러 개 구분용 쉼표 — 지울 글자와 구분되게 흐리게 */
   .mychip--rep .mychip__to{color:var(--ink);}
   .mychip--rep .mychip__to.is-del{color:var(--ink-3);font-style:italic;font-weight:500;}
   .repform{
@@ -1023,13 +1024,13 @@
             <button class="histbtn" id="t-redo" type="button" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg></button>
           </div>
           <div class="mini-row">
-            <button class="mini" id="t-star-gray" type="button" title="*내용* 을 서브색(회색)으로">*색*</button>
-            <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">(색)</button>
+            <button class="mini" id="t-star-gray" type="button" title="*내용* 을 *색*의 색깔로">*색*</button>
+            <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 (색)의 색깔로">(색)</button>
             <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(I)</button>
-            <button class="mini" id="t-paren-sub" type="button" title="괄호(포함)를 서브 글자 크기로">(Aa)</button>
-            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말풍선&quot;</button>
-            <button class="mini" id="t-quote-line" type="button" title="큰따옴표로 감싼 부분을 인용선으로">&quot;인용선&quot;</button>
-            <button class="mini" id="t-code" type="button" title="텍스트에 든 &lt;br&gt; &lt;sub&gt; &lt;/sub&gt; 삭제">코드</button>
+            <button class="mini" id="t-paren-sub" type="button" title="괄호(포함)를 작은 글자 크기로">(Aa)</button>
+            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말&quot;</button>
+            <button class="mini" id="t-quote-line" type="button" title="큰따옴표로 감싼 부분을 인용선으로">&quot;인&quot;</button>
+            <button class="mini" id="t-quote-add" type="button" title="기호가 없는 문단 앞뒤에 큰따옴표 넣기">&quot;넣&quot;</button>
             <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
           </div>
         </div>
@@ -1046,7 +1047,7 @@
             <button class="fbtn" type="button" data-fmt="strike"><s>S</s></button>
             <button class="fbtn" type="button" data-sheet="em" title="글자색(강조)"><span class="c-ic">A</span></button>
             <button class="fbtn" type="button" data-sheet="hl" title="형광펜(하이라이터)"><span class="h-ic">H</span></button>
-            <button class="fbtn" type="button" data-fmt="sub" title="서브(작은 글씨)"><span class="sub-ic">A<span class="sub-ic__a">a</span></span></button>
+            <button class="fbtn" type="button" data-fmt="sub" title="작은 글자"><span class="sub-ic">A<span class="sub-ic__a">a</span></span></button>
             <button class="fbtn" type="button" data-sheet="insert" title="삽입 (사진 · 인용선 · 구분선)">
               <span class="ins-ic"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><line x1="8" y1="2.8" x2="8" y2="13.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><line x1="2.8" y1="8" x2="13.2" y2="8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
             </button>
@@ -1129,7 +1130,7 @@
                   <div class="rangewrap"><input id="font-size" type="range" min="20" max="50" value="32"></div>
                 </div>
                 <div class="field">
-                  <span class="label">서브 글자 크기 <span class="val">26px</span></span>
+                  <span class="label">작은 글자 크기 <span class="val">26px</span></span>
                   <div class="rangewrap"><input id="subtext-size" type="range" min="12" max="36" step="1" value="26"></div>
                 </div>
               </div>
@@ -1305,14 +1306,13 @@
             <div class="fold__body">
               <div class="cgrid cgrid--2">
                 <div class="cchip"><label>본문 글자</label><div class="cchip__box"><input id="c-fg" type="color" value="#2b2b2b"><input class="cchip__hex" id="c-fg-txt" type="text" value="#2b2b2b"></div></div>
-                <div class="cchip"><label>서브 글자</label><div class="cchip__box"><input id="c-sub" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-sub-txt" type="text" value="#8a8a8a"></div></div>
-                <div class="cchip"><label>*색*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
-                <div class="cchip"><label>(색)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
+                <div class="cchip"><label>작은 글자</label><div class="cchip__box"><input id="c-sub" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-sub-txt" type="text" value="#8a8a8a"></div></div>
                 <div class="cchip"><label>제목</label><div class="cchip__box"><input id="c-title" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-title-txt" type="text" value="#1a1a1a"></div></div>
                 <div class="cchip"><label>소제목</label><div class="cchip__box"><input id="c-subtitle" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-subtitle-txt" type="text" value="#1a1a1a"></div></div>
-                <div class="cchip"><label>구분선</label><div class="cchip__box"><input id="c-hr" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-hr-txt" type="text" value="#c8c8c8"></div></div>
                 <div class="cchip"><label>하단 글자</label><div class="cchip__box"><input id="c-name" type="color" value="#6c6c6c"><input class="cchip__hex" id="c-name-txt" type="text" value="#6c6c6c"></div></div>
-                <div class="cchip"><label>하단 인용선</label><div class="cchip__box"><input id="c-bar" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-bar-txt" type="text" value="#c8c8c8"></div></div>
+                <div class="cchip"><label>구분선</label><div class="cchip__box"><input id="c-hr" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-hr-txt" type="text" value="#c8c8c8"></div></div>
+                <div class="cchip"><label>*색*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
+                <div class="cchip"><label>(색)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
               </div>
             </div>
           </details>
@@ -1388,6 +1388,7 @@
                 <div class="cchip"><label>인용선 2</label><div class="cchip__box"><input id="c-quote2" type="color" value="#b4d3ec"><input class="cchip__hex" id="c-quote2-txt" type="text" value="#b4d3ec"></div></div>
                 <div class="cchip"><label>인용선 3</label><div class="cchip__box"><input id="c-quote3" type="color" value="#efbcd3"><input class="cchip__hex" id="c-quote3-txt" type="text" value="#efbcd3"></div></div>
                 <div class="cchip"><label>인용선 4</label><div class="cchip__box"><input id="c-quote4" type="color" value="#c4e1ac"><input class="cchip__hex" id="c-quote4-txt" type="text" value="#c4e1ac"></div></div>
+                <div class="cchip cchip--wide" style="grid-column:1/-1"><label>하단 인용선</label><div class="cchip__box"><input id="c-bar" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-bar-txt" type="text" value="#c8c8c8"></div></div>
               </div>
               <div class="section">
                 <p class="section__head">프리셋</p>
@@ -1398,6 +1399,7 @@
                     <button type="button" data-slot="2" aria-pressed="false">2</button>
                     <button type="button" data-slot="3" aria-pressed="false">3</button>
                     <button type="button" data-slot="4" aria-pressed="false">4</button>
+                    <button type="button" data-slot="bar" aria-pressed="false">하단</button>
                     <span class="seg__thumb"></span>
                   </div>
                 </div>
@@ -1419,7 +1421,7 @@
 
           <details class="fold" id="fold-presets" style="margin-top:14px" open>
             <summary>
-              인물 · 말풍선 삽입
+              인물 · 삽입 방식
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
@@ -1465,8 +1467,8 @@
                 </div>
               </div>
 
-              <p class="section__head" style="margin-top:24px">말풍선 삽입</p>
-              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 삽입 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향·프사 등을 추가 조정 가능해요.</p>
+              <p class="section__head" style="margin-top:24px">삽입 방식</p>
+              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향·프사 등을 추가 조정 가능해요.</p>
               <div class="mychips" id="bubpreset-list"></div>
               <div class="repform" id="bubpreset-form" hidden>
                 <div class="field">
@@ -1541,27 +1543,21 @@
                   <div class="rangewrap"><input id="bub-body-gap" type="range" min="0" max="48" step="1" value="18"></div>
                 </div>
                 <div class="field">
-                  <span class="label">상하단바 ↔ 본문 <span class="val" id="bar-body-gap-val">32px</span></span>
-                  <div class="rangewrap"><input id="bar-body-gap" type="range" min="0" max="72" step="1" value="32"></div>
+                  <span class="label">말풍선 사진 크기 <span class="val" id="photo-size-val">60%</span></span>
+                  <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="5" value="60"></div>
                 </div>
               </div>
 
-              <div class="field" style="margin-top:16px">
-                <span class="label">말풍선 사진 크기 <span class="val" id="photo-size-val">60%</span></span>
-                <div class="rangewrap"><input id="photo-size" type="range" min="25" max="95" step="5" value="60"></div>
-              </div>
+            </div>
+          </details>
 
-              <p class="section__head" style="margin-top:18px">아이메시지 상하단바</p>
-              <div class="cgrid cgrid--2">
-                <div class="cchip"><label>바 배경</label><div class="cchip__box"><input id="c-bar-bg" type="color" value="#f5f5f7"><input class="cchip__hex" id="c-bar-bg-txt" type="text" value="#f5f5f7"></div></div>
-                <div class="cchip"><label>이름 글자</label><div class="cchip__box"><input id="c-bar-name" type="color" value="#000000"><input class="cchip__hex" id="c-bar-name-txt" type="text" value="#000000"></div></div>
-                <div class="cchip"><label>아바타</label><div class="cchip__box"><input id="c-bar-avatar" type="color" value="#c7c7cc"><input class="cchip__hex" id="c-bar-avatar-txt" type="text" value="#c7c7cc"></div></div>
-                <div class="cchip"><label>＋</label><div class="cchip__box"><input id="c-bar-plus" type="color" value="#8e8e93"><input class="cchip__hex" id="c-bar-plus-txt" type="text" value="#8e8e93"></div></div>
-                <div class="cchip"><label>뒤로 · 정보 · 전송 동그라미</label><div class="cchip__box"><input id="c-bar-accent" type="color" value="#0b93f6"><input class="cchip__hex" id="c-bar-accent-txt" type="text" value="#0b93f6"></div></div>
-                <div class="cchip"><label>전송 화살표</label><div class="cchip__box"><input id="c-bar-arrow" type="color" value="#ffffff"><input class="cchip__hex" id="c-bar-arrow-txt" type="text" value="#ffffff"></div></div>
-              </div>
-
-              <label class="switch" style="margin-top:16px">
+          <details class="fold" id="fold-imsgbar">
+            <summary>
+              아이메시지 상하단바
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <label class="switch" style="margin-top:0">
                 <span class="switch__text" style="flex:1">
                   <span class="switch__title">아이메시지 상단바</span>
                   <span class="switch__sub">위쪽에 프로필 헤더를 표시해요</span>
@@ -1598,6 +1594,19 @@
                 <input id="inputbar-on" type="checkbox" style="margin-left:auto">
               </label>
 
+              <div class="cgrid cgrid--2">
+                <div class="cchip"><label>바 배경</label><div class="cchip__box"><input id="c-bar-bg" type="color" value="#f5f5f7"><input class="cchip__hex" id="c-bar-bg-txt" type="text" value="#f5f5f7"></div></div>
+                <div class="cchip"><label>이름 글자</label><div class="cchip__box"><input id="c-bar-name" type="color" value="#000000"><input class="cchip__hex" id="c-bar-name-txt" type="text" value="#000000"></div></div>
+                <div class="cchip"><label>아바타</label><div class="cchip__box"><input id="c-bar-avatar" type="color" value="#c7c7cc"><input class="cchip__hex" id="c-bar-avatar-txt" type="text" value="#c7c7cc"></div></div>
+                <div class="cchip"><label>＋</label><div class="cchip__box"><input id="c-bar-plus" type="color" value="#8e8e93"><input class="cchip__hex" id="c-bar-plus-txt" type="text" value="#8e8e93"></div></div>
+                <div class="cchip"><label>뒤로 · 정보 · 전송 동그라미</label><div class="cchip__box"><input id="c-bar-accent" type="color" value="#0b93f6"><input class="cchip__hex" id="c-bar-accent-txt" type="text" value="#0b93f6"></div></div>
+                <div class="cchip"><label>전송 화살표</label><div class="cchip__box"><input id="c-bar-arrow" type="color" value="#ffffff"><input class="cchip__hex" id="c-bar-arrow-txt" type="text" value="#ffffff"></div></div>
+              </div>
+
+              <div class="field" style="margin-top:16px">
+                <span class="label">상하단바 ↔ 본문 <span class="val" id="bar-body-gap-val">32px</span></span>
+                <div class="rangewrap"><input id="bar-body-gap" type="range" min="0" max="72" step="1" value="32"></div>
+              </div>
               <p class="hint" style="margin:14px 0 0">상하단바의 요소들은 레이아웃의 여백에 영향을 받아요.<br>메시지만 구성할 경우 40~60으로 여백을 조정한 후 저장 추천드려요.</p>
             </div>
           </details>
@@ -1711,13 +1720,13 @@
         <!-- ========== 설명 ========== -->
         <div class="panel" data-panel="help" role="tabpanel">
           <div class="section">
-            <p class="section__head">입력 프리셋</p>
-            <p class="hint" style="margin:0 0 12px">특정 글자를 다른 글자로 바꾸거나 삭제해요.<br>저장한 프리셋을 클릭하면 입력과 미리보기에 바로 적용돼요.<br>예: ... → ⋯, 바보 → 사랑해</p>
+            <p class="section__head">텍스트 대치</p>
+            <p class="hint" style="margin:0 0 12px">특정 글자를 다른 글자로 변환·삭제해요.<br>변환은 한 프리셋당 하나만 1:1로 지원해요.<br>삭제는 한 프리셋당 여러 개를 지원하며 쉼표로 구분해요.<br>저장한 프리셋을 클릭하면 입력과 미리보기에 바로 적용돼요.<br>예: ... → ⋯ / 바보 → 사랑해 / 케이크, 푸딩 → 삭제</p>
             <div class="mychips" id="replace-presets"></div>
             <div class="repform" id="replace-form" hidden>
-              <input class="txt-input" id="replace-find" type="text" placeholder="무엇을 바꿀지" maxlength="120" autocomplete="off">
+              <input class="txt-input" id="replace-find" type="text" placeholder="무엇을 바꿀지 (여러 개 삭제는 ,로 구분)" maxlength="120" autocomplete="off">
               <div class="repform__arrow">↓</div>
-              <input class="txt-input" id="replace-to" type="text" placeholder="어떻게 바꿀지 (비우면 삭제 처리)" maxlength="120" autocomplete="off">
+              <input class="txt-input" id="replace-to" type="text" placeholder="어떻게 바꿀지 (삭제는 비우기)" maxlength="120" autocomplete="off">
               <div class="repform__btns">
                 <button class="btn btn--ghost" id="replace-cancel" type="button">취소</button>
                 <button class="btn btn--primary" id="replace-confirm" type="button">추가</button>
@@ -1739,8 +1748,8 @@
             <button class="btn btn--ghost" id="t-reset" type="button" style="width:100%;height:42px;font-size:13px;color:var(--danger,#d9534f)">전체 초기화</button>
             <div class="grid-2" style="margin-top:12px">
               <button class="btn btn--ghost" id="reset-chars" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">인물 초기화</button>
-              <button class="btn btn--ghost" id="reset-bubpreset" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">말풍선 삽입 초기화</button>
-              <button class="btn btn--ghost" id="reset-replace" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">입력 프리셋 초기화</button>
+              <button class="btn btn--ghost" id="reset-bubpreset" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">삽입 방식 초기화</button>
+              <button class="btn btn--ghost" id="reset-replace" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">텍스트 대치 초기화</button>
               <button class="btn btn--ghost" id="reset-mypreset" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">내 프리셋 초기화</button>
             </div>
           </div>
@@ -1783,17 +1792,17 @@
     <div class="sheet__title">도움말</div>
     <div class="help-body">
       <p class="help-cat">입력 도구</p>
-      <p class="hint">· <b>*색*</b>: *지문* 영역을 * 포함 서브 글자 색으로 변경해요.<br>· <b>(색)</b>: (지문) 영역을 ( ) 포함 서브 글자 색으로 변경해요.<br>· <b>(I)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>&quot;말풍선&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 말풍선에 같이 들어가요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.<br>· <b>팁</b>: 특정 글자를 다른 글자로 변환·삭제하고 싶을 경우 프리셋 탭의 입력 프리셋을 사용해 주세요. 이 기능으로 ( )와 * 등도 깔끔히 삭제할 수 있어요.</p>
+      <p class="hint">· <b>*색*</b>: *지문* 영역을 * 포함 *색*의 색깔로 변경해요.<br>· <b>(색)</b>: (지문) 영역을 ( ) 포함 (색)의 색깔로 변경해요. 말풍선 안의 (지문)은 각 인물별로 지정된 (색)을 사용해요.<br>· <b>(I)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>(Aa)</b>: (지문) 영역을 ( ) 포함 작은 글자 크기로 변경해요. 크기만 반영하기 때문에 색깔은 그대로 유지돼요.<br>· <b>&quot;말&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 말풍선에 같이 들어가요.<br>· <b>&quot;인&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 인용선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 인용선에 같이 들어가요.<br><br><b>TIP!</b><br>· *색*과 (색)에 사용되는 색깔은 디자인-글자 · 보조에서 변경돼요.<br>· 말풍선 안의 (색)에 사용되는 색깔은 말풍선-인물에서 인물별로 변경돼요.<br>· 프리셋-텍스트 대치에서 특정 글자를 다른 글자로 변환·삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
-      <p class="hint">· <b>강조·형광펜</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.</p>
+      <p class="hint">· <b>강조·형광펜·인용선</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br><br><b>TIP!</b><br>· 강조·형광펜·인용선을 삭제하고 싶을 경우, 칠해진 모든 영역을 드래그하는 대신 일부에 커서만 둬도 전체를 삭제할 수 있어요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.</p>
       <p class="help-cat">말풍선</p>
-      <p class="hint">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.</p>
+      <p class="hint">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 이름</b>: 말풍선 이름은 입력에서 조정 가능한 텍스트가 아니에요. 이름을 바꾸고 싶다면 인물에서 변경해 주세요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.</p>
       <p class="help-cat">말풍선 간격</p>
-      <p class="hint">· <b>연속 말풍선</b>: 같은 인물이 같은 방향으로 이어지고, 이름표를 매번 붙이지 않으면 하나의 묶음이 돼요. 이때 프로필은 맨 위에만 뜨고 말풍선 사이엔 <b>연속 말풍선 간격</b>이 적용돼요.<br>· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 묶음(인물·방향이 다르거나 이름표로 나뉜 말풍선)끼리의 간격이에요.<br>· <b>말풍선 ↔ 본문 간격</b>: 말풍선과 본문 글자 사이의 간격이에요.<br>· 말풍선 아래에 빈 문단을 넣으면 말풍선 ↔ 본문 간격에 <b>문단 간격</b>이 더해져요.</p>
+      <p class="hint">· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 말풍선끼리의 간격이에요.<br>· <b>연속 말풍선 간격</b>: 같은 인물, 같은 방향, 중간에 빈 문단이 없는 말풍선들을 연속 말풍선으로 처리해요. 이때 연속 말풍선끼리의 간격이에요.<br>· <b>말풍선 ↔ 본문 간격</b>: 말풍선과 본문 글자 사이의 간격이에요. 말풍선과 말풍선 사이에 빈 문단을 만들거나, 말풍선과 글 사이에 띄어쓰기를 한다면 0으로 설정해야 내용-문단 간격의 수치만 적용돼요.<br>· 말풍선 아래에 빈 문단을 넣으면 말풍선 ↔ 본문 간격에 문단 간격이 더해져요.</p>
       <p class="help-cat">말풍선 모양</p>
-      <p class="hint">· <b>아이메시지</b>: 프로필 사진이 필요 없는 메시지를 추천해요. 그라데이션, 사진 배경의 경우 미리보기에서 말풍선 꼬리가 이상하게 뜨지만 저장 시 정상적으로 자리 잡아요.<br>· <b>심플</b>: 메시지와 일반 대화에 모두 호환돼요.<br>· <b>네모</b>: 메시지와 일반 대화에 모두 호환되지만, 일반 대화를 추천해요.</p>
+      <p class="hint">· <b>아이메시지</b>: 메시지를 추천해요. 그라데이션, 사진 배경의 경우 미리보기에서 말풍선 꼬리가 이상하게 뜨지만 저장 시 정상적으로 자리 잡아요.<br>· <b>심플</b>: 메시지와 일반 대화를 모두 추천해요.<br>· <b>네모</b>: 메시지와 일반 대화에 모두 호환되지만, 일반 대화를 추천해요.<br><br><b>TIP!</b><br>· 메시지: 프로필 사진 없는 대화.<br>· 일반 대화: 프로필 사진이 있는 대화.</p>
       <p class="help-cat">프리셋</p>
-      <p class="hint">· <b>프리셋 순서</b>: 모든 프리셋(인물, 입력, 기본)은 저장된 타원 부분을 꾹 클릭한 뒤 드래그하여 순서를 변경할 수 있어요.</p>
+      <p class="hint">· <b>프리셋 종류</b>: 인물, 삽입 방식, 텍스트 대치, 내 프리셋.<br>· <b>프리셋 순서</b>: 모든 프리셋은 저장된 타원 부분을 꾹 클릭한 뒤 드래그하여 순서를 변경할 수 있어요.</p>
     </div>
     <button class="sheet__cancel" id="help-close" type="button">닫기</button>
   </div>
@@ -1837,8 +1846,8 @@
 
   /* 형광펜·강조색: 슬롯 1/2/3 (슬롯1은 기존 c-hl / c-em 을 그대로 사용) */
   var hlSlot = 1, emSlot = 1, quoteSlot = 1;
-  function quoteInput(slot){ return $(slot===1 ? 'c-quote' : 'c-quote'+slot); }
-  function quoteTxt(slot){ return $((slot===1 ? 'c-quote' : 'c-quote'+slot)+'-txt'); }
+  function quoteInput(slot){ return $(slot==='bar' ? 'c-bar' : (slot===1 ? 'c-quote' : 'c-quote'+slot)); }   // 'bar'=하단 인용선
+  function quoteTxt(slot){ return $((slot==='bar' ? 'c-bar' : (slot===1 ? 'c-quote' : 'c-quote'+slot))+'-txt'); }
   function hlInput(slot){ return $(slot===1 ? 'c-hl' : 'c-hl'+slot); }
   function emInput(slot){ return $(slot===1 ? 'c-em' : 'c-em'+slot); }
   function hlTxt(slot){ return $((slot===1 ? 'c-hl' : 'c-hl'+slot)+'-txt'); }
@@ -2005,7 +2014,15 @@
   });
 
   var quoteWrap = $('quote-presets');
-  hlPresets.forEach(function(p){
+  // 인용선 팔레트 = 형광펜 색 목록에서 맨 뒤 하나를 '인용선 기본 회색'으로 교체(실제 기본값과 맞춤)
+  // 인용선 전용 팔레트 — 얇은 세로선이라 형광펜(배경용)보다 한 톤 진하게. 맨 끝은 기본 회색(#c8c8c8).
+  var quotePresets = [
+    {c:'#d08a86', label:'코랄'}, {c:'#d9a077', label:'피치'}, {c:'#cfb861', label:'옐로'}, {c:'#aeb972', label:'라임'},
+    {c:'#8fb894', label:'세이지'}, {c:'#7fb7b4', label:'민트'}, {c:'#8aabc9', label:'스카이'}, {c:'#8f9dc9', label:'페리'},
+    {c:'#9a97c6', label:'인디고'}, {c:'#a894c6', label:'라벤더'}, {c:'#bb92c2', label:'바이올렛'}, {c:'#c78fae', label:'로즈'},
+    {c:'#bfa08f', label:'클레이'}, {c:'#a89282', label:'코코아'}, {c:'#9aa3ad', label:'슬레이트'}, {c:'#c8c8c8', label:'기본 회색'}
+  ];
+  quotePresets.forEach(function(p){
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'dot'; b.title = p.label; b.setAttribute('aria-label', p.label);
     var i = document.createElement('i'); i.style.background = p.c; b.appendChild(i);
@@ -2014,7 +2031,7 @@
       b.classList.add('on');
       var ci=quoteInput(quoteSlot), ti=quoteTxt(quoteSlot);
       if(ci) ci.value = p.c; if(ti) ti.value = p.c;
-      recolorQuoteSlot(quoteSlot, p.c);
+      if(quoteSlot!=='bar') recolorQuoteSlot(quoteSlot, p.c);   // 하단 인용선은 요소가 하나뿐이라 render로 반영
       render();
     });
     quoteWrap.appendChild(b);
@@ -2861,7 +2878,7 @@
   }
   // slot(1~4): 인용선 색 슬롯. 요소에 data-qslot과 인라인 --quote-color를 넣어
   //   나중에 해당 슬롯 색을 바꿔도 이미 그린 인용선에 반영되게 한다(형광펜·강조와 같은 방식).
-  function quoteSlotColor(slot){ var el=$(slot>1?('c-quote'+slot):'c-quote'); return el?el.value:''; }
+  function quoteSlotColor(slot){ var el=(slot==='bar')?$('c-bar'):$(slot>1?('c-quote'+slot):'c-quote'); return el?el.value:''; }
   function paintQuote(el, slot){
     if(!el) return;
     slot = slot||1;
@@ -3285,7 +3302,8 @@
     sel.removeAllRanges(); sel.addRange(r);
     saveSel(); updateFormatButtons();
   });
-  // 이름표(편집 불가) 클릭: 커서를 이름 바로 앞에 둬서 위쪽 빈 줄을 백스페이스로 지울 수 있게
+  // 이름표(편집 불가) 클릭: 커서를 바로 뒤 말풍선 "안쪽 맨 앞"에 둔다.
+  //   예전엔 이름 앞(블록 사이)이라 커서가 눈에 안 보였음. 말풍선 맨 앞이면 백스페이스 가드가 위쪽 빈 줄 삭제를 그대로 처리.
   editor.addEventListener('click', function(e){
     var t=e.target;
     var nameEl=(t && t.closest) ? t.closest('.g-bub-name') : null;
@@ -3293,7 +3311,14 @@
     e.preventDefault();
     editor.focus();
     var sel=window.getSelection(), r=document.createRange();
-    r.setStartBefore(nameEl); r.collapse(true);
+    var bub=nameEl.nextSibling;
+    while(bub && !(bub.nodeType===1 && bub.classList && bub.classList.contains('g-bub'))){ bub=bub.nextSibling; }
+    if(bub){
+      var first=bub.firstChild;
+      while(first && first.nodeType===1 && first.firstChild){ first=first.firstChild; }   // 서식으로 감싸여 있으면 가장 안쪽 첫 노드
+      if(!first || first.nodeType!==3){ var anc=document.createTextNode('\u200b'); bub.insertBefore(anc, bub.firstChild); first=anc; }
+      r.setStart(first, 0); r.collapse(true);
+    } else { r.setStartBefore(nameEl); r.collapse(true); }
     sel.removeAllRanges(); sel.addRange(r);
     saveSel(); updateFormatButtons();
   });
@@ -3489,9 +3514,18 @@
       { label: '오른쪽 인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="17.6" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="4" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="7" y1="16" x2="14" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ openQuoteColorSheet('right'); } }
       ];
       var q = caretQuoteEl();
-      if(q){   // 커서가 인용선 안이면 '삭제'(해제) 항목 추가 — 드래그 없이 지울 수 있게
-        opts.push({ label: '인용선 삭제', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 12.5A1.6 1.6 0 0 0 8.6 21h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7"/></svg></span>',
-          run: function(){ removeQuote(q); cleanEditor(); render(); saveSel(); } });
+      if(q){   // 이미 인용선 안이면 '편집' 메뉴로 대체: 방향 전환 / 색 변경 / 삭제
+        var isRight = q.classList.contains('right');
+        var curSlot = parseInt(q.getAttribute('data-qslot')||'1',10) || 1;
+        return [
+          { label: (isRight?'왼쪽':'오른쪽')+'으로 방향 전환',
+            preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10l-3-3M17 16H7l3 3"/></svg></span>',
+            run: function(){ q.className='g-quote '+(isRight?'left':'right'); paintQuote(q, curSlot); cleanEditor(); render(); saveSel(); } },
+          { label: '슬롯 (색) 변경 · 현재 '+curSlot, preview: function(){ return swatchHtml(quoteSlotColor(curSlot)); },
+            run: function(){ openQuoteEditColorSheet(q); } },
+          { label: '인용선 삭제', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 12.5A1.6 1.6 0 0 0 8.6 21h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7"/></svg></span>',
+            run: function(){ removeQuote(q); cleanEditor(); render(); saveSel(); } }
+        ];
       }
       return opts;
     } },
@@ -3546,6 +3580,13 @@
   }
   function openSheet(key){ var def = SHEETS[key]; if(def) openSheetDef(def); }
   // 인용선 색(슬롯) 선택 시트 — 왼쪽/오른쪽을 고른 다음에 뜬다
+  // 이미 있는 인용선의 색(슬롯)만 교체
+  function openQuoteEditColorSheet(q){
+    openSheetDef({ title:'인용선 색', noFocus:true, options:[1,2,3,4].map(function(n){
+      return { label:'인용선 '+n, preview:function(){ return swatchHtml(quoteSlotColor(n)); },
+        run:function(){ paintQuote(q, n); cleanEditor(); render(); saveSel(); } };
+    })});
+  }
   function openQuoteColorSheet(side){
     var opts=[1,2,3,4].map(function(n){
       return { label:'인용선 '+n, preview: swatchHtml(quoteSlotColor(n) || '#c8c8c8'),
@@ -4014,10 +4055,11 @@
     btn.addEventListener('click', function(){
       document.querySelectorAll('#quote-slot-seg button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
       btn.setAttribute('aria-pressed','true');
-      quoteSlot = parseInt(btn.getAttribute('data-slot'),10) || 1;
-      var lbl=$('quote-slot-val'); if(lbl){ lbl.textContent = '인용선 '+quoteSlot; }
+      var _sv=btn.getAttribute('data-slot');
+      quoteSlot = (_sv==='bar') ? 'bar' : (parseInt(_sv,10) || 1);
+      var lbl=$('quote-slot-val'); if(lbl){ lbl.textContent = (quoteSlot==='bar') ? '하단 인용선' : ('인용선 '+quoteSlot); }
       moveThumb($('quote-slot-seg'));
-      markDot(quoteWrap, hlPresets, quoteSlotColor(quoteSlot));
+      markDot(quoteWrap, quotePresets, quoteSlotColor(quoteSlot));
     });
   });
   document.querySelectorAll('#em-slot-seg button').forEach(function(btn){
@@ -4043,6 +4085,8 @@
   if(_foldBg){ _foldBg.addEventListener('toggle', function(){ if(_foldBg.open){ requestAnimationFrame(moveAllThumbs); } }); }
   var _foldBubDesign=$('fold-bubdesign');
   if(_foldBubDesign){ _foldBubDesign.addEventListener('toggle', function(){ if(_foldBubDesign.open){ requestAnimationFrame(moveAllThumbs); } }); }
+  var _foldImsgBar=$('fold-imsgbar');
+  if(_foldImsgBar){ _foldImsgBar.addEventListener('toggle', function(){ if(_foldImsgBar.open){ requestAnimationFrame(moveAllThumbs); } }); }
 
   var ratios = [
     {w:1,h:1,label:'1:1',rw:1080}, {w:4,h:5,label:'4:5',rw:1080},
@@ -4988,12 +5032,11 @@
     replaceInText(/\([^()\n]*\)/g, function(m){ return subMark(m[0]); }, isSubEl);
   });
   $('t-quote-line').addEventListener('click', function(){ openQuoteLineSheet(); });
+  $('t-quote-add').addEventListener('click', function(){ wrapPlainLines(editor); cleanEditor(); render(); saveSel(); });
   $('t-quote-bub').addEventListener('click', function(){
     if(!characters || !characters.length){ alert('먼저 말풍선 탭에서 인물을 등록해 주세요.'); return; }
     openQuoteBubbleSheet();
   });
-  // 코드: 텍스트에 리터럴로 들어간 <br> <sub> </sub> 문자열 삭제 (실제 줄바꿈 <br> 요소는 텍스트 노드가 아니라 영향 없음)
-  $('t-code').addEventListener('click', function(){ transformTextNodes(function(t){ return t.replace(/<br\s*\/?>|<\/?sub>/gi,''); }); });
   // ( ) 이탤릭: 괄호 안쪽(괄호 포함)을 이탤릭으로
   $('t-paren').addEventListener('click', function(){
     replaceInText(/\([^()\n]*\)/g, function(m){ var it=document.createElement('i'); it.textContent=m[0]; return it; }, isItalicEl);
@@ -5051,6 +5094,41 @@
       }
       return out;
     }, isBubEl, true, mergeQuoteParens);
+  }
+  // ===== 따옴표 넣기 (미니 도구 '"넣"') =====
+  //   각 문단(줄)을 훑어 앞뒤에 " 를 붙인다. 단, 아래는 건너뜀:
+  //   ① 줄 앞/뒤 글자가 " ' * ( ) 인 줄  ② 줄 안에 따옴표가 섞인 줄  ③ 빈 줄
+  //   말풍선·인용선 '안쪽' 줄도 대상(단 위 조건은 동일). 사진·구분선·이름표 등 블록은 건너뜀.
+  var _QMARK=/["'\u201C\u201D\u201E\u201F\u2018\u2019\u201B\u2032\u2033]/;
+  var _EDGE_SKIP='*()（）"\'\u201C\u201D\u201E\u201F\u2018\u2019\u201B\u2032\u2033';   // 앞뒤 글자로 오면 건너뛸 기호(큰·작은따옴표는 휜 것/곧은 것 모두)
+  function _isBlockish(n){
+    return n.nodeType===1 && n.classList && (n.classList.contains('g-img')||n.classList.contains('g-hr')||
+           n.classList.contains('g-bub-name')||n.classList.contains('g-title-blk')||n.classList.contains('g-para-gap'));
+  }
+  function _isLineHost(n){
+    return n.nodeType===1 && n.classList && (n.classList.contains('g-bub')||n.classList.contains('g-quote'));
+  }
+  function _wrapSeg(parent, seg){
+    if(!seg.length) return;
+    var txt=''; seg.forEach(function(n){ txt += (n.textContent||''); });
+    txt = txt.replace(/\u200b/g,'').trim();
+    if(!txt) return;
+    if(_QMARK.test(txt)) return;                                    // 따옴표가 섞인 줄
+    if(_EDGE_SKIP.indexOf(txt.charAt(0))>-1) return;                // 앞이 * ( )
+    if(_EDGE_SKIP.indexOf(txt.charAt(txt.length-1))>-1) return;     // 뒤가 * ( )
+    parent.insertBefore(document.createTextNode('"'), seg[0]);      // 서식 '바깥'에 붙음
+    var last=seg[seg.length-1];
+    parent.insertBefore(document.createTextNode('"'), last.nextSibling);
+  }
+  function wrapPlainLines(host){
+    var seg=[], kids=[].slice.call(host.childNodes);
+    kids.forEach(function(n){
+      if(n.nodeType===1 && n.tagName==='BR'){ _wrapSeg(host, seg); seg=[]; return; }
+      if(_isBlockish(n)){ _wrapSeg(host, seg); seg=[]; return; }
+      if(_isLineHost(n)){ _wrapSeg(host, seg); seg=[]; wrapPlainLines(n); return; }
+      seg.push(n);
+    });
+    _wrapSeg(host, seg);
   }
   // ===== 따옴표 → 인용선 (미니 도구 '인용선') =====
   //   " 말풍선과 같은 방식: 큰따옴표로 감싼 줄을 따옴표째 인용선 블록으로. 바로 아래(빈 줄 없이) 괄호 줄은 같은 인용선에 흡수.
@@ -5222,13 +5300,13 @@
     render();
   });
   if($('reset-bubpreset')) $('reset-bubpreset').addEventListener('click', function(){
-    if(!confirm('말풍선 삽입 프리셋을 기본값으로 되돌릴까요?')) return;
+    if(!confirm('삽입 방식을 기본값으로 되돌릴까요?')) return;
     try{ localStorage.removeItem(BUBPRESET_KEY); }catch(e){}
     if(typeof closeBpForm==='function') closeBpForm();
     renderBubPresets();
   });
   if($('reset-replace')) $('reset-replace').addEventListener('click', function(){
-    if(!confirm('입력 프리셋을 기본값으로 되돌릴까요?')) return;
+    if(!confirm('텍스트 대치 규칙을 기본값으로 되돌릴까요?')) return;
     try{ localStorage.removeItem(REPLACE_KEY); }catch(e){}
     renderReplacePresets();
   });
@@ -5422,8 +5500,10 @@
   var BUILTIN_RULES = {
     star: function(t){ return t.replace(/\*/g,''); },
     quote: function(t){ return t.replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"'); },
-    squote: function(t){ return t.replace(/[\u2018\u2019\u201A\u201B\u2032]/g,"'"); },
-    dots: function(t){ return t.replace(/\u2026/g,'\u22EF').replace(/\u00B7\u00B7\u00B7/g,'\u22EF').replace(/\.{3,}/g,'\u22EF'); }
+    squote: function(t){ return t.replace(/[\u2018\u2019\u201B\u2032]/g,"'"); },
+    dots: function(t){ return t.replace(/\u2026/g,'\u22EF').replace(/\u00B7\u00B7\u00B7/g,'\u22EF').replace(/\.{3,}/g,'\u22EF'); },
+    paren: function(t){ return t.replace(/[()（）]/g,''); },   // 괄호 기호만 삭제(안쪽 글자는 유지), 반각·전각 모두
+    code: function(t){ return t.replace(/<br\s*\/?>|<\/?sub>/gi,''); }   // 텍스트에 리터럴로 들어간 <br> <sub> </sub> 삭제(한 규칙으로 전부)
   };
   // 빌트인 칩의 '표시용' find→to (사용자 규칙과 같은 형태로 보이게). to==='' 는 '삭제'로 표시.
   // 저장값이 아니라 코드가 항상 우선 → 라벨을 바꾸면 이미 심어진 것도 즉시 반영됨.
@@ -5431,14 +5511,18 @@
     star:   { find:'*',        to:'' },
     quote:  { find:'\u201C',   to:'"' },
     squote: { find:'\u2018',   to:"'" },
-    dots:   { find:'...',      to:'\u22EF' }
+    dots:   { find:'...',      to:'\u22EF' },
+    paren:  { find:'( , )',    to:'' },
+    code:   { find:'<br>, <sub>, </sub>', to:'' }
   };
   // 앱 최초 실행 시 기본 입력 프리셋 4종을 심어둠 (이후엔 사용자가 지우면 다시 생기지 않음)
   var DEFAULT_REPLACE_PRESETS = [
-    { builtin:'star' },
     { builtin:'quote' },
     { builtin:'squote' },
-    { builtin:'dots' }
+    { builtin:'dots' },
+    { builtin:'star' },
+    { builtin:'paren' },
+    { builtin:'code' }
   ];
   function loadReplacePresets(){
     var raw; try{ raw=localStorage.getItem(REPLACE_KEY); }catch(e){ raw=null; }
@@ -5455,6 +5539,20 @@
         if(!hasSq){ if(qi>=0) list.splice(qi+1,0,{builtin:'squote'}); else list.push({builtin:'squote'}); saveReplacePresets(list); }
         localStorage.setItem('logmaker-replace-mig-squote','1');
       }
+      if(!localStorage.getItem('logmaker-replace-mig-paren')){   // 괄호 삭제 기본 규칙 추가
+        var hasP=false;
+        for(var k=0;k<list.length;k++){ if(list[k]&&list[k].builtin==='paren') hasP=true; }
+        if(!hasP){ var ci=-1; for(var k2=0;k2<list.length;k2++){ if(list[k2]&&list[k2].builtin==='code'){ ci=k2; break; } }
+          if(ci>=0) list.splice(ci,0,{builtin:'paren'}); else list.push({builtin:'paren'});   // 항상 '코드' 앞에
+          saveReplacePresets(list); }
+        localStorage.setItem('logmaker-replace-mig-paren','1');
+      }
+      if(!localStorage.getItem('logmaker-replace-mig-code')){   // 미니툴바 '코드' 버튼을 입력 프리셋으로 이동
+        var hasCode=false;
+        for(var j=0;j<list.length;j++){ if(list[j]&&list[j].builtin==='code') hasCode=true; }
+        if(!hasCode){ list.push({builtin:'code'}); saveReplacePresets(list); }
+        localStorage.setItem('logmaker-replace-mig-code','1');
+      }
     }catch(e){}
     return list;
   }
@@ -5463,7 +5561,14 @@
   function applyPreset(p){
     if(p && p.builtin && BUILTIN_RULES[p.builtin]){ transformTextNodes(BUILTIN_RULES[p.builtin]); return; }
     if(!p || !p.find) return;
-    var find=p.find, to=p.to;
+    var find=p.find, to=p.to||'';
+    // 삭제(바꿀 내용 비움)일 때만 쉼표로 여러 개 지정 가능. 바꾸기(1:1)는 쉼표가 든 문구를 그대로 써야 해서 분리 안 함.
+    if(to==='' && find.indexOf(',')>-1){
+      var parts=find.split(',').map(function(x){ return x.trim(); }).filter(function(x){ return x!==''; });
+      if(!parts.length) parts=[','];                       // 입력이 쉼표뿐이면 쉼표 자체를 삭제
+      transformTextNodes(function(t){ parts.forEach(function(x){ t=t.split(x).join(''); }); return t; });
+      return;
+    }
     transformTextNodes(function(t){ return t.split(find).join(to); });
   }
   function renderReplacePresets(){
@@ -5473,7 +5578,14 @@
       var chip=document.createElement('div'); chip.className='mychip mychip--rep reorderable'; chip.title='클릭하면 입력과 미리보기에 적용합니다';
       var label=document.createElement('span');
       var disp = p.builtin ? (BUILTIN_META[p.builtin] || {find:p.builtin, to:''}) : p;
-      var f=document.createElement('span'); f.className='mychip__find'; f.textContent=disp.find;
+      var f=document.createElement('span'); f.className='mychip__find';
+      // 삭제 규칙에서 여러 개를 나누는 쉼표는 '구분 기호'라 흐리게 — 지울 글자와 헷갈리지 않게
+      if(!disp.to && String(disp.find).indexOf(',')>-1){
+        String(disp.find).split(',').forEach(function(part, i){
+          if(i){ var c=document.createElement('span'); c.className='mychip__sep'; c.textContent=','; f.appendChild(c); }
+          f.appendChild(document.createTextNode(part));
+        });
+      } else { f.textContent=disp.find; }
       var ar=document.createElement('span'); ar.className='mychip__arrow'; ar.textContent=' → ';
       var to=document.createElement('span'); to.className='mychip__to';
       if(!disp.to){ to.classList.add('is-del'); to.textContent='삭제'; } else { to.textContent=disp.to; }
