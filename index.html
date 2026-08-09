@@ -1397,6 +1397,10 @@
                   <div class="cchip"><label>이름 색</label><div class="cchip__box"><input id="char-namecolor" type="color" value="#8a8a8a"><input class="cchip__hex" id="char-namecolor-txt" type="text" value="#8a8a8a"></div></div>
                 </div>
                 <div class="cchip cchip--wide" style="margin-top:14px">
+                  <label>괄호 색 <span class="val" style="font-weight:400;color:var(--ink-3)">(색깔) 적용 시</span></label>
+                  <div class="cchip__box"><input id="char-subcolor" type="color" value="#8a8a8a"><input class="cchip__hex" id="char-subcolor-txt" type="text" value="#8a8a8a"></div>
+                </div>
+                <div class="cchip cchip--wide" style="margin-top:14px">
                   <label>말풍선 색</label>
                   <div class="cchip__box"><input id="char-bub" type="color" value="#248bf5"><input class="cchip__hex" id="char-bub-txt" type="text" value="#248bf5"></div>
                 </div>
@@ -2180,6 +2184,16 @@
       if(hit) toUnwrap.push(mk);
     });
     toUnwrap.forEach(function(mk){ var pr=mk.parentNode; if(!pr) return; while(mk.firstChild){ pr.insertBefore(mk.firstChild, mk); } pr.removeChild(mk); });
+    // 강조(글자색)를 칠하면 그 범위에 '완전히 들어간' (색깔) 회색 마크는 벗겨낸다 — 색이 두 겹 쌓여 나중에 강조만 지웠을 때 회색이 남는 것 방지
+    if(cls==='em'){
+      var grayOut=[];
+      [].forEach.call(editor.querySelectorAll('mark.gray'), function(mk){
+        try{ var gr=document.createRange(); gr.selectNode(mk);
+          if(work.compareBoundaryPoints(Range.START_TO_START, gr) <= 0 && work.compareBoundaryPoints(Range.END_TO_END, gr) >= 0){ grayOut.push(mk); }
+        }catch(e){}
+      });
+      grayOut.forEach(function(mk){ var pr=mk.parentNode; if(!pr) return; while(mk.firstChild){ pr.insertBefore(mk.firstChild, mk); } pr.removeChild(mk); });
+    }
     var wrap = document.createRange(); wrap.setStartAfter(startMark); wrap.setEndBefore(endMark);
     var mm = document.createElement('mark'); mm.className = cls; if(colorVarName){ mm.style.setProperty(colorVarName, colorValue); } if(slot!=null){ mm.setAttribute('data-slot', slot); }
     try{ wrap.surroundContents(mm); }
@@ -2321,6 +2335,8 @@
         b.style.setProperty('color', c.ink, 'important');
       }
       b.style.setProperty('--bub', c.bub);
+      // 인물별 괄호 색: 이 말풍선 안의 (색깔) 회색 마크가 참조하는 변수만 덮어씀(값을 박지 않아 위치에 따라 자동 반영)
+      if(c.subColor){ b.style.setProperty('--sub-color', c.subColor); } else { b.style.removeProperty('--sub-color'); }
       var path=b.querySelector('svg.g-tail path'); if(path){ path.style.setProperty('fill', c.bub, 'important'); }
     });
     [].forEach.call(root.querySelectorAll('.g-bub-name.char-name'), function(n){
@@ -4757,7 +4773,10 @@
     replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[1]); }, isGrayEl);
   });
   // " 말풍선: 큰따옴표 안쪽을 인물 말풍선으로 (시트로 옵션 선택)
-  $('t-quote-bub').addEventListener('click', function(){ openQuoteBubbleSheet(); });
+  $('t-quote-bub').addEventListener('click', function(){
+    if(!characters || !characters.length){ alert('먼저 말풍선 탭에서 인물을 등록해 주세요.'); return; }
+    openQuoteBubbleSheet();
+  });
   // 코드: 텍스트에 리터럴로 들어간 <br> <sub> </sub> 문자열 삭제 (실제 줄바꿈 <br> 요소는 텍스트 노드가 아니라 영향 없음)
   $('t-code').addEventListener('click', function(){ transformTextNodes(function(t){ return t.replace(/<br\s*\/?>|<\/?sub>/gi,''); }); });
   // ( ) 이탤릭: 괄호 안쪽(괄호 포함)을 이탤릭으로
@@ -5598,6 +5617,7 @@
     syncCharBubPreset(c ? c.bub : '#248bf5');
     setColorPair('char-ink', c ? c.ink : '#ffffff');
     setColorPair('char-namecolor', c ? c.nameColor : '#8a8a8a');
+    setColorPair('char-subcolor', (c && c.subColor) ? c.subColor : (($('c-sub')&&$('c-sub').value)||'#8a8a8a'));
     tmpPhoto = c ? (c.photo||null) : null;
     tmpShape = c ? (c.photoShape||'circle') : 'circle';
     updateCharPhotoPreview(); setShapeSeg(tmpShape);
@@ -5609,6 +5629,7 @@
     linkColor('char-bub','char-bub-txt',false,false, function(){ syncCharBubPreset($('char-bub').value); });
     linkColor('char-ink','char-ink-txt',false,false);
     linkColor('char-namecolor','char-namecolor-txt',false,false);
+    linkColor('char-subcolor','char-subcolor-txt',false,false);
     var charBubPresets = ['#248bf5','#e5e5ea','#1c1c1e','#ffffff','#ffd1d1','#ffe0b8','#fbf0b0','#cdeccb','#cbe0fb','#ddd0f5','#f6c9de','#cdb29a'];
     var cbpWrap = $('char-bub-presets');
     if(cbpWrap){
@@ -5638,8 +5659,8 @@
     });
     $('char-save').addEventListener('click', function(){
       var name=$('char-name').value.trim(); if(!name){ $('char-name').focus(); return; }
-      var d={ name:name, bub:$('char-bub').value, ink:$('char-ink').value, nameColor:$('char-namecolor').value, photo:tmpPhoto, photoShape:tmpShape };
-      if(editingCharId){ var c=findChar(editingCharId); if(c){ c.name=d.name; c.bub=d.bub; c.ink=d.ink; c.nameColor=d.nameColor; c.photo=d.photo; c.photoShape=d.photoShape; } }
+      var d={ name:name, bub:$('char-bub').value, ink:$('char-ink').value, nameColor:$('char-namecolor').value, subColor:$('char-subcolor').value, photo:tmpPhoto, photoShape:tmpShape };
+      if(editingCharId){ var c=findChar(editingCharId); if(c){ c.name=d.name; c.bub=d.bub; c.ink=d.ink; c.nameColor=d.nameColor; c.subColor=d.subColor; c.photo=d.photo; c.photoShape=d.photoShape; } }
       else { d.id='c_'+Date.now().toString(36); characters.push(d); }
       saveChars(); renderCharList(); renderCharInsert(); if(typeof renderTopbarCharList==='function') renderTopbarCharList(); closeCharEditor(); render();
     });
