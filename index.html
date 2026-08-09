@@ -3292,6 +3292,49 @@
     sel.removeAllRanges(); sel.addRange(r);
     saveSel(); updateFormatButtons();
   });
+  // 커서(선택 없이)가 놓인 mark.cls를 찾아, 좌우로 '이어진' 같은 종류 마크까지 한 덩어리로 벗긴다.
+  //   이어짐 판정: 사이에 눈에 보이는 내용(글자·요소)이 없고 같은 클래스인 형제 마크.
+  function caretMarkEl(cls){
+    var sel=window.getSelection(), r=null;
+    if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)) r=sel.getRangeAt(0);
+    else if(_sheetSavedRange) r=_sheetSavedRange;
+    else if(_savedRange) r=_savedRange;
+    if(!r) return null;
+    var n=r.startContainer; n=(n.nodeType===1)?n:n.parentNode;
+    while(n && n!==editor){ if(n.tagName==='MARK' && n.classList.contains(cls)) return n; n=n.parentNode; }
+    return null;
+  }
+  // 시트에 '지우기'를 띄울지 판정: 커서가 마크 안이거나, 드래그 범위가 마크와 겹치면 true
+  function hasMarkAtSel(cls){
+    if(caretMarkEl(cls)) return true;
+    var sel=window.getSelection(), r=null;
+    if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)) r=sel.getRangeAt(0);
+    else if(_sheetSavedRange) r=_sheetSavedRange;
+    else if(_savedRange) r=_savedRange;
+    if(!r || r.collapsed) return false;
+    var hit=false;
+    [].forEach.call(editor.querySelectorAll('mark.'+cls), function(m){
+      if(hit) return;
+      try{ var mr=document.createRange(); mr.selectNode(m);
+        if(r.compareBoundaryPoints(Range.END_TO_START, mr) < 0 && r.compareBoundaryPoints(Range.START_TO_END, mr) > 0) hit=true;
+      }catch(e){}
+    });
+    return hit;
+  }
+  function stripMarkChain(el, cls){
+    if(!el) return;
+    function skipEmpty(node, dir){
+      while(node && node.nodeType===3 && node.nodeValue.replace(/[\u200b]/g,'')===''){ node = dir<0 ? node.previousSibling : node.nextSibling; }
+      return node;
+    }
+    var chain=[el], n;
+    n=skipEmpty(el.previousSibling,-1);
+    while(n && n.nodeType===1 && n.tagName==='MARK' && n.classList.contains(cls)){ chain.unshift(n); n=skipEmpty(n.previousSibling,-1); }
+    n=skipEmpty(el.nextSibling,1);
+    while(n && n.nodeType===1 && n.tagName==='MARK' && n.classList.contains(cls)){ chain.push(n); n=skipEmpty(n.nextSibling,1); }
+    chain.forEach(function(m){ var pr=m.parentNode; if(!pr) return; while(m.firstChild){ pr.insertBefore(m.firstChild, m); } pr.removeChild(m); });
+    cleanEditor(); render(); saveSel();
+  }
   function applyFormat(fmt, tail, side, withName, color){
     var sel0 = window.getSelection();
     var saved = (sel0 && sel0.rangeCount && editor.contains(sel0.getRangeAt(0).startContainer)) ? sel0.getRangeAt(0).cloneRange() : null;
@@ -3314,12 +3357,14 @@
       else { paintUnion(rangeU, 'ul', null, null); }
     }
     else if(fmt==='hl'){
-      var range=sel.getRangeAt(0); if(range.collapsed) return;
+      var range=sel.getRangeAt(0);
+      if(range.collapsed){ if(color==='__remove__'){ stripMarkChain(caretMarkEl('hl'),'hl'); } return; }   // 커서만 있을 때도 지우기 동작
       if(color==='__remove__'){ stripMarks(range, 'hl'); }
       else { var hs=(color!=null?color:hlSlot); paintUnion(range, 'hl', '--hl', hlColorOf(hs), hs); }
     }
     else if(fmt==='emph'){
-      var range2=sel.getRangeAt(0); if(range2.collapsed) return;
+      var range2=sel.getRangeAt(0);
+      if(range2.collapsed){ if(color==='__remove__'){ stripMarkChain(caretMarkEl('em'),'em'); } return; }
       if(color==='__remove__'){ stripMarks(range2, 'em'); }
       else { var es=(color!=null?color:emSlot); paintUnion(range2, 'em', '--em', emColorOf(es), es); }
     }
@@ -3397,20 +3442,21 @@
       { label: '인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="10" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', noFocus:true, run: function(){ openSheet('quote'); } },
       { label: '구분선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', noFocus:true, run: function(){ openSheet('hr'); } }
     ]},
-    hl: { title: '형광펜', options: [
-      { label: '형광펜 1', preview: function(){ return swatchHtml(hlColorOf(1)); }, run: function(){ applyFormat('hl', null, null, false, 1); } },
-      { label: '형광펜 2', preview: function(){ return swatchHtml(hlColorOf(2)); }, run: function(){ applyFormat('hl', null, null, false, 2); } },
-      { label: '형광펜 3', preview: function(){ return swatchHtml(hlColorOf(3)); }, run: function(){ applyFormat('hl', null, null, false, 3); } },
-      { label: '형광펜 4', preview: function(){ return swatchHtml(hlColorOf(4)); }, run: function(){ applyFormat('hl', null, null, false, 4); } },
-      { label: '형광펜 지우기', preview: removeSwatchHtml, run: function(){ applyFormat('hl', null, null, false, '__remove__'); } }
-    ]},
-    em: { title: '강조색', options: [
-      { label: '강조 1', preview: function(){ return swatchHtml(emColorOf(1)); }, run: function(){ applyFormat('emph', null, null, false, 1); } },
-      { label: '강조 2', preview: function(){ return swatchHtml(emColorOf(2)); }, run: function(){ applyFormat('emph', null, null, false, 2); } },
-      { label: '강조 3', preview: function(){ return swatchHtml(emColorOf(3)); }, run: function(){ applyFormat('emph', null, null, false, 3); } },
-      { label: '강조 4', preview: function(){ return swatchHtml(emColorOf(4)); }, run: function(){ applyFormat('emph', null, null, false, 4); } },
-      { label: '강조 지우기', preview: removeSwatchHtml, run: function(){ applyFormat('emph', null, null, false, '__remove__'); } }
-    ]},
+    hl: { title: '형광펜', options: function(){
+      var opts=[1,2,3,4].map(function(n){
+        return { label: '형광펜 '+n, preview: function(){ return swatchHtml(hlColorOf(n)); }, run: function(){ applyFormat('hl', null, null, false, n); } };
+      });
+      // '지우기'는 이미 칠해진 곳(커서 또는 드래그 범위)일 때만 노출
+      if(hasMarkAtSel('hl')) opts.push({ label: '형광펜 지우기', preview: removeSwatchHtml, run: function(){ applyFormat('hl', null, null, false, '__remove__'); } });
+      return opts;
+    } },
+    em: { title: '강조색', options: function(){
+      var opts=[1,2,3,4].map(function(n){
+        return { label: '강조 '+n, preview: function(){ return swatchHtml(emColorOf(n)); }, run: function(){ applyFormat('emph', null, null, false, n); } };
+      });
+      if(hasMarkAtSel('em')) opts.push({ label: '강조 지우기', preview: removeSwatchHtml, run: function(){ applyFormat('emph', null, null, false, '__remove__'); } });
+      return opts;
+    } },
     // 1단계: 왼쪽/오른쪽 → 2단계: 색(슬롯 1~4) 선택 (한 번에 8칸이면 헷갈려서 두 단계로 나눔)
     quote: { title: '인용선', options: function(){
       var opts = [
