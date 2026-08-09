@@ -96,8 +96,8 @@
     --line-strong:#363636;
 
     --ink:#f2f2f2;
-    --ink-2:#a6a6a6;
-    --ink-3:#6e6e6e;
+    --ink-2:#bcbcbc;
+    --ink-3:#8f8f8f;
     --ink-on-accent:#0e0e0e;
 
     --danger:#d98b83;
@@ -986,8 +986,8 @@
           <button class="tab" role="tab" aria-selected="false" data-tab="layout">레이아웃</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="help">편의성</button>
         </div>
-        <button class="icon-btn" id="help-btn" type="button" title="팁 · 도움말" aria-label="팁 · 도움말">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.8 2.8 0 0 1 5.4 1c0 1.9-2.6 2.3-2.6 3.9"/><circle cx="12" cy="17.2" r=".7" fill="currentColor" stroke="none"/></svg>
+        <button class="icon-btn" id="help-btn" type="button" title="도움말" aria-label="도움말">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.4 9.6a2.7 2.7 0 1 1 3.55 2.83c-.7.28-1 .78-1 1.52"/><circle cx="12" cy="16.3" r="1.05" fill="currentColor" stroke="none"/></svg>
         </button>
         <button class="icon-btn" id="theme-toggle" type="button" title="라이트/다크 전환" aria-label="라이트/다크 전환">
           <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
@@ -1003,12 +1003,12 @@
             <button class="histbtn" id="t-redo" type="button" title="다시 실행 (Ctrl+Shift+Z)" aria-label="다시 실행" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h1"/></svg></button>
           </div>
           <div class="mini-row">
-            <button class="mini" id="t-star-gray" type="button" title="**강조** 안쪽을 서브색(회색)으로">* 회색</button>
-            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표 안쪽을 인물 말풍선으로">&quot; 말풍선</button>
-            <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">( ) 이탤릭</button>
-            <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">( ) 회색</button>
+            <button class="mini" id="t-star-gray" type="button" title="*내용* 을 서브색(회색)으로">*색깔*</button>
+            <button class="mini" id="t-paren-gray" type="button" title="괄호(포함)를 서브색(회색)으로">(색깔)</button>
+            <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(이탤릭)</button>
+            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">말풍선</button>
             <button class="mini" id="t-code" type="button" title="텍스트에 든 &lt;br&gt; &lt;sub&gt; &lt;/sub&gt; 삭제">코드</button>
-            <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단 정보)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
+            <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
           </div>
         </div>
 
@@ -1103,7 +1103,7 @@
               </div>
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
-                  <span class="label">글자 크기 <span class="val">32px</span></span>
+                  <span class="label">본문 글자 크기 <span class="val">32px</span></span>
                   <div class="rangewrap"><input id="font-size" type="range" min="20" max="50" value="32"></div>
                 </div>
                 <div class="field">
@@ -1189,11 +1189,11 @@
               </div>
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
-                  <span class="label">제목 크기 <span class="val" id="title-size-val">52px</span></span>
+                  <span class="label">제목 글자 크기 <span class="val" id="title-size-val">52px</span></span>
                   <div class="rangewrap"><input id="title-size" type="range" min="20" max="80" step="2" value="52"></div>
                 </div>
                 <div class="field">
-                  <span class="label">소제목 크기 <span class="val" id="subtitle-size-val">36px</span></span>
+                  <span class="label">소제목 글자 크기 <span class="val" id="subtitle-size-val">36px</span></span>
                   <div class="rangewrap"><input id="subtitle-size" type="range" min="16" max="56" step="2" value="36"></div>
                 </div>
               </div>
@@ -1212,14 +1212,14 @@
 
           <details class="fold" id="fold-name">
             <summary>
-              하단 정보
+              하단
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
               <div class="field">
-                <span class="label">하단 정보</span>
+                <span class="label">하단</span>
                 <div id="name-ed" contenteditable="true" role="textbox" spellcheck="false" translate="no"
-                     aria-label="하단 정보 입력" data-placeholder="캐릭터 이름 등 (비워도 됨)"></div>
+                     aria-label="하단 입력" data-placeholder="캐릭터 이름 등 (비워도 됨)"></div>
               </div>
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
@@ -1261,7 +1261,7 @@
               </div>
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
-                  <span class="label">하단 크기 <span class="val" id="name-size-val">22px</span></span>
+                  <span class="label">하단 글자 크기 <span class="val" id="name-size-val">22px</span></span>
                   <div class="rangewrap"><input id="name-size" type="range" min="12" max="36" step="1" value="22"></div>
                 </div>
                 <div class="field">
@@ -1719,18 +1719,18 @@
   </div>
 </div>
 
-<!-- 팁 · 도움말 모달 (? 버튼) -->
+<!-- 도움말 모달 (? 버튼) -->
 <div class="sheet-overlay" id="help-overlay" hidden>
-  <div class="sheet help-sheet" role="dialog" aria-modal="true" aria-label="팁 · 도움말">
+  <div class="sheet help-sheet" role="dialog" aria-modal="true" aria-label="도움말">
     <div class="sheet__grip"></div>
-    <div class="sheet__title">팁 · 도움말</div>
+    <div class="sheet__title">도움말</div>
     <div class="help-body">
       <p class="help-cat">입력 도구</p>
-      <p class="hint">· <b>* 회색</b>: * 사이의 지문을 서브 글자 색으로 변경해요.<br>· <b>&quot; 말풍선</b>: 따옴표 삭제 후 그 사이의 내용을 말풍선에 넣어요.<br>· <b>( ) 이탤릭</b>: 괄호 포함 내용을 이탤릭으로 변경해요.<br>· <b>( ) 회색</b>: 괄호 포함 내용을 서브 글자 색으로 변경해요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.</p>
+      <p class="hint">· <b>*색깔*</b>: * 사이의 지문을 서브 글자 색으로 변경해요.<br>· <b>(색깔)</b>: 괄호 포함 내용을 서브 글자 색으로 변경해요.<br>· <b>(이탤릭)</b>: 괄호 포함 내용을 이탤릭으로 변경해요.<br>· <b>말풍선</b>: 큰따옴표로 감싼 부분을 따옴표째 말풍선으로 바꿔요. (작은따옴표는 대상이 아니에요.) 말풍선 바로 아래 줄에 괄호로 된 지문이 있으면 같은 말풍선에 함께 들어가고, 빈 줄로 띄우면 따로 분리돼요.<br>· <b>코드</b>: &lt;br&gt;, &lt;sub&gt;, &lt;/sub&gt;를 삭제해요.<br>· <b>팁</b>: 특정 글자를 다른 글자로 변환·삭제하고 싶을 경우 프리셋 탭의 입력 프리셋 기능을 사용해 주세요. 이 기능으로 괄호도 깔끔히 삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
       <p class="hint">· <b>강조·형광펜</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.</p>
       <p class="help-cat">말풍선</p>
-      <p class="hint">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일의 경우 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.</p>
+      <p class="hint">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.</p>
       <p class="help-cat">말풍선 간격</p>
       <p class="hint">· <b>연속 말풍선</b>: 같은 인물이 같은 방향으로 이어지고, 이름표를 매번 붙이지 않으면 하나의 묶음이 돼요. 이때 프로필은 맨 위에만 뜨고 말풍선 사이엔 <b>연속 말풍선 간격</b>이 적용돼요.<br>· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 묶음(인물·방향이 다르거나 이름표로 나뉜 말풍선)끼리의 간격이에요.<br>· <b>말풍선 ↔ 본문 간격</b>: 말풍선과 본문 글자 사이의 간격이에요.<br>· 말풍선 아래에 빈 문단을 넣으면 말풍선 ↔ 본문 간격에 <b>문단 간격</b>이 더해져요.</p>
       <p class="help-cat">말풍선 모양</p>
@@ -3360,7 +3360,7 @@
   if(sheetOverlay){ sheetOverlay.addEventListener('click', function(e){ if(e.target===sheetOverlay){ closeSheet(); } }); }
   document.addEventListener('keydown', function(e){ if(e.key==='Escape' && sheetOverlay && !sheetOverlay.hidden){ closeSheet(); } });
 
-  // 팁 · 도움말 모달 (? 버튼)
+  // 도움말 모달 (? 버튼)
   (function(){
     var hOv=$('help-overlay'), hBtn=$('help-btn'), hClose=$('help-close'), hT=null;
     if(!hOv || !hBtn) return;
@@ -4708,7 +4708,7 @@
   }
   // 텍스트 노드를 순회하며 정규식 매칭 구간을 커스텀 노드로 치환하는 공통 헬퍼.
   // build(match) → 삽입할 DOM 노드(반환 null 이면 원문 유지). skip(el) → true 이면 그 조상 안의 노드는 건너뜀.
-  function replaceInText(re, build, skip, absorbBub){
+  function replaceInText(re, build, skip, absorbBub, postBuild){
     var walker=document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false), nodes=[];
     while(walker.nextNode()){ nodes.push(walker.currentNode); }
     var _absorbList=[];
@@ -4731,6 +4731,7 @@
       if(tn.parentNode) tn.parentNode.replaceChild(frag, tn);
       if(lastBub) _absorbList.push(lastBub);
     });
+    if(typeof postBuild==='function') postBuild();   // 정리·absorbBubBreak 전, br 구조 원본 상태에서 후처리
     cleanEditor();
     _absorbList.forEach(absorbBubBreak);
     render(); if(!IS_TOUCH) editor.focus();
@@ -4742,7 +4743,7 @@
 
   // 전체 비우기 (본문 + 제목·소제목·하단 정보)
   $('t-clear').addEventListener('click', function(){
-    if(!confirm('본문과 제목·소제목·하단 정보를 모두 비울까요?')) return;
+    if(!confirm('본문·제목·소제목·하단을 모두 비울까요?')) return;
     editor.innerHTML='';
     ['title-ed','subtitle-ed','name-ed'].forEach(function(id){ var el=$(id); if(el) el.innerHTML=''; });
     if(typeof clearHrSel==='function') clearHrSel();
@@ -4771,26 +4772,51 @@
   /* ===== 큰따옴표 → 인물 말풍선 ===== */
   function currentCharId(){ return (characters && characters.length) ? characters[0].id : null; }
   // mode: 'plain'(말풍선만) | 'named'(사진+이름: 말풍선마다 각각 이름+아바타)
+  // " 말풍선 후처리: 따옴표 말풍선 '바로 아래'(빈 줄 없이)에 괄호 줄이 오면 같은 말풍선 안으로 흡수(괄호 유지, 줄바꿈 유지).
+  //   빈 줄(br 2개)이 있으면 흡수 안 함. 연속 괄호 줄은 모두 흡수. 따옴표 없는 괄호는 대상 아님(data-qb 없음).
+  function mergeQuoteParens(){
+    var PAREN=/^\s*[（(][\s\S]*[)）]\s*$/;
+    [].slice.call(editor.querySelectorAll('.g-bub[data-qb]')).forEach(function(bub){
+      bub.removeAttribute('data-qb');
+      while(true){
+        var n=bub.nextSibling;
+        while(n && n.nodeType===3 && n.nodeValue.replace(/[\u200b\s]/g,'')===''){ n=n.nextSibling; }
+        if(!(n && n.nodeType===1 && n.tagName==='BR')) break;         // 바로 아래 줄바꿈 없음
+        var a=n.nextSibling;
+        while(a && a.nodeType===3 && a.nodeValue.replace(/[\u200b\s]/g,'')===''){ a=a.nextSibling; }
+        if(a && a.nodeType===1 && a.tagName==='BR') break;            // 빈 줄(br 2개) → 흡수 안 함
+        if(!(a && a.nodeType===3)) break;                            // 괄호 텍스트 아님
+        var txt=a.nodeValue.replace(/^\s+|\s+$/g,'');
+        if(!PAREN.test(txt)) break;                                  // 괄호 줄 아님
+        bub.appendChild(document.createElement('br'));               // 말풍선 안 줄바꿈
+        bub.appendChild(document.createTextNode(txt));               // 괄호 그대로
+        var rm=n; while(rm && rm!==a){ var nx=rm.nextSibling; rm.parentNode.removeChild(rm); rm=nx; }
+        if(a.parentNode) a.parentNode.removeChild(a);
+      }
+    });
+  }
   function quoteToBubbles(opts, cid){
     if(cid===undefined) cid=currentCharId();
     opts=opts||{};
     var side=(opts.side==='right')?'right':'left';
     var re=/[\u201C\u201D\u201E\u201F\u2033"]([^\u201C\u201D\u201E\u201F\u2033"\n]*)[\u201C\u201D\u201E\u201F\u2033"]/g;
     replaceInText(re, function(m){
-      var inner=m[1]; var out=document.createDocumentFragment();
+      var text=m[0]; var out=document.createDocumentFragment();   // 따옴표(큰따옴표) 포함 전체를 말풍선에 — 기호 유지
       if(cid){
         if(opts.nm){ out.appendChild(makeCharName(cid, side)); }
         var bub=makeCharBub(cid, side, !!opts.tail);
         if(opts.av){ bub.setAttribute('data-av','1'); }
-        bub.appendChild(document.createTextNode(inner===''?'\u200b':inner));
+        bub.setAttribute('data-qb','1');
+        bub.appendChild(document.createTextNode(text));
         out.appendChild(bub);
       } else {
         var gb=document.createElement('span'); gb.className='g-bub recv cont';
-        gb.appendChild(document.createTextNode(inner===''?'\u200b':inner));
+        gb.setAttribute('data-qb','1');
+        gb.appendChild(document.createTextNode(text));
         out.appendChild(gb);
       }
       return out;
-    }, isBubEl, true);
+    }, isBubEl, true, mergeQuoteParens);
   }
   function openQuoteStyleSheet(cid){
     var c=cid?findChar(cid):null, col=c?c.bub:'#e5e5ea';
