@@ -2866,18 +2866,33 @@
   function recolorQuoteSlot(slot, color){
     [].forEach.call(editor.querySelectorAll('.g-quote[data-qslot="'+slot+'"]'), function(q){ q.style.setProperty('--quote-color', color); });
   }
+  // 인용선 해제(내용은 남기고 테두리만 제거) — 앞뒤 줄바꿈 보존
+  function removeQuote(el){
+    if(!el || !el.parentNode) return;
+    var pr=el.parentNode, prev=el.previousSibling;
+    if(prev && !(prev.nodeType===1 && prev.tagName==='BR')){ pr.insertBefore(document.createElement('br'), el); }
+    while(el.firstChild){ pr.insertBefore(el.firstChild, el); }
+    var nx=el.nextSibling; if(nx && !(nx.nodeType===1 && nx.tagName==='BR')){ pr.insertBefore(document.createElement('br'), el); }
+    pr.removeChild(el);
+  }
+  // 시트를 열기 직전 커서(또는 저장된 선택)가 놓인 인용선 — 있으면 시트에 '삭제' 항목을 띄운다
+  function caretQuoteEl(){
+    var r=null, sel=window.getSelection();
+    if(sel && sel.rangeCount && editor.contains(sel.getRangeAt(0).startContainer)) r=sel.getRangeAt(0);
+    else if(_sheetSavedRange) r=_sheetSavedRange;
+    else if(_savedRange) r=_savedRange;
+    if(!r) return null;
+    return closestQuote(r.startContainer) || closestQuote(r.endContainer);
+  }
   function applyQuote(side, slot){
     var sel = window.getSelection(); if(!sel || sel.rangeCount===0) return;
     var range = sel.getRangeAt(0); if(!editor.contains(range.startContainer)) return;
     var existing = closestQuote(range.startContainer) || closestQuote(range.endContainer);
     if(existing){
-      if(existing.classList.contains(side)){
-        var pr=existing.parentNode, prev=existing.previousSibling;
-        if(prev && !(prev.nodeType===1 && prev.tagName==='BR')){ pr.insertBefore(document.createElement('br'), existing); }
-        while(existing.firstChild){ pr.insertBefore(existing.firstChild, existing); }
-        var nx=existing.nextSibling; if(nx && !(nx.nodeType===1 && nx.tagName==='BR')){ pr.insertBefore(document.createElement('br'), existing); }
-        pr.removeChild(existing);
-      } else { existing.className = 'g-quote ' + side; paintQuote(existing, slot); }
+      var curSlot = parseInt(existing.getAttribute('data-qslot')||'1',10) || 1;
+      if(existing.classList.contains(side) && curSlot!==(slot||1)){ paintQuote(existing, slot); return; }   // 같은 방향 + 다른 번호 = 색(슬롯)만 교체
+      if(existing.classList.contains(side)){ removeQuote(existing); }
+      else { existing.className = 'g-quote ' + side; paintQuote(existing, slot); }
       return;
     }
     if(range.collapsed){
@@ -3396,29 +3411,19 @@
       { label: '강조 4', preview: function(){ return swatchHtml(emColorOf(4)); }, run: function(){ applyFormat('emph', null, null, false, 4); } },
       { label: '강조 지우기', preview: removeSwatchHtml, run: function(){ applyFormat('emph', null, null, false, '__remove__'); } }
     ]},
-    quote: { title: '인용선', options: (function(){
-      // 4색 슬롯 × 좌/우 = 8칸. 미리보기 세로선에 각 슬롯 색을 실제로 칠해 보여준다.
-      function qIcon(side, col){
-        var bar = side==='left'
-          ? '<rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="'+col+'"/>'
-          : '<rect x="17.6" y="4" width="2.4" height="16" rx="1.2" fill="'+col+'"/>';
-        var lines = side==='left'
-          ? '<line x1="10" y1="8" x2="20" y2="8"/><line x1="10" y1="12" x2="20" y2="12"/><line x1="10" y1="16" x2="17" y2="16"/>'
-          : '<line x1="4" y1="8" x2="14" y2="8"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="7" y1="16" x2="14" y2="16"/>';
-        return '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">'+bar+lines+'</svg></span>';
+    // 1단계: 왼쪽/오른쪽 → 2단계: 색(슬롯 1~4) 선택 (한 번에 8칸이면 헷갈려서 두 단계로 나눔)
+    quote: { title: '인용선', options: function(){
+      var opts = [
+      { label: '왼쪽 인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="10" y1="8" x2="20" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="12" x2="20" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="10" y1="16" x2="17" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ openQuoteColorSheet('left'); } },
+      { label: '오른쪽 인용선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><rect x="17.6" y="4" width="2.4" height="16" rx="1.2" fill="currentColor"/><line x1="4" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="4" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="7" y1="16" x2="14" y2="16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ openQuoteColorSheet('right'); } }
+      ];
+      var q = caretQuoteEl();
+      if(q){   // 커서가 인용선 안이면 '삭제'(해제) 항목 추가 — 드래그 없이 지울 수 있게
+        opts.push({ label: '인용선 삭제', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 12.5A1.6 1.6 0 0 0 8.6 21h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7"/></svg></span>',
+          run: function(){ removeQuote(q); cleanEditor(); render(); saveSel(); } });
       }
-      var out=[];
-      [1,2,3,4].forEach(function(n){
-        ['left','right'].forEach(function(side){
-          out.push({
-            label: '인용선 '+n+' · '+(side==='left'?'왼쪽':'오른쪽'),
-            preview: qIcon(side, quoteSlotColor(n) || '#c8c8c8'),
-            run: (function(sd, slot){ return function(){ applyFormat('quote', null, sd, false, slot); }; })(side, n)
-          });
-        });
-      });
-      return out;
-    }) },
+      return opts;
+    } },
     hr: { title: '구분선', options: [
       { label: '가로 구분선', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>', run: function(){ applyHr('line'); } },
       { label: '점 세 개', preview: '<span class="s-preview"><svg viewBox="0 0 24 24" fill="none"><circle cx="7" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="17" cy="12" r="1.5" fill="currentColor"/></svg></span>', run: function(){ applyHr('dots'); } },
@@ -3469,6 +3474,14 @@
     requestAnimationFrame(function(){ sheetOverlay.classList.add('is-open'); });
   }
   function openSheet(key){ var def = SHEETS[key]; if(def) openSheetDef(def); }
+  // 인용선 색(슬롯) 선택 시트 — 왼쪽/오른쪽을 고른 다음에 뜬다
+  function openQuoteColorSheet(side){
+    var opts=[1,2,3,4].map(function(n){
+      return { label:'인용선 '+n, preview: swatchHtml(quoteSlotColor(n) || '#c8c8c8'),
+               run:function(){ applyFormat('quote', null, side, false, n); } };
+    });
+    openSheetDef({ title:'인용선 색', options: opts });
+  }
   function closeSheet(){
     if(!sheetOverlay) return;
     sheetOverlay.classList.remove('is-open');
