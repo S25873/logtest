@@ -5319,14 +5319,14 @@
   $('t-clear').addEventListener('click', openClearSheet);
   // * 회색: *내용* 을 감지 → 별(*)까지 포함해 통째로 서브색(회색)으로 (별 유지)
   $('t-star-gray').addEventListener('click', function(){
-    replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[0]); }, isGrayEl, null, null, '별표로 감싼 부분(*내용*)이 없어요.');
+    replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[0]); }, isGrayEl, null, null, '별표로 감싼 부분이 없어요. 예: *내용*');
   });
   // " 말풍선: 큰따옴표 안쪽을 인물 말풍선으로 (시트로 옵션 선택)
   // (서브): 괄호 포함 내용을 서브 '크기'로. 색은 (색깔)이 맡음(겹치면 색은 괄호색 우선 — CSS로 처리)
   function subMark(text){ var mk=document.createElement('mark'); mk.className='sub'; mk.textContent=text; return mk; }
   function isSubEl(el){ return el.tagName==='MARK' && el.classList.contains('sub'); }
   $('t-paren-sub').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ return subMark(m[0]); }, isSubEl, null, null, '괄호로 감싼 부분(내용)이 없어요.');
+    replaceInText(/\([^()\n]*\)/g, function(m){ return subMark(m[0]); }, isSubEl, null, null, '괄호로 감싼 부분이 없어요. 예: (내용)');
   });
   $('t-quote-line').addEventListener('click', function(){ openQuoteLineSheet(); });
   $('t-quote-add').addEventListener('click', function(){
@@ -5344,11 +5344,11 @@
   });
   // ( ) 이탤릭: 괄호 안쪽(괄호 포함)을 이탤릭으로
   $('t-paren').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ var it=document.createElement('i'); it.textContent=m[0]; return it; }, isItalicEl, null, null, '괄호로 감싼 부분(내용)이 없어요.');
+    replaceInText(/\([^()\n]*\)/g, function(m){ var it=document.createElement('i'); it.textContent=m[0]; return it; }, isItalicEl, null, null, '괄호로 감싼 부분이 없어요. 예: (내용)');
   });
   // ( ) 회색: 괄호(포함) 전체를 서브색(회색)으로
   $('t-paren-gray').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ return grayMark(m[0], true); }, isGrayEl, null, null, '괄호로 감싼 부분(내용)이 없어요.');
+    replaceInText(/\([^()\n]*\)/g, function(m){ return grayMark(m[0], true); }, isGrayEl, null, null, '괄호로 감싼 부분이 없어요. 예: (내용)');
   });
 
   /* ===== 큰따옴표 → 인물 말풍선 ===== */
