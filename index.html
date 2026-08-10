@@ -254,6 +254,20 @@
     margin-left:auto;color:var(--ink);font-weight:600;
     font-variant-numeric:tabular-nums;font-size:11.5px;
   }
+  /* 값 부분을 눌러 직접 숫자 입력 */
+  .label .val.is-editable{cursor:text;border-bottom:1px dashed var(--line-strong);padding-bottom:1px;}
+  .label .val.is-editable:hover{color:var(--accent);}
+  /* 공통 input[type=text] 스타일(높이 42px·폭 100%·테두리)이 우선하지 않도록 전부 덮어씀 */
+  input.val-input[type=text]{
+    appearance:none;-webkit-appearance:none;
+    margin:0 0 0 auto;align-self:center;width:auto;min-width:0;max-width:none;
+    height:auto !important;padding:0 !important;box-sizing:content-box;
+    text-align:right;line-height:1.2;letter-spacing:inherit;
+    border:none !important;border-bottom:1px dashed var(--line-strong) !important;border-radius:0 !important;   /* 평소 표시(점선)와 같은 회색·점선 유지 */
+    background:transparent !important;box-shadow:none !important;color:var(--ink);
+    font-family:inherit;font-size:11.5px !important;font-weight:600;font-variant-numeric:tabular-nums;
+    outline:none;transition:none;
+  }
   .label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;}
   .label-row .label{margin:0;}
   .hist-row{display:flex;align-items:center;gap:5px;}
@@ -314,7 +328,7 @@
     box-shadow:var(--shadow-1);transition:transform .28s var(--ease),width .28s var(--ease);
     z-index:0;pointer-events:none;
   }
-  .seg .align-ic{display:inline-flex;align-items:center;justify-content:center;color:inherit;}
+  .seg .align-ic{display:flex;height:100%;align-items:center;justify-content:center;color:inherit;}   /* 글자 기준선에 걸려 위로 쏠리던 것 → 버튼 높이 전체 기준 중앙 정렬 */
   .seg .align-ic svg{width:15px;height:15px;display:block;}
 
   /* 미니 버튼 */
@@ -322,7 +336,8 @@
   .mini{
     border:1px solid var(--line);background:var(--surface);color:var(--ink-3);
     border-radius:6px;height:22px;padding:0 6px;font-size:10px;font-weight:600;
-    cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;
+    min-width:26px;   /* (I)처럼 라벨이 짧아도 누르기 편하게 최소 폭 확보 */
+    cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:3px;
     transition:background .16s var(--ease),color .16s,border-color .16s,transform .1s;
   }
   .mini:hover{background:var(--ink);color:var(--surface);border-color:var(--ink);}
@@ -865,6 +880,7 @@
   #canvas *,.canvas-clone *{margin:0;padding:0;background:transparent;}
   #canvas .g-inner,.canvas-clone .g-inner{position:relative;z-index:1;}
   #canvas .g-bg-layer,.canvas-clone .g-bg-layer{position:absolute;inset:0;background-size:cover;background-position:center;pointer-events:none;z-index:0;}
+  #canvas .g-frame,.canvas-clone .g-frame{position:absolute;background-size:cover;background-position:center;pointer-events:none;z-index:2;}
   #canvas mark.hl,.canvas-clone mark.hl{color:inherit !important;text-decoration:none !important;display:inline !important;
     background:var(--hl-solid,#eaeaea) !important;padding:0 !important;
     -webkit-box-decoration-break:clone;box-decoration-break:clone;}
@@ -985,6 +1001,9 @@
     .fbtn b,.fbtn i,.fbtn .u,.fbtn s,.fbtn .c-ic,.fbtn .h-ic,.fbtn .sub-ic{font-size:12px;}
     .fbtn .quote-ic svg,.fbtn .hr-ic svg{width:13px;height:13px;}
     .fmt-row{gap:3px;}
+    .mini-row{gap:3px;}
+    .mini{padding:0 4px;gap:2px;min-width:24px;}
+    .hist-row{gap:3px;}
     .cgrid--3{grid-template-columns:repeat(2,minmax(0,1fr));}
     .presets--bg{grid-template-columns:repeat(6,minmax(0,1fr));}
     .preview__meta{display:none;}
@@ -1029,8 +1048,9 @@
             <button class="mini" id="t-paren" type="button" title="괄호 안쪽을 이탤릭(기울임)으로">(I)</button>
             <button class="mini" id="t-paren-sub" type="button" title="괄호(포함)를 작은 글자 크기로">(Aa)</button>
             <button class="mini" id="t-quote-add" type="button" title="기호가 없는 문단 앞뒤에 큰따옴표 넣기">&quot;넣&quot;</button>
-            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말&quot;</button>
+            <button class="mini" id="t-quote-em" type="button" title="큰따옴표로 감싼 부분을 강조색으로">&quot;색&quot;</button>
             <button class="mini" id="t-quote-line" type="button" title="큰따옴표로 감싼 부분을 인용선으로">&quot;인&quot;</button>
+            <button class="mini" id="t-quote-bub" type="button" title="큰따옴표로 감싼 부분을 말풍선으로">&quot;말&quot;</button>
             <button class="mini is-danger" id="t-clear" type="button" title="전체 비우기 (본문 · 제목 · 소제목 · 하단)" aria-label="전체 비우기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7M10 11v6M14 11v6"/></svg></button>
           </div>
         </div>
@@ -1127,11 +1147,11 @@
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
                   <span class="label">본문 글자 크기 <span class="val">32px</span></span>
-                  <div class="rangewrap"><input id="font-size" type="range" min="20" max="50" value="32"></div>
+                  <div class="rangewrap"><input id="font-size" type="range" min="10" max="50" value="32"></div>
                 </div>
                 <div class="field">
                   <span class="label">작은 글자 크기 <span class="val">26px</span></span>
-                  <div class="rangewrap"><input id="subtext-size" type="range" min="12" max="36" step="1" value="26"></div>
+                  <div class="rangewrap"><input id="subtext-size" type="range" min="6" max="36" step="1" value="26"></div>
                 </div>
               </div>
               <div class="grid-2" style="margin-top:16px">
@@ -1213,11 +1233,11 @@
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
                   <span class="label">제목 글자 크기 <span class="val" id="title-size-val">52px</span></span>
-                  <div class="rangewrap"><input id="title-size" type="range" min="20" max="80" step="2" value="52"></div>
+                  <div class="rangewrap"><input id="title-size" type="range" min="10" max="80" step="2" value="52"></div>
                 </div>
                 <div class="field">
                   <span class="label">소제목 글자 크기 <span class="val" id="subtitle-size-val">36px</span></span>
-                  <div class="rangewrap"><input id="subtitle-size" type="range" min="16" max="56" step="2" value="36"></div>
+                  <div class="rangewrap"><input id="subtitle-size" type="range" min="8" max="56" step="2" value="36"></div>
                 </div>
               </div>
               <div class="grid-2" style="margin-top:16px">
@@ -1285,7 +1305,7 @@
               <div class="grid-2" style="margin-top:16px">
                 <div class="field">
                   <span class="label">하단 글자 크기 <span class="val" id="name-size-val">22px</span></span>
-                  <div class="rangewrap"><input id="name-size" type="range" min="12" max="36" step="1" value="22"></div>
+                  <div class="rangewrap"><input id="name-size" type="range" min="6" max="36" step="1" value="22"></div>
                 </div>
                 <div class="field">
                   <span class="label">하단 ↔ 본문 간격 <span class="val" id="name-gap-val">35px</span></span>
@@ -1307,8 +1327,8 @@
               <div class="cgrid cgrid--2">
                 <div class="cchip"><label>본문 글자</label><div class="cchip__box"><input id="c-fg" type="color" value="#2b2b2b"><input class="cchip__hex" id="c-fg-txt" type="text" value="#2b2b2b"></div></div>
                 <div class="cchip"><label>작은 글자</label><div class="cchip__box"><input id="c-sub" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-sub-txt" type="text" value="#8a8a8a"></div></div>
-                <div class="cchip"><label>제목</label><div class="cchip__box"><input id="c-title" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-title-txt" type="text" value="#1a1a1a"></div></div>
-                <div class="cchip"><label>소제목</label><div class="cchip__box"><input id="c-subtitle" type="color" value="#1a1a1a"><input class="cchip__hex" id="c-subtitle-txt" type="text" value="#1a1a1a"></div></div>
+                <div class="cchip"><label>제목</label><div class="cchip__box"><input id="c-title" type="color" value="#2b2b2b"><input class="cchip__hex" id="c-title-txt" type="text" value="#2b2b2b"></div></div>
+                <div class="cchip"><label>소제목</label><div class="cchip__box"><input id="c-subtitle" type="color" value="#2b2b2b"><input class="cchip__hex" id="c-subtitle-txt" type="text" value="#2b2b2b"></div></div>
                 <div class="cchip"><label>하단 글자</label><div class="cchip__box"><input id="c-name" type="color" value="#6c6c6c"><input class="cchip__hex" id="c-name-txt" type="text" value="#6c6c6c"></div></div>
                 <div class="cchip"><label>구분선</label><div class="cchip__box"><input id="c-hr" type="color" value="#c8c8c8"><input class="cchip__hex" id="c-hr-txt" type="text" value="#c8c8c8"></div></div>
                 <div class="cchip"><label>*색*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
@@ -1463,25 +1483,21 @@
                   <div class="cchip"><label>글자</label><div class="cchip__box"><input id="char-ink" type="color" value="#ffffff"><input class="cchip__hex" id="char-ink-txt" type="text" value="#ffffff"></div></div>
                   <div class="cchip"><label>이름</label><div class="cchip__box"><input id="char-namecolor" type="color" value="#8a8a8a"><input class="cchip__hex" id="char-namecolor-txt" type="text" value="#8a8a8a"></div></div>
                 </div>
-                <div class="cchip cchip--wide" style="margin-top:14px">
-                  <label>(색깔)</label>
-                  <div class="cchip__box"><input id="char-subcolor" type="color" value="#8a8a8a"><input class="cchip__hex" id="char-subcolor-txt" type="text" value="#8a8a8a"></div>
+                <div class="cgrid cgrid--2" style="margin-top:14px">
+                  <div class="cchip"><label>(색)</label><div class="cchip__box"><input id="char-subcolor" type="color" value="#8a8a8a"><input class="cchip__hex" id="char-subcolor-txt" type="text" value="#8a8a8a"></div></div>
+                  <div class="cchip"><label>말풍선</label><div class="cchip__box"><input id="char-bub" type="color" value="#248bf5"><input class="cchip__hex" id="char-bub-txt" type="text" value="#248bf5"></div></div>
                 </div>
-                <div class="field" style="margin-top:12px">
+                <div class="field" style="margin-top:14px">
                   <span class="label">적용할 색 <span class="val" id="char-slot-val">글자</span></span>
                   <div class="seg" id="char-slot-seg">
                     <button type="button" data-cslot="ink" aria-pressed="true">글자</button>
                     <button type="button" data-cslot="name" aria-pressed="false">이름</button>
-                    <button type="button" data-cslot="sub" aria-pressed="false">(색깔)</button>
+                    <button type="button" data-cslot="sub" aria-pressed="false">(색)</button>
+                    <button type="button" data-cslot="bub" aria-pressed="false">말풍선</button>
                     <span class="seg__thumb"></span>
                   </div>
                 </div>
-                <div class="dots" id="char-ink-presets" style="margin-top:10px"></div>
-                <div class="cchip cchip--wide" style="margin-top:14px">
-                  <label>말풍선</label>
-                  <div class="cchip__box"><input id="char-bub" type="color" value="#248bf5"><input class="cchip__hex" id="char-bub-txt" type="text" value="#248bf5"></div>
-                </div>
-                <div class="dots" id="char-bub-presets" style="margin-top:12px"></div>
+                <div class="dots" id="char-color-presets" style="margin-top:10px"></div>
                 <div style="margin-top:16px;display:flex;align-items:center;gap:8px;justify-content:flex-end">
                   <button class="btn btn--ghost" id="char-delete" type="button" style="height:36px;font-size:12.5px;color:var(--danger);border-color:var(--danger);flex:none;padding:0 18px;margin-right:auto">삭제</button>
                   <button class="btn btn--ghost" id="char-cancel" type="button" style="height:36px;font-size:12.5px;flex:none;padding:0 18px">취소</button>
@@ -1490,7 +1506,7 @@
               </div>
 
               <p class="section__head" style="margin-top:24px">삽입 방식</p>
-              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향·프사 등을 추가 조정 가능해요.</p>
+              <p class="hint" style="margin:0 0 12px">말풍선 삽입을 위해 인물을 눌렀을 때 뜨는 방식이에요.<br>각 캐릭터마다 삽입 방식을 다르게 저장할 수 있어요.<br>어떤 옵션을 선택하더라도 삽입 후 방향·프사 등을 조정할 수 있어요.</p>
               <div class="mychips" id="bubpreset-list"></div>
               <div class="repform" id="bubpreset-form" hidden>
                 <div class="field">
@@ -1617,7 +1633,7 @@
                 <input id="inputbar-on" type="checkbox" style="margin-left:auto">
               </label>
 
-              <div class="cgrid cgrid--2">
+              <div class="cgrid cgrid--2" style="margin-top:16px">
                 <div class="cchip"><label>바 배경</label><div class="cchip__box"><input id="c-bar-bg" type="color" value="#f5f5f7"><input class="cchip__hex" id="c-bar-bg-txt" type="text" value="#f5f5f7"></div></div>
                 <div class="cchip"><label>이름 글자</label><div class="cchip__box"><input id="c-bar-name" type="color" value="#000000"><input class="cchip__hex" id="c-bar-name-txt" type="text" value="#000000"></div></div>
                 <div class="cchip"><label>아바타</label><div class="cchip__box"><input id="c-bar-avatar" type="color" value="#c7c7cc"><input class="cchip__hex" id="c-bar-avatar-txt" type="text" value="#c7c7cc"></div></div>
@@ -1696,6 +1712,54 @@
                   <div class="field">
                     <span class="label">밝기 <span class="val">100%</span></span>
                     <div class="rangewrap"><input id="bright" type="range" min="10" max="100" step="10" value="100"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details class="fold" id="fold-frame">
+            <summary>
+              꾸밈
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <p class="hint" style="margin:0 0 12px">가장자리에 사진 띠를 둘러요. 글 영역은 그만큼 좁아져요.<br>시범 기능이기에 고정 비율에서는 적용되지 않아요.</p>
+              <div class="field">
+                <span class="label">위치</span>
+                <div class="seg" id="frame-pos-seg">
+                  <button type="button" data-fpos="none" aria-pressed="true">없음</button>
+                  <button type="button" data-fpos="left" aria-pressed="false">왼쪽</button>
+                  <button type="button" data-fpos="right" aria-pressed="false">오른쪽</button>
+                  <button type="button" data-fpos="top" aria-pressed="false">위</button>
+                  <button type="button" data-fpos="bottom" aria-pressed="false">아래</button>
+                  <button type="button" data-fpos="all" aria-pressed="false">사방</button>
+                  <span class="seg__thumb"></span>
+                </div>
+              </div>
+              <div id="frame-opts" hidden>
+                <input id="frame-file" type="file" accept="image/*" hidden>
+                <div class="mini-row" style="justify-content:flex-start;margin-top:12px">
+                  <button class="mini" id="frame-pick" type="button">🖼 사진 선택</button>
+                </div>
+                <div class="grid-2" style="margin-top:14px">
+                  <div class="field">
+                    <span class="label">두께 <span class="val" id="frame-size-val">20%</span></span>
+                    <div class="rangewrap"><input id="frame-size" type="range" min="5" max="50" step="5" value="20"></div>
+                  </div>
+                  <div class="field">
+                    <span class="label">사진 확대 <span class="val" id="frame-zoom-val">100%</span></span>
+                    <div class="rangewrap"><input id="frame-zoom" type="range" min="100" max="200" step="5" value="100"></div>
+                  </div>
+                </div>
+                <div class="grid-2" style="margin-top:14px">
+                  <div class="field">
+                    <span class="label">사진 좌우 <span class="val" id="frame-x-val">50%</span></span>
+                    <div class="rangewrap"><input id="frame-x" type="range" min="0" max="100" step="5" value="50"></div>
+                  </div>
+                  <div class="field">
+                    <span class="label">사진 상하 <span class="val" id="frame-y-val">50%</span></span>
+                    <div class="rangewrap"><input id="frame-y" type="range" min="0" max="100" step="5" value="50"></div>
                   </div>
                 </div>
               </div>
@@ -1814,16 +1878,16 @@
     <div class="sheet__grip"></div>
     <div class="sheet__title">도움말</div>
     <div class="help-body">
-      <p class="help-cat">입력 도구</p>
-      <p class="hint">· <b>*색*</b>: *지문* 영역을 * 포함 *색*의 색깔로 변경해요.<br>· <b>(색)</b>: (지문) 영역을 ( ) 포함 (색)의 색깔로 변경해요. 말풍선 안의 (지문)은 각 인물별로 지정된 (색)을 사용해요.<br>· <b>(I)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>(Aa)</b>: (지문) 영역을 ( ) 포함 작은 글자 크기로 변경해요. 크기만 반영하기 때문에 색깔은 그대로 유지돼요.<br>· <b>&quot;말&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 말풍선에 같이 들어가요.<br>· <b>&quot;인&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 인용선으로 변경해요. 바로 아래 줄에 (지문)이 있으면 하나의 인용선에 같이 들어가요.<br><br><b>TIP!</b><br>· *색*과 (색)에 사용되는 색깔은 디자인-글자 · 보조에서 변경돼요.<br>· 말풍선 안의 (색)에 사용되는 색깔은 말풍선-인물에서 인물별로 변경돼요.<br>· 프리셋-텍스트 대치에서 특정 글자를 다른 글자로 변환·삭제할 수 있어요.</p>
+      <p class="help-cat">자동화 도구</p>
+      <p class="hint">· <b>*색*</b>: *지문* 영역을 * 포함 *색*의 색깔로 변경해요.<br>· <b>(색)</b>: (지문) 영역을 ( ) 포함 (색)의 색깔로 변경해요. 말풍선 안의 (지문)은 각 인물별로 지정된 (색)을 사용해요.<br>· <b>(I)</b>: (지문) 영역을 ( ) 포함 이탤릭으로 변경해요.<br>· <b>(Aa)</b>: (지문) 영역을 ( ) 포함 작은 글자 크기로 변경해요. 크기만 반영하기 때문에 색깔은 그대로 유지돼요.<br>· <b>&quot;넣&quot;</b>: 문단의 앞뒤에 &quot; &quot;를 넣어요. 문단의 앞뒤에 *, ( ), 큰따옴표, 작은따옴표가 하나라도 있다면 적용되지 않아요.<br>· <b>&quot;색&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 강조색으로 변경해요. 강조 1~6 중에서 고를 수 있으며, 적용 후에는 일반적인 강조와 똑같이 조정돼요.<br>· <b>&quot;인&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 인용선으로 변경해요. 바로 아래 줄에 (지문)이나 *(지문)*이 있으면 하나의 인용선에 같이 들어가요. 인용선 1~6 중에서 고를 수 있으며, 적용 후에는 일반적인 인용선과 똑같이 조정돼요.<br>· <b>&quot;말&quot;</b>: &quot;지문&quot; 영역을 &quot; &quot; 포함 말풍선으로 변경해요. 바로 아래 줄에 (지문)이나 *(지문)*이 있으면 하나의 말풍선에 같이 들어가요.<br><br><b>TIP!</b><br>· *색*과 (색)에 사용되는 색깔은 디자인-글자 · 보조에서 변경돼요.<br>· 말풍선 안의 (색)에 사용되는 색깔은 말풍선-인물에서 인물별로 변경돼요.<br>· 프리셋-텍스트 대치에서 특정 글자를 다른 글자로 변환·삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
-      <p class="hint">· <b>강조·형광펜·인용선</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br><br><b>TIP!</b><br>· 강조·형광펜·인용선을 삭제하고 싶을 경우, 칠해진 모든 영역을 드래그하는 대신 일부에 커서만 둬도 전체를 삭제할 수 있어요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.</p>
+      <p class="hint">· <b>강조·형광펜·인용선</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br><br><b>TIP!</b><br>· 강조·형광펜·인용선을 삭제하거나 슬롯(색)을 변경하고 싶을 경우, 칠해진 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.</p>
       <p class="help-cat">말풍선</p>
       <p class="hint">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 이름</b>: 말풍선 이름은 입력에서 조정 가능한 텍스트가 아니에요. 이름을 바꾸고 싶다면 인물에서 변경해 주세요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.</p>
       <p class="help-cat">말풍선 간격</p>
-      <p class="hint">· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 말풍선끼리의 간격이에요.<br>· <b>연속 말풍선 간격</b>: 같은 인물, 같은 방향, 중간에 빈 문단이 없는 말풍선들을 연속 말풍선으로 처리해요. 이때 연속 말풍선끼리의 간격이에요.<br>· <b>말풍선 ↔ 본문 간격</b>: 말풍선과 본문 글자 사이의 간격이에요. 말풍선과 말풍선 사이에 빈 문단을 만들거나, 말풍선과 글 사이에 띄어쓰기를 한다면 0으로 설정해야 내용-문단 간격의 수치만 적용돼요.<br>· 말풍선 아래에 빈 문단을 넣으면 말풍선 ↔ 본문 간격에 문단 간격이 더해져요.</p>
+      <p class="hint">· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 말풍선끼리의 간격이에요.<br>· <b>연속 말풍선 간격</b>: 같은 인물, 같은 방향, 중간에 빈 문단이 없는 말풍선들을 연속 말풍선으로 처리해요. 이때 연속 말풍선끼리의 간격이에요.<br>· <b>말풍선 ↔ 본문 간격</b>: 말풍선과 본문 글자 사이의 간격이에요. 말풍선과 말풍선 사이에 빈 문단을 만들거나, 말풍선과 글 사이에 띄어쓰기를 한다면 0으로 설정해야 내용-문단 간격의 수치만 적용돼요.</p>
       <p class="help-cat">말풍선 모양</p>
-      <p class="hint">· <b>아이메시지</b>: 메시지를 추천해요. 그라데이션, 사진 배경의 경우 미리보기에서 말풍선 꼬리가 이상하게 뜨지만 저장 시 정상적으로 자리 잡아요.<br>· <b>심플</b>: 메시지와 일반 대화를 모두 추천해요.<br>· <b>네모</b>: 메시지와 일반 대화에 모두 호환되지만, 일반 대화를 추천해요.<br><br><b>TIP!</b><br>· 메시지: 프로필 사진 없는 대화.<br>· 일반 대화: 프로필 사진이 있는 대화.</p>
+      <p class="hint">· <b>아이메시지</b>: 메시지를 추천해요. 그라데이션, 사진 배경의 경우 미리보기에서 말풍선 꼬리가 이상하게 뜨지만 저장 시 정상적으로 자리 잡아요.<br>· <b>심플</b>: 메시지와 일반 대화 모두 추천해요.<br>· <b>네모</b>: 메시지와 일반 대화에 모두 호환되지만, 일반 대화를 추천해요.<br><br><b>TIP!</b><br>· 메시지: 프로필 사진 없는 대화.<br>· 일반 대화: 프로필 사진이 있는 대화.</p>
       <p class="help-cat">프리셋</p>
       <p class="hint">· <b>프리셋 종류</b>: 인물, 삽입 방식, 텍스트 대치, 내 프리셋.<br>· <b>프리셋 순서</b>: 모든 프리셋은 저장된 타원 부분을 꾹 클릭한 뒤 드래그하여 순서를 변경할 수 있어요.</p>
     </div>
@@ -1864,6 +1928,16 @@
   var bgValue = '#ffffff';
   var photoOn = false;
   var photoData = null;
+  var framePos = 'none', frameData = null;   // 꾸밈(가장자리 사진 띠)
+  var frameNatW = 0, frameNatH = 0;          // 꾸밈 사진 원본 크기(확대·위치 계산용)
+  function loadFrameNat(cb){
+    frameNatW=0; frameNatH=0;
+    if(!frameData){ if(cb) cb(); return; }
+    var im=new Image();
+    im.onload=function(){ frameNatW=im.naturalWidth||0; frameNatH=im.naturalHeight||0; if(cb) cb(); };
+    im.onerror=function(){ if(cb) cb(); };
+    im.src=frameData;
+  }
   var bgMode = 'solid';  // 'solid' | 'gradient' | 'photo'
   var bubbleShape = 'imessage';  // 'imessage' | 'simple'
 
@@ -1942,6 +2016,7 @@
     {c:'#c3c1eb', label:'인디고'}, {c:'#d0c2e8', label:'라벤더'}, {c:'#debee3', label:'바이올렛'}, {c:'#efbcd3', label:'로즈'},
     {c:'#e9d2c6', label:'클레이'}, {c:'#ddccbf', label:'코코아'}, {c:'#dadce0', label:'그레이'}, {c:'#e6e6e6', label:'페일'}
   ];
+  // 강조색 = 말풍선 팔레트와 동일한 16색(앞 4칸: 아이메시지 파랑·회색·흰색·검정)
   var emPresets = [
     {c:'#c25b57', label:'브릭'}, {c:'#cf7b57', label:'테라코타'}, {c:'#c9995a', label:'오커'}, {c:'#9aa35c', label:'올리브'},
     {c:'#5e9b72', label:'그린'}, {c:'#4e9a98', label:'틸'}, {c:'#5b87a8', label:'스틸블루'}, {c:'#5d74a6', label:'데님'},
@@ -2948,7 +3023,8 @@
     }
     if(range.collapsed){
       var qE=document.createElement('div'); qE.className='g-quote '+side; paintQuote(qE, slot); qE.appendChild(document.createTextNode('\u200b'));
-      range.insertNode(qE); var r0=document.createRange(); r0.selectNodeContents(qE); r0.collapse(false); sel.removeAllRanges(); sel.addRange(r0); return;
+      range.insertNode(qE); absorbBubBreak(qE);
+      var r0=document.createRange(); r0.selectNodeContents(qE); r0.collapse(false); sel.removeAllRanges(); sel.addRange(r0); return;
     }
     var frag = range.extractContents();
     [].forEach.call(frag.querySelectorAll('.g-quote'), function(b){ var p=b.parentNode; while(b.firstChild){ p.insertBefore(b.firstChild,b); } p.removeChild(b); });
@@ -2958,6 +3034,7 @@
     while(q.lastChild && edgeStrippable(q.lastChild)){ q.removeChild(q.lastChild); }
     if(!q.childNodes.length){ q.appendChild(document.createTextNode('\u200b')); }
     range.insertNode(q);
+    absorbBubBreak(q);   // 블록이라 뒤에 남는 빈 줄 하나 제거
     var r=document.createRange(); r.selectNodeContents(q); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
   }
 
@@ -3614,6 +3691,7 @@
       b.innerHTML = pv + '<span>'+opt.label+'</span>';
       b.addEventListener('click', function(ev){
         ev.preventDefault(); ev.stopPropagation();
+        if(opt.keepOpen){ opt.run(); return; }   // 체크 토글처럼 시트를 닫지 않는 항목
         closeSheet();
         if(!opt.noFocus && _sheetSavedRange && editor.contains(_sheetSavedRange.startContainer)){
           editor.focus();
@@ -4061,7 +4139,13 @@
     thumb.style.width = aRect.width + 'px';
     thumb.style.transform = 'translateX(' + (aRect.left - segRect.left - pad) + 'px)';
   }
-  function moveAllThumbs(){ moveThumb($('align-seg')); moveThumb($('size-seg')); moveThumb($('ratio-seg')); moveThumb($('hl-slot-seg')); moveThumb($('em-slot-seg')); moveThumb($('quote-slot-seg')); moveThumb($('bg-mode-seg')); moveThumb($('char-shape-seg')); moveThumb($('bub-shape-seg')); moveThumb($('topbar-src-seg')); }
+  function moveAllThumbs(){ [].forEach.call(document.querySelectorAll('.seg'), moveThumb); }
+  // 세그가 '숨김→보임'으로 바뀌는 순간(아코디언 열기·탭 전환 등) 폭이 0이라 막대 위치를 못 잡던 문제:
+  //   폭이 바뀔 때마다 다시 계산해 두면 막대가 빠지는 경우가 없어진다(막대가 없으면 흰 글자만 남아 안 보임).
+  if(window.ResizeObserver){
+    var _segRO = new ResizeObserver(function(entries){ entries.forEach(function(en){ moveThumb(en.target); }); });
+    requestAnimationFrame(function(){ [].forEach.call(document.querySelectorAll('.seg'), function(sg){ try{ _segRO.observe(sg); }catch(e){} }); });
+  }
 
   document.querySelectorAll('#align-seg button').forEach(function(btn){
     btn.addEventListener('click', function(){
@@ -4270,7 +4354,56 @@
     el.style.fontSize = fs+'px';
     el.style.letterSpacing = ls+'px';
     el.style.lineHeight = String((parseFloat($('line-height').value)/10).toFixed(2));
-    el.style.padding = pad+'px';
+    // ── 테두리 꾸밈(가장자리 사진 띠). 고정 비율에선 적용하지 않음.
+    var frameOn = (framePos!=='none' && frameData && sizeMode!=='ratio');
+    var fThick = 0;
+    if(frameOn){
+      var fp = parseFloat($('frame-size') ? $('frame-size').value : 20); if(isNaN(fp)) fp=20;
+      fThick = Math.round(el.clientWidth * fp/100);   // 두께는 '전체 폭' 기준
+    }
+    // 띠가 차지하는 만큼 안쪽으로 밀어 글이 띠를 침범하지 않게(여백은 띠 안쪽에 남음)
+    el.style.padding = frameOn
+      ? ((pad + (framePos==='top'||framePos==='all' ? fThick : 0))+'px '
+        +(pad + (framePos==='right'||framePos==='all' ? fThick : 0))+'px '
+        +(pad + (framePos==='bottom'||framePos==='all' ? fThick : 0))+'px '
+        +(pad + (framePos==='left'||framePos==='all' ? fThick : 0))+'px')
+      : (pad+'px');
+    (function(){
+      [].forEach.call(el.querySelectorAll('.g-frame'), function(f){ f.parentNode.removeChild(f); });
+      if(!frameOn) return;
+      var isAll = (framePos==='all');
+      var W = el.clientWidth, H = el.clientHeight;
+      var sides = isAll ? ['left','right','top','bottom'] : [framePos];
+      sides.forEach(function(sd){
+        var f=document.createElement('div'); f.className='g-frame';
+        f.style.setProperty('background-image','url("'+frameData+'")','important');
+        if(sd==='left'||sd==='right'){
+          f.style.top='0'; f.style.bottom='0'; f.style.width=fThick+'px'; f.style[sd]='0';
+        } else {
+          f.style.left='0'; f.style.right='0'; f.style.height=fThick+'px'; f.style[sd]='0';
+        }
+        // 확대·좌우·위아래 슬라이더 반영 (원본 크기를 알아야 정확 — 모르면 cover/center로 폴백)
+        var zoom = (parseFloat($('frame-zoom') ? $('frame-zoom').value : 100)||100)/100;
+        var px = (parseFloat($('frame-x') ? $('frame-x').value : 50)||0)/100;
+        var py = (parseFloat($('frame-y') ? $('frame-y').value : 50)||0)/100;
+        var boxW = isAll ? W : (sd==='left'||sd==='right' ? fThick : W);
+        var boxH = isAll ? H : (sd==='top'||sd==='bottom' ? fThick : H);
+        if(frameNatW>0 && frameNatH>0){
+          var sc = Math.max(boxW/frameNatW, boxH/frameNatH) * zoom;   // 최소 '꽉 채움' 보장 → 빈 공간 안 생김
+          var bw = frameNatW*sc, bh = frameNatH*sc;
+          var bx = -(bw-boxW)*px, by = -(bh-boxH)*py;                 // 남는 만큼만 이동(끝에서 더 안 밀림)
+          if(isAll){ bx -= (sd==='right') ? (W-fThick) : 0; by -= (sd==='bottom') ? (H-fThick) : 0; }
+          f.style.setProperty('background-size', bw+'px '+bh+'px','important');
+          f.style.setProperty('background-position', bx+'px '+by+'px','important');
+        } else {
+          f.style.setProperty('background-size', isAll ? (W+'px '+H+'px') : 'cover','important');
+          var ox0 = (isAll && sd==='right') ? -(W-fThick) : 0;
+          var oy0 = (isAll && sd==='bottom') ? -(H-fThick) : 0;
+          f.style.setProperty('background-position', isAll ? (ox0+'px '+oy0+'px') : 'center','important');
+        }
+        el.appendChild(f);
+      });
+    })();
     el.style.setProperty('--gpad', pad+'px');
     // 아이메시지 상단바 / 입력창 (폰트 기준 크기 — 레퍼런스 이식)
     var _barBg = barBgColor(), _accent = barAccentColor(), _nameCol = barNameColor(), _avatar = barAvatarColor(), _plus = barPlusColor(), _arrow = barArrowColor();
@@ -4454,6 +4587,53 @@
   /* ============================================================
      렌더 + 스케일링
      ============================================================ */
+  // 슬라이더 값 표시를 눌러 숫자를 직접 입력 — 범위·단위를 벗어나면 가장 가까운 값으로 맞춤
+  function nearestSliderValue(sl, raw){
+    var min=parseFloat(sl.min), max=parseFloat(sl.max), st=parseFloat(sl.step)||1;
+    if(isNaN(min)) min=0; if(isNaN(max)) max=100;
+    var v=parseFloat(raw); if(isNaN(v)) return parseFloat(sl.value);
+    v=Math.min(max, Math.max(min, v));                 // 범위 밖이면 끝값으로
+    v=min + Math.round((v-min)/st)*st;                 // 단위에 맞는 가장 가까운 값으로
+    v=Math.min(max, Math.max(min, v));
+    return Math.round(v*1000)/1000;
+  }
+  function enableValueEditing(){
+    [].forEach.call(document.querySelectorAll('.rangewrap input[type="range"]'), function(sl){
+      var wrap=sl.closest('.rangewrap'); if(!wrap) return;
+      var lbl=wrap.previousElementSibling; if(!lbl) return;
+      var span=lbl.querySelector('.val'); if(!span || span._editInit) return;
+      span._editInit=true; span.classList.add('is-editable'); span.title='눌러서 숫자 입력';
+      span.addEventListener('click', function(){
+        if(span.hidden) return;
+        var inp=document.createElement('input');
+        inp.type='text'; inp.className='val-input'; inp.inputMode='decimal';
+        inp.value=sl.value;
+        function fitW(){ inp.size = Math.max(2, String(inp.value||'').length); }   // 숫자 길이만큼만
+        fitW(); inp.addEventListener('input', fitW);
+        span.hidden=true; span.parentNode.insertBefore(inp, span.nextSibling);
+        inp.focus(); inp.select();
+        var done=false;
+        function finish(apply){
+          if(done) return; done=true;
+          if(apply){
+            var nv=nearestSliderValue(sl, inp.value);
+            if(String(nv)!==String(sl.value)){
+              sl.value=nv;
+              sl.dispatchEvent(new Event('input', {bubbles:true}));
+              sl.dispatchEvent(new Event('change', {bubbles:true}));
+            }
+          }
+          if(inp.parentNode) inp.parentNode.removeChild(inp);
+          span.hidden=false;
+        }
+        inp.addEventListener('keydown', function(e){
+          if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+          else if(e.key==='Escape'){ e.preventDefault(); finish(false); }
+        });
+        inp.addEventListener('blur', function(){ finish(true); });
+      });
+    });
+  }
   function setVal(sliderId, text){
     var s=$(sliderId); if(!s) return;
     var wrap=s.closest('.rangewrap'); var lbl=wrap?wrap.previousElementSibling:null;
@@ -4639,7 +4819,7 @@
     var lisz=$('logimg-size'); if(lisz){ var liszv=$('logimg-size-val'); if(liszv) liszv.textContent=parseFloat(lisz.value)+'%'; }
     var lirad=$('logimg-radius'); if(lirad){ var liradv=$('logimg-radius-val'); if(liradv) liradv.textContent=parseFloat(lirad.value)+'px'; }
   }
-  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','title-font','name-font'].forEach(function(id){
+  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','title-font','name-font'].forEach(function(id){
     var e=$(id); if(e){ e.addEventListener('input', function(){ updateTitleSizeLabels(); render(); }); e.addEventListener('change', function(){ updateTitleSizeLabels(); render(); }); }
   });
 
@@ -4653,6 +4833,41 @@
   function updatePhotoUI(){
     var pick=$('photo-pick'); if(pick){ pick.textContent = photoData ? '🖼 사진 변경' : '🖼 사진 선택'; }
   }
+  // ── 테두리 꾸밈 UI
+  function updateFrameUI(){
+    var opts=$('frame-opts'); if(opts) opts.hidden = (framePos==='none');
+    var pick=$('frame-pick'); if(pick) pick.textContent = frameData ? '🖼 사진 변경' : '🖼 사진 선택';
+    var v=$('frame-size-val'); if(v && $('frame-size')) v.textContent = $('frame-size').value+'%';
+    [['frame-zoom','frame-zoom-val'],['frame-x','frame-x-val'],['frame-y','frame-y-val']].forEach(function(pair){
+      var el=$(pair[0]), lb=$(pair[1]); if(el && lb) lb.textContent = el.value+'%';
+    });
+  }
+  if($('frame-pos-seg')){
+    document.querySelectorAll('#frame-pos-seg button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        document.querySelectorAll('#frame-pos-seg button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+        btn.setAttribute('aria-pressed','true');
+        framePos = btn.getAttribute('data-fpos') || 'none';
+        moveThumb($('frame-pos-seg')); updateFrameUI();
+        if(framePos!=='none' && !frameData){ $('frame-file').click(); }
+        render(); saveState();
+      });
+    });
+    $('frame-pick').addEventListener('click', function(){ $('frame-file').click(); });
+    $('frame-file').addEventListener('change', function(e){
+      var file=e.target.files && e.target.files[0]; if(!file) return;
+      var rd=new FileReader();
+      rd.onload=function(ev){ frameData=ev.target.result; loadFrameNat(render); updateFrameUI(); render(); saveState(); };
+      rd.readAsDataURL(file); e.target.value='';
+    });
+    ['frame-size','frame-zoom','frame-x','frame-y'].forEach(function(id){
+      var el=$(id); if(!el) return;
+      el.addEventListener('input', function(){ updateFrameUI(); render(); });
+      el.addEventListener('change', saveState);
+    });
+  }
+  var _foldFrame=$('fold-frame');
+  if(_foldFrame){ _foldFrame.addEventListener('toggle', function(){ if(_foldFrame.open){ requestAnimationFrame(function(){ moveThumb($('frame-pos-seg')); }); } }); }
   $('photo-pick').addEventListener('click', function(){ $('photo-file').click(); });
   $('photo-file').addEventListener('change', function(e){
     var file=e.target.files && e.target.files[0]; if(!file) return;
@@ -5023,10 +5238,14 @@
   }
   // 텍스트 노드를 순회하며 정규식 매칭 구간을 커스텀 노드로 치환하는 공통 헬퍼.
   // build(match) → 삽입할 DOM 노드(반환 null 이면 원문 유지). skip(el) → true 이면 그 조상 안의 노드는 건너뜀.
-  function replaceInText(re, build, skip, absorbBub, postBuild){
+  function replaceInText(re, build, skip, absorbBub, postBuild, noMatchMsg){
+    // '가끔 안 먹힘' 예방: 매칭 전에 쪼개진 텍스트 노드를 합침. 다른 도구를 쓴 직후·
+    // 붙여넣기·커서 이동 등으로 텍스트가 여러 노드로 갈리면 한 노드 안에서 정규식이
+    // 패턴을 못 잡아 조용히 실패하던 문제를 넓게 막는다.
+    editor.normalize();
     var walker=document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false), nodes=[];
     while(walker.nextNode()){ nodes.push(walker.currentNode); }
-    var _absorbList=[];
+    var _absorbList=[], _hit=0;
     nodes.forEach(function(tn){
       var text=tn.nodeValue; if(!text) return;
       if(skip){ var p=tn.parentNode, bad=false; while(p && p!==editor){ if(p.nodeType===1 && skip(p)){ bad=true; break; } p=p.parentNode; } if(bad) return; }
@@ -5036,16 +5255,18 @@
         if(m.index===re.lastIndex){ re.lastIndex++; continue; }
         if(m.index>last){ frag.appendChild(document.createTextNode(text.slice(last, m.index))); }
         var node=build(m); frag.appendChild(node || document.createTextNode(m[0]));
-        last=m.index+m[0].length;
+        last=m.index+m[0].length; _hit++;
       }
       if(last<text.length){ frag.appendChild(document.createTextNode(text.slice(last))); }
       var lastBub=null;
       if(absorbBub){
-        for(var k=frag.childNodes.length-1;k>=0;k--){ var cn=frag.childNodes[k]; if(cn.nodeType===1 && cn.classList && cn.classList.contains('g-bub')){ lastBub=cn; break; } }
+        for(var k=frag.childNodes.length-1;k>=0;k--){ var cn=frag.childNodes[k]; if(cn.nodeType===1 && cn.classList && (cn.classList.contains('g-bub')||cn.classList.contains('g-quote'))){ lastBub=cn; break; } }
       }
       if(tn.parentNode) tn.parentNode.replaceChild(frag, tn);
       if(lastBub) _absorbList.push(lastBub);
     });
+    // 하나도 못 바꿨으면 조용히 실패하지 않고 알려줌 — '고장났다'는 오해로 이탈하는 걸 막음
+    if(_hit===0){ if(noMatchMsg) alert(noMatchMsg); return; }
     if(typeof postBuild==='function') postBuild();   // 정리·absorbBubBreak 전, br 구조 원본 상태에서 후처리
     cleanEditor();
     _absorbList.forEach(absorbBubBreak);
@@ -5058,40 +5279,76 @@
   function isBubEl(el){ return el.classList && (el.classList.contains('g-bub') || el.classList.contains('g-bub-name')); }
 
   // 전체 비우기 (본문 + 제목·소제목·하단 정보)
-  $('t-clear').addEventListener('click', function(){
-    if(!confirm('본문·제목·소제목·하단을 모두 비울까요?')) return;
-    editor.innerHTML='';
-    ['title-ed','subtitle-ed','name-ed'].forEach(function(id){ var el=$(id); if(el) el.innerHTML=''; });
+  // 비우기: 무엇을 비울지 고르는 시트(선택은 기억됨)
+  var CLEAR_KEY='logmaker-clear-targets-v1';
+  var clearTargets = (function(){
+    try{ var v=JSON.parse(localStorage.getItem(CLEAR_KEY)); if(v && typeof v==='object') return v; }catch(e){}
+    return { body:true, title:true, subtitle:true, name:true };
+  })();
+  function saveClearTargets(){ try{ localStorage.setItem(CLEAR_KEY, JSON.stringify(clearTargets)); }catch(e){} }
+  function runClear(){
+    if(clearTargets.body) editor.innerHTML='';
+    if(clearTargets.title){ var t=$('title-ed'); if(t) t.innerHTML=''; }
+    if(clearTargets.subtitle){ var st=$('subtitle-ed'); if(st) st.innerHTML=''; }
+    if(clearTargets.name){ var nm=$('name-ed'); if(nm) nm.innerHTML=''; }
     if(typeof clearHrSel==='function') clearHrSel();
     if(typeof cleanEditor==='function') cleanEditor();
     if(typeof updateTitleSizeLabels==='function') updateTitleSizeLabels();
     render();
     if(typeof scheduleSave==='function') scheduleSave(); else if(typeof saveState==='function') saveState();
-  });
-  // * 회색: **내용** 을 감지 → 내용을 서브색(회색)으로, ** 기호는 제거
+  }
+  function openClearSheet(){
+    var defs=[['body','본문'],['title','제목'],['subtitle','소제목'],['name','하단']];
+    openSheetDef({ title:'무엇을 비울까요?', noFocus:true, options:
+      defs.map(function(d){
+        return { label:d[1], preview: clearTargets[d[0]] ? '<span class="s-preview">✓</span>' : '<span class="s-preview" style="opacity:.25">✓</span>',
+          keepOpen:true,
+          run:function(){ clearTargets[d[0]]=!clearTargets[d[0]]; saveClearTargets(); openClearSheet(); } };
+      }).concat([
+        { label:'선택한 항목 비우기', preview:'<span class="s-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M9 7V5h6v2M6 7l1 12.5A1.6 1.6 0 0 0 8.6 21h6.8a1.6 1.6 0 0 0 1.6-1.5L18 7"/></svg></span>',
+          run:function(){
+            var names=[]; if(clearTargets.body) names.push('본문'); if(clearTargets.title) names.push('제목');
+            if(clearTargets.subtitle) names.push('소제목'); if(clearTargets.name) names.push('하단');
+            if(!names.length){ alert('비울 항목을 하나 이상 골라 주세요.'); return; }
+            if(!confirm(names.join(' · ')+'을(를) 비울까요?')) return;
+            runClear();
+          } }
+      ])
+    });
+  }
+  $('t-clear').addEventListener('click', openClearSheet);
+  // * 회색: *내용* 을 감지 → 별(*)까지 포함해 통째로 서브색(회색)으로 (별 유지)
   $('t-star-gray').addEventListener('click', function(){
-    replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[1]); }, isGrayEl);
+    replaceInText(/\*([^\n*]+?)\*/g, function(m){ return grayMark(m[0]); }, isGrayEl, null, null, '별표로 감싼 부분(*내용*)이 없어요.');
   });
   // " 말풍선: 큰따옴표 안쪽을 인물 말풍선으로 (시트로 옵션 선택)
   // (서브): 괄호 포함 내용을 서브 '크기'로. 색은 (색깔)이 맡음(겹치면 색은 괄호색 우선 — CSS로 처리)
   function subMark(text){ var mk=document.createElement('mark'); mk.className='sub'; mk.textContent=text; return mk; }
   function isSubEl(el){ return el.tagName==='MARK' && el.classList.contains('sub'); }
   $('t-paren-sub').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ return subMark(m[0]); }, isSubEl);
+    replaceInText(/\([^()\n]*\)/g, function(m){ return subMark(m[0]); }, isSubEl, null, null, '괄호로 감싼 부분(내용)이 없어요.');
   });
   $('t-quote-line').addEventListener('click', function(){ openQuoteLineSheet(); });
-  $('t-quote-add').addEventListener('click', function(){ wrapPlainLines(editor); cleanEditor(); render(); saveSel(); });
+  $('t-quote-add').addEventListener('click', function(){
+    editor.normalize();   // 쪼개진 텍스트 조각을 먼저 합쳐 '가끔 안 먹힘' 예방
+    _wrapCount=0;
+    wrapPlainLines(editor);
+    if(_wrapCount===0){ alert('따옴표를 넣을 문단이 없어요.\n(빈 줄이거나 이미 따옴표·괄호·별표로 시작하는 줄은 건너뛰어요.)'); return; }
+    editor.normalize();   // 새로 넣은 " 를 옆 글자와 한 덩어리로 합침 — 안 그러면 "말"·"인"이 못 잡음
+    cleanEditor(); render(); saveSel();
+  });
+  $('t-quote-em').addEventListener('click', function(){ openQuoteEmSheet(); });
   $('t-quote-bub').addEventListener('click', function(){
     if(!characters || !characters.length){ alert('먼저 말풍선 탭에서 인물을 등록해 주세요.'); return; }
     openQuoteBubbleSheet();
   });
   // ( ) 이탤릭: 괄호 안쪽(괄호 포함)을 이탤릭으로
   $('t-paren').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ var it=document.createElement('i'); it.textContent=m[0]; return it; }, isItalicEl);
+    replaceInText(/\([^()\n]*\)/g, function(m){ var it=document.createElement('i'); it.textContent=m[0]; return it; }, isItalicEl, null, null, '괄호로 감싼 부분(내용)이 없어요.');
   });
   // ( ) 회색: 괄호(포함) 전체를 서브색(회색)으로
   $('t-paren-gray').addEventListener('click', function(){
-    replaceInText(/\([^()\n]*\)/g, function(m){ return grayMark(m[0], true); }, isGrayEl);
+    replaceInText(/\([^()\n]*\)/g, function(m){ return grayMark(m[0], true); }, isGrayEl, null, null, '괄호로 감싼 부분(내용)이 없어요.');
   });
 
   /* ===== 큰따옴표 → 인물 말풍선 ===== */
@@ -5100,7 +5357,7 @@
   // " 말풍선 후처리: 따옴표 말풍선 '바로 아래'(빈 줄 없이)에 괄호 줄이 오면 같은 말풍선 안으로 흡수(괄호 유지, 줄바꿈 유지).
   //   빈 줄(br 2개)이 있으면 흡수 안 함. 연속 괄호 줄은 모두 흡수. 따옴표 없는 괄호는 대상 아님(data-qb 없음).
   function mergeQuoteParens(){
-    var PAREN=/^\s*[（(][\s\S]*[)）]\s*$/;
+    var PAREN=/^\s*\*?\s*[（(][\s\S]*[)）]\s*\*?\s*$/;   // (지문) 뿐 아니라 *(지문)* 형태도 흡수
     [].slice.call(editor.querySelectorAll('.g-bub[data-qb]')).forEach(function(bub){
       bub.removeAttribute('data-qb');
       while(true){
@@ -5141,7 +5398,27 @@
         out.appendChild(gb);
       }
       return out;
-    }, isBubEl, true, mergeQuoteParens);
+    }, isBubEl, true, mergeQuoteParens, '큰따옴표로 감싼 문장이 없어요.');
+  }
+  // ===== 따옴표 → 강조색 (미니 도구 '"색"') =====
+  //   큰따옴표로 감싼 부분(따옴표 포함)을 강조색 mark.em으로. data-slot·인라인 --em을 넣으므로
+  //   나중에 커서만 두고 슬롯 변경·해제하는 기존 강조색 편집이 그대로 먹힌다.
+  function isEmEl(el){ return el.tagName==='MARK' && el.classList.contains('em'); }
+  function quoteToEm(slot){
+    slot = slot || 1;
+    var re=/[\u201C\u201D\u201E\u201F\u2033"]([^\u201C\u201D\u201E\u201F\u2033"\n]*)[\u201C\u201D\u201E\u201F\u2033"]/g;
+    replaceInText(re, function(m){
+      var mk=document.createElement('mark'); mk.className='em';
+      mk.setAttribute('data-slot', String(slot));
+      mk.style.setProperty('--em', emColorOf(slot));
+      mk.textContent=m[0];   // 따옴표 기호 유지
+      return mk;
+    }, isEmEl, null, null, '큰따옴표로 감싼 문장이 없어요.');
+  }
+  function openQuoteEmSheet(){
+    openSheetDef({ title:'따옴표 → 강조색', noFocus:true, options:[1,2,3,4,5,6].map(function(n){
+      return { label:'강조 '+n, preview:function(){ return swatchHtml(emColorOf(n)); }, run:function(){ quoteToEm(n); } };
+    })});
   }
   // ===== 따옴표 넣기 (미니 도구 '"넣"') =====
   //   각 문단(줄)을 훑어 앞뒤에 " 를 붙인다. 단, 아래는 건너뜀:
@@ -5155,6 +5432,7 @@
   function _isLineHost(n){
     return n.nodeType===1 && n.classList && (n.classList.contains('g-bub')||n.classList.contains('g-quote'));
   }
+  var _wrapCount=0;   // wrapPlainLines가 실제로 감싼 줄 수 — 0이면 안내
   function _wrapSeg(parent, seg){
     if(!seg.length) return;
     var txt=''; seg.forEach(function(n){ txt += (n.textContent||''); });
@@ -5165,6 +5443,7 @@
     parent.insertBefore(document.createTextNode('"'), seg[0]);      // 서식 '바깥'에 붙음
     var last=seg[seg.length-1];
     parent.insertBefore(document.createTextNode('"'), last.nextSibling);
+    _wrapCount++;
   }
   function wrapPlainLines(host){
     var seg=[], kids=[].slice.call(host.childNodes);
@@ -5181,7 +5460,7 @@
   //   말풍선과 달리 '연속' 개념 없음 — 각 인용선은 독립 블록.
   function isQuoteEl(el){ return el.tagName==='DIV' && el.classList && el.classList.contains('g-quote'); }
   function mergeQuoteLineParens(){
-    var PAREN=/^\s*[（(][\s\S]*[)）]\s*$/;
+    var PAREN=/^\s*\*?\s*[（(][\s\S]*[)）]\s*\*?\s*$/;   // (지문) 뿐 아니라 *(지문)* 형태도 흡수
     [].slice.call(editor.querySelectorAll('.g-quote[data-ql]')).forEach(function(q){
       q.removeAttribute('data-ql');
       while(true){
@@ -5210,7 +5489,7 @@
       q.setAttribute('data-ql','1');
       q.appendChild(document.createTextNode(m[0]));   // 따옴표 기호 유지
       return q;
-    }, isQuoteEl, true, mergeQuoteLineParens);
+    }, isQuoteEl, true, mergeQuoteLineParens, '큰따옴표로 감싼 문장이 없어요.');
   }
   // 1단계 왼쪽/오른쪽 → 2단계 색 슬롯
   function openQuoteLineSheet(){
@@ -5251,7 +5530,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','logimg-size','logimg-radius','font-size','subtext-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','font-size','subtext-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-hl5','c-hl5-txt','c-hl6','c-hl6-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-em5','c-em5-txt','c-em6','c-em6-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-quote2','c-quote2-txt','c-quote3','c-quote3-txt','c-quote4','c-quote4-txt','c-quote5','c-quote5-txt','c-quote6','c-quote6-txt','c-hr','c-hr-txt',
@@ -5264,7 +5543,7 @@
       var vals={}; TEXT_IDS.forEach(function(id){ var e=$(id); if(e) vals[id]=e.value; });
       var data={ vals:vals, editorHtml:editor.innerHTML, nameHtml:nameEd?nameEd.innerHTML:'',
         titleHtml:($('title-ed')?$('title-ed').innerHTML:''), subtitleHtml:($('subtitle-ed')?$('subtitle-ed').innerHTML:''),
-        bgValue:bgValue, align:currentAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, photoOn:photoOn, photoData:photoData, chrome:chrome };
+        bgValue:bgValue, align:currentAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, photoOn:photoOn, photoData:photoData, framePos:framePos, frameData:frameData, chrome:chrome };
       try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
       catch(e){ try{ data.photoData=null; localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e2){} }
     }catch(e){}
@@ -5321,6 +5600,12 @@
       applyBgViews();
       photoOn = (bgMode==='photo') && !!photoData;
       updatePhotoUI();
+      frameData = (typeof data.frameData==='string') ? data.frameData : null;
+      framePos = ({none:1,left:1,right:1,top:1,bottom:1,all:1})[data.framePos] ? data.framePos : 'none';
+      document.querySelectorAll('#frame-pos-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-fpos')===framePos?'true':'false'); });
+      loadFrameNat(render);
+      if(typeof updateFrameUI==='function') updateFrameUI();
+      requestAnimationFrame(function(){ moveThumb($('frame-pos-seg')); });
       bubbleShape = ({imessage:1,simple:1,soft:1})[data.bubbleShape] ? data.bubbleShape : 'imessage';
       syncShapeSeg();
       applyBubbleShape();
@@ -5548,7 +5833,8 @@
     quote: function(t){ return t.replace(/[\u201C\u201D\u201E\u201F\u2033]/g,'"'); },
     squote: function(t){ return t.replace(/[\u2018\u2019\u201B\u2032]/g,"'"); },
     dots: function(t){ return t.replace(/\u2026/g,'\u22EF').replace(/\u00B7\u00B7\u00B7/g,'\u22EF').replace(/\.{3,}/g,'\u22EF'); },
-    paren: function(t){ return t.replace(/[()（）]/g,''); },   // 괄호 기호만 삭제(안쪽 글자는 유지), 반각·전각 모두
+    paren: function(t){ return t.replace(/[()（）]/g,''); },
+    quotedel: function(t){ return t.replace(/["\u201C\u201D]/g,''); },   // 큰따옴표 3종(곧은 " · 여는 \u201C · 닫는 \u201D) 삭제   // 괄호 기호만 삭제(안쪽 글자는 유지), 반각·전각 모두
     code: function(t){ return t.replace(/<br\s*\/?>|<\/?sub>/gi,''); }   // 텍스트에 리터럴로 들어간 <br> <sub> </sub> 삭제(한 규칙으로 전부)
   };
   // 빌트인 칩의 '표시용' find→to (사용자 규칙과 같은 형태로 보이게). to==='' 는 '삭제'로 표시.
@@ -5559,6 +5845,7 @@
     squote: { find:'\u2018',   to:"'" },
     dots:   { find:'...',      to:'\u22EF' },
     paren:  { find:'( , )',    to:'' },
+    quotedel: { find:'" , \u201C , \u201D', to:'' },
     code:   { find:'<br>, <sub>, </sub>', to:'' }
   };
   // 앱 최초 실행 시 기본 입력 프리셋 4종을 심어둠 (이후엔 사용자가 지우면 다시 생기지 않음)
@@ -5568,6 +5855,7 @@
     { builtin:'dots' },
     { builtin:'star' },
     { builtin:'paren' },
+    { builtin:'quotedel' },
     { builtin:'code' }
   ];
   function loadReplacePresets(){
@@ -5592,6 +5880,14 @@
           if(ci>=0) list.splice(ci,0,{builtin:'paren'}); else list.push({builtin:'paren'});   // 항상 '코드' 앞에
           saveReplacePresets(list); }
         localStorage.setItem('logmaker-replace-mig-paren','1');
+      }
+      if(!localStorage.getItem('logmaker-replace-mig-quotedel')){
+        var hasQd=false;
+        for(var q1=0;q1<list.length;q1++){ if(list[q1]&&list[q1].builtin==='quotedel') hasQd=true; }
+        if(!hasQd){ var ci2=-1; for(var q2=0;q2<list.length;q2++){ if(list[q2]&&list[q2].builtin==='code'){ ci2=q2; break; } }
+          if(ci2>=0) list.splice(ci2,0,{builtin:'quotedel'}); else list.push({builtin:'quotedel'});
+          saveReplacePresets(list); }
+        localStorage.setItem('logmaker-replace-mig-quotedel','1');
       }
       if(!localStorage.getItem('logmaker-replace-mig-code')){   // 미니툴바 '코드' 버튼을 입력 프리셋으로 이동
         var hasCode=false;
@@ -6026,10 +6322,8 @@
     var empty=$('char-insert-empty'); if(empty) empty.style.display = characters.length ? 'none' : '';
   }
   function setColorPair(base, val){ var c=$(base), t=$(base+'-txt'); if(c) c.value=val; if(t) t.value=val; }
-  function syncCharBubPreset(val){
-    var wrap=$('char-bub-presets'); if(!wrap) return; var v=(val||'').toLowerCase();
-    [].forEach.call(wrap.children, function(x){ x.classList.toggle('on', (x.getAttribute('data-col')||'').toLowerCase()===v); });
-  }
+  // 색이 바뀌면 통합 팔레트의 선택 표시를 갱신(대상이 그 색일 때만 표시됨)
+  function syncCharBubPreset(){ if(typeof _renderCharPaletteHook==='function') _renderCharPaletteHook(); }
   function updateCharPhotoPreview(){
     var av=$('char-photo-preview'); if(!av) return;
     av.className='char-avatar'+(tmpShape==='square'?' square':'');
@@ -6040,7 +6334,7 @@
     document.querySelectorAll('#char-shape-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-shape')===shape?'true':'false'); });
     requestAnimationFrame(function(){ moveThumb($('char-shape-seg')); });
   }
-  var _markCharDotHook = null;
+  var _renderCharPaletteHook = null;
   function openCharEditor(id){
     editingCharId = id || null;
     var c = id ? findChar(id) : null;
@@ -6055,42 +6349,41 @@
     updateCharPhotoPreview(); setShapeSeg(tmpShape);
     $('char-delete').style.display = id ? '' : 'none';
     $('char-editor').hidden = false; $('char-add').hidden = true;
-    requestAnimationFrame(function(){ moveThumb($('char-slot-seg')); if(typeof _markCharDotHook==='function') _markCharDotHook(); });
+    requestAnimationFrame(function(){ moveThumb($('char-slot-seg')); if(typeof _renderCharPaletteHook==='function') _renderCharPaletteHook(); });
   }
   function closeCharEditor(){ $('char-editor').hidden=true; $('char-add').hidden=false; editingCharId=null; tmpPhoto=null; }
   if($('char-add')){
     linkColor('char-bub','char-bub-txt',false,false, function(){ syncCharBubPreset($('char-bub').value); });
-    linkColor('char-ink','char-ink-txt',false,false);
-    linkColor('char-namecolor','char-namecolor-txt',false,false);
-    linkColor('char-subcolor','char-subcolor-txt',false,false);
-    // 글자·이름·(색깔) 전용: 세그로 대상 고르고 팔레트로 색 지정 (말풍선=배경색이라 팔레트 분리)
+    linkColor('char-ink','char-ink-txt',false,false, syncCharBubPreset);
+    linkColor('char-namecolor','char-namecolor-txt',false,false, syncCharBubPreset);
+    linkColor('char-subcolor','char-subcolor-txt',false,false, syncCharBubPreset);
+    // 색 팔레트 하나로 통합 — 세그(글자/이름/(색)/말풍선)로 대상만 고르고 같은 팔레트에서 색 선택.
+    //   공용 컬러 12색은 모든 대상이 공유하고, 앞쪽 '중요한 색'만 대상에 따라 달라진다.
+    var SHARED_COLORS = ['#bd524c','#b05e3b','#956c37','#727944','#4a7d5b','#407d7b',
+                         '#4f7796','#5b72a4','#6e6faa','#8765a4','#ad5882','#bd6288'];
+    var BUB_KEEP = ['#248bf5','#e5e5ea','#ffffff','#1c1c1e'];      // 아이메시지 파랑·회색 / 흰 / 검정
+    var INK_KEEP = ['#2b2b2b','#6c6c6c','#8a8a8a','#ffffff'];      // 본문색 / 하단색 / 회색 / 흰색 (말풍선과 같은 4칸)
     var _charSlot='ink';
-    function charSlotInput(k){ return $(k==='name'?'char-namecolor':(k==='sub'?'char-subcolor':'char-ink')); }
-    function charSlotLabel(k){ return k==='name'?'이름':(k==='sub'?'(색깔)':'글자'); }
-    // 밝은 말풍선 위에서도 읽히도록 컬러는 명도 33% 선으로 낮춤(중간 톤이면 대비 3:1대라 흐림).
-    //   앞 6개는 무채색(어두운 말풍선용 연회색·흰색 포함).
-    var charInkPresets = ['#1c1c1e','#3e4149','#6b7280','#9a9a9a','#d0d0d0','#ffffff',
-                          '#7f2c29','#874022','#835a25','#3d6b4c','#367271','#385871',
-                          '#394a6f','#3e3f6a','#543e6a','#6b3e62','#75344a','#654f43'];
-    var charInkWrap = $('char-ink-presets');
-    if(charInkWrap){
-      charInkPresets.forEach(function(col){
-        var b=document.createElement('button'); b.type='button'; b.className='dot'; b.title=col; b.setAttribute('aria-label', col);
+    function charSlotInput(k){ return $(k==='name'?'char-namecolor':(k==='sub'?'char-subcolor':(k==='bub'?'char-bub':'char-ink'))); }
+    function charSlotLabel(k){ return k==='name'?'이름':(k==='sub'?'(색)':(k==='bub'?'말풍선':'글자')); }
+    function charSlotColors(k){ return (k==='bub'?BUB_KEEP:INK_KEEP).concat(SHARED_COLORS); }
+    function renderCharPalette(){
+      var wrap=$('char-color-presets'); if(!wrap) return;
+      var cols=charSlotColors(_charSlot), cur=(charSlotInput(_charSlot).value||'').toLowerCase();
+      wrap.innerHTML='';
+      cols.forEach(function(col){
+        var b=document.createElement('button'); b.type='button'; b.className='dot'+(col.toLowerCase()===cur?' on':'');
+        b.setAttribute('data-col', col); b.title=col;
         var i=document.createElement('i'); i.style.background=col; b.appendChild(i);
         b.addEventListener('click', function(){
-          [].forEach.call(charInkWrap.children, function(x){ x.classList.remove('on'); });
+          [].forEach.call(wrap.children, function(x){ x.classList.remove('on'); });
           b.classList.add('on');
           setColorPair(charSlotInput(_charSlot).id, col);
         });
-        charInkWrap.appendChild(b);
+        wrap.appendChild(b);
       });
     }
-    function markCharDot(){
-      if(!charInkWrap) return;
-      var cur=(charSlotInput(_charSlot).value||'').toLowerCase();
-      [].forEach.call(charInkWrap.children, function(x, i){ x.classList.toggle('on', (charInkPresets[i]||'').toLowerCase()===cur); });
-    }
-    _markCharDotHook = markCharDot;
+    _renderCharPaletteHook = renderCharPalette;
     document.querySelectorAll('#char-slot-seg button').forEach(function(btn){
       btn.addEventListener('click', function(){
         document.querySelectorAll('#char-slot-seg button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
@@ -6098,20 +6391,10 @@
         _charSlot = btn.getAttribute('data-cslot') || 'ink';
         var lbl=$('char-slot-val'); if(lbl) lbl.textContent = charSlotLabel(_charSlot);
         moveThumb($('char-slot-seg'));
-        markCharDot();
+        renderCharPalette();
       });
     });
-    var charBubPresets = ['#248bf5','#e5e5ea','#1c1c1e','#ffffff','#ffd1d1','#ffe0b8','#fbf0b0','#cdeccb',
-                          '#c9e9e4','#cbe0fb','#ddd0f5','#f6c9de','#cdb29a','#e9e2d6','#dfe3e8','#2b2f36'];
-    var cbpWrap = $('char-bub-presets');
-    if(cbpWrap){
-      charBubPresets.forEach(function(col){
-        var b=document.createElement('button'); b.type='button'; b.className='dot'; b.setAttribute('data-col', col); b.title='말풍선 색';
-        var i=document.createElement('i'); i.style.background=col; b.appendChild(i);
-        b.addEventListener('click', function(){ setColorPair('char-bub', col); syncCharBubPreset(col); });
-        cbpWrap.appendChild(b);
-      });
-    }
+    renderCharPalette();
     $('char-add').addEventListener('click', function(){ openCharEditor(null); });
     $('char-cancel').addEventListener('click', closeCharEditor);
     if($('char-photo-preview')){
@@ -6222,6 +6505,7 @@
   histInit();
   updateFormatButtons();
   requestAnimationFrame(function(){ if(typeof moveAllThumbs==='function') moveAllThumbs(); });
+  enableValueEditing();
   window.addEventListener('resize', function(){ if(typeof moveAllThumbs==='function') moveAllThumbs(); });
 })();
 
