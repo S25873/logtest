@@ -2646,6 +2646,39 @@
   function tagMsgGroupNeighbors(root){
     var inner = root.querySelector('.g-inner'); if(!inner) return;
     function skip(n){ return n && n.classList && (n.classList.contains('g-bg-layer')||n.classList.contains('g-topbar')||n.classList.contains('g-inputbar')); }
+    function isGroupEl(n){ return n && n.nodeType===1 && n.classList && n.classList.contains('g-msg-group'); }
+    // ── 말풍선 그룹 옆 빈 줄 정규화 ──
+    // 편집 중 말풍선 위/아래의 빈 줄 개수가 제각각(한쪽 br 1개, 한쪽 br 2개 등)이 되면
+    // 간격이 비대칭으로 보인다. 그룹과 '본문' 사이의 연속 빈 요소(<br>·빈 텍스트·para-gap)를
+    // 항상 para-gap 하나로 통일해, 말풍선↔본문 간격이 위/아래 동일해지도록 만든다.
+    // (그룹끼리 곧바로 붙은 경우는 건드리지 않는다 — 그건 msg-gap/stack-gap이 담당.)
+    function isBlank(n){
+      if(!n) return false;
+      if(n.nodeType===1 && n.tagName==='BR') return true;
+      if(n.nodeType===1 && n.classList && n.classList.contains('g-para-gap')) return true;
+      if(n.nodeType===3 && n.nodeValue.replace(/[\u200b\s]/g,'')==='') return true;
+      return false;
+    }
+    function normalizeSide(g, dir){
+      // 그룹 바로 옆의 연속 빈 요소를 수집
+      var run=[], n = dir<0 ? g.previousSibling : g.nextSibling;
+      while(isBlank(n)){ run.push(n); n = dir<0 ? n.previousSibling : n.nextSibling; }
+      if(!run.length) return;                 // 빈 줄 없음(그룹끼리 붙었거나 끝) → 유지
+      if(!n) {                                 // 그 너머에 아무것도 없음(맨 끝) → 빈 줄 전부 제거
+        run.forEach(function(b){ if(b.parentNode) b.parentNode.removeChild(b); });
+        return;
+      }
+      // 너머에 실제 내용(본문/다른 그룹)이 있음 → 빈 요소들을 para-gap '하나'로 치환
+      var anchor = run[run.length-1]; // 그룹에서 가장 먼 빈 요소 위치 기준
+      var gap = document.createElement('div'); gap.className='g-para-gap';
+      anchor.parentNode.insertBefore(gap, anchor);
+      run.forEach(function(b){ if(b.parentNode) b.parentNode.removeChild(b); });
+    }
+    [].forEach.call(inner.querySelectorAll('.g-msg-group'), function(g){
+      // 그룹끼리 곧바로 붙은 방향은 건드리지 않음(빈 줄이 없으므로 normalizeSide가 자동 skip)
+      normalizeSide(g, -1);
+      normalizeSide(g, 1);
+    });
     // 그룹 바로 옆(빈 줄 없이)에 다른 그룹이 붙어 있을 때만 'bub'(말풍선끼리) 간격.
     // 사이에 빈 요소(<br>·para-gap·공백)가 하나라도 있으면 '본문과의 간격'(body)으로 통일 →
     // 위/아래가 방향과 무관하게 같은 규칙을 타서 대칭이 보장된다.
