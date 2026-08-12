@@ -2643,28 +2643,31 @@
   function tagMsgGroupNeighbors(root){
     var inner = root.querySelector('.g-inner'); if(!inner) return;
     function skip(n){ return n && n.classList && (n.classList.contains('g-bg-layer')||n.classList.contains('g-topbar')||n.classList.contains('g-inputbar')); }
-    function meaningfulSib(nd, dir){
+    // 그룹 바로 옆(빈 줄 없이)에 다른 그룹이 붙어 있을 때만 'bub'(말풍선끼리) 간격.
+    // 사이에 빈 요소(<br>·para-gap·공백)가 하나라도 있으면 '본문과의 간격'(body)으로 통일 →
+    // 위/아래가 방향과 무관하게 같은 규칙을 타서 대칭이 보장된다.
+    function adjacentGroup(nd, dir){
       var n = dir<0 ? nd.previousSibling : nd.nextSibling;
       while(n){
         if(n.nodeType===1){
-          if(skip(n)){ n = dir<0?n.previousSibling:n.nextSibling; continue; }
-          // <br>·문단 간격 스페이서(빈 문단)는 '본문(빈 줄)'로 취급 → 그룹이 아니므로 body 간격.
-          // wrapParaGaps 이후 실행되므로 위/아래 모두 동일하게 판정된다.
-          return n;
+          if(skip(n)){ n = dir<0?n.previousSibling:n.nextSibling; continue; }   // 배경·바 레이어는 무시(간격과 무관)
+          if(n.tagName==='BR') return false;                                     // 빈 줄 → 본문 취급
+          if(n.classList && n.classList.contains('g-para-gap')) return false;    // 문단 간격 스페이서 → 본문 취급
+          return isGroup(n);                                                     // 다른 그룹이 곧바로 붙음 → 말풍선끼리
         }
         if(n.nodeType===3){
           if(n.nodeValue.replace(/[\u200b\s]/g,'')===''){ n = dir<0?n.previousSibling:n.nextSibling; continue; }
-          return n; // 실제 본문 텍스트
+          return false;                                                          // 실제 본문 텍스트 → 본문
         }
         n = dir<0?n.previousSibling:n.nextSibling;
       }
-      return null;
+      return false;                                                              // 위/아래 끝(내용 없음) → 본문 취급
     }
     function isGroup(n){ return n && n.nodeType===1 && n.classList && n.classList.contains('g-msg-group'); }
     [].forEach.call(inner.querySelectorAll('.g-msg-group'), function(g){
       g.classList.remove('gmg-top-bub','gmg-top-body','gmg-bot-bub','gmg-bot-body');
-      g.classList.add(isGroup(meaningfulSib(g,-1)) ? 'gmg-top-bub' : 'gmg-top-body');
-      g.classList.add(isGroup(meaningfulSib(g, 1)) ? 'gmg-bot-bub' : 'gmg-bot-body');
+      g.classList.add(adjacentGroup(g,-1) ? 'gmg-top-bub' : 'gmg-top-body');
+      g.classList.add(adjacentGroup(g, 1) ? 'gmg-bot-bub' : 'gmg-bot-body');
     });
   }
   // 캔버스 후처리: 본문 사진(.g-img)의 위/아래에 '실제 내용'이 있는지 감지해 마진(.5em)을 조건부로 제거.
