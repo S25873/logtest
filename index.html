@@ -937,7 +937,7 @@
   /* 캔버스 */
   #canvas.bub-script .g-msg-group,.canvas-clone.bub-script .g-msg-group{
     display:grid !important;grid-template-columns:auto 1fr !important;
-    column-gap:var(--script-gap,.8em) !important;row-gap:0 !important;align-items:baseline !important;}
+    column-gap:var(--script-gap,.8em) !important;row-gap:0 !important;align-items:baseline !important;flex-direction:unset !important;}
   #canvas.bub-script .g-bub-name,.canvas-clone.bub-script .g-bub-name{
     grid-column:1 !important;font-weight:700 !important;font-size:1em !important;margin:0 !important;padding:0 !important;
     float:none !important;}
@@ -3028,7 +3028,7 @@
     [].forEach.call(root.querySelectorAll('.g-bub.char-bub'), function(b){
       var c=findChar(b.getAttribute('data-char')); if(!c) return;
       // '로그' 모양은 배경 없이 글만 — 인물별 말풍선 색도 무시한다(글자색은 그대로 유지)
-      if(b.classList.contains('img-only') || bubbleShape==='plain'){
+      if(b.classList.contains('img-only') || bubbleShape==='plain' || bubbleShape==='script'){
         b.style.setProperty('background','transparent','important');
         if(b.classList.contains('img-only')){ b.style.removeProperty('color'); }
         else { b.style.setProperty('color', c.ink, 'important'); }
@@ -3039,7 +3039,7 @@
       b.style.setProperty('--bub', c.bub);
       // 인물별 괄호 색: 이 말풍선 안의 (색깔) 회색 마크가 참조하는 변수만 덮어씀(값을 박지 않아 위치에 따라 자동 반영)
       if(c.subColor){ b.style.setProperty('--paren-color', c.subColor); } else { b.style.removeProperty('--paren-color'); }
-      var path=b.querySelector('svg.g-tail path'); if(path){ path.style.setProperty('fill', (bubbleShape==='plain')?'transparent':c.bub, 'important'); }
+      var path=b.querySelector('svg.g-tail path'); if(path){ path.style.setProperty('fill', (bubbleShape==='plain'||bubbleShape==='script')?'transparent':c.bub, 'important'); }
     });
     [].forEach.call(root.querySelectorAll('.g-bub-name.char-name'), function(n){
       var c=findChar(n.getAttribute('data-char')); if(!c) return;
