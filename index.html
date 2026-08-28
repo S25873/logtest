@@ -929,39 +929,37 @@
   #canvas.bub-plain .g-bub-img,.canvas-clone.bub-plain .g-bub-img,#canvas.bub-plain .g-bub.img-only .g-bub-img,.canvas-clone.bub-plain .g-bub.img-only .g-bub-img{border-radius:.32em !important;}
   /* ===== 대본 모드 ===== */
   /* 편집창 */
-  #editor.bub-script .g-msg-group{display:grid;grid-template-columns:auto 1fr;column-gap:.8em;align-items:baseline;}
-  #editor.bub-script .g-bub-name{grid-column:1;font-weight:700;font-size:1em;margin:0;padding:0;}
-  #editor.bub-script .g-bub{grid-column:2;margin:0;padding:0;background:transparent !important;}
   #editor.bub-script .g-avatar{display:none;}
+  #editor.bub-script .g-bub{background:transparent !important;margin:0;padding:0;}
   #editor.bub-script .g-bub>svg.g-tail{display:none;}
-  /* 캔버스 */
-  #canvas.bub-script .g-msg-group,.canvas-clone.bub-script .g-msg-group{
-    display:grid !important;grid-template-columns:auto 1fr !important;
-    column-gap:var(--script-gap,.8em) !important;row-gap:0 !important;align-items:baseline !important;flex-direction:unset !important;}
-  #canvas.bub-script .g-bub-name,.canvas-clone.bub-script .g-bub-name{
-    grid-column:1 !important;font-weight:700 !important;font-size:1em !important;margin:0 !important;padding:0 !important;
-    float:none !important;}
+  /* 캔버스: g-script-name이 avatar 자리에 들어감 */
+  #canvas.bub-script .g-script-name,.canvas-clone.bub-script .g-script-name{
+    font-weight:700 !important;font-size:1em !important;white-space:nowrap !important;
+    flex-shrink:0 !important;align-self:baseline !important;min-width:0 !important;}
+  #canvas.bub-script .g-msg-col,.canvas-clone.bub-script .g-msg-col{
+    align-self:baseline !important;}
   #canvas.bub-script .g-bub,.canvas-clone.bub-script .g-bub{
-    grid-column:2 !important;background:transparent !important;
-    margin:0 !important;padding:0 !important;max-width:none !important;border-radius:0 !important;}
+    background:transparent !important;margin:0 !important;padding:0 !important;
+    max-width:none !important;border-radius:0 !important;}
   #canvas.bub-script .g-bub::before,#canvas.bub-script .g-bub::after,
   .canvas-clone.bub-script .g-bub::before,.canvas-clone.bub-script .g-bub::after{display:none !important;content:none !important;}
   #canvas.bub-script .g-bub>svg.g-tail,.canvas-clone.bub-script .g-bub>svg.g-tail{display:none !important;}
   #canvas.bub-script .g-avatar,.canvas-clone.bub-script .g-avatar{display:none !important;}
+  #canvas.bub-script .g-bub-name,.canvas-clone.bub-script .g-bub-name{display:none !important;}
   /* 대본: 좌우 정렬 무시 — 항상 왼쪽 */
+  #canvas.bub-script .g-msg-group,.canvas-clone.bub-script .g-msg-group{
+    flex-direction:row !important;}
   #canvas.bub-script .g-bub.char-bub.left,#canvas.bub-script .g-bub.char-bub.right,
   .canvas-clone.bub-script .g-bub.char-bub.left,.canvas-clone.bub-script .g-bub.char-bub.right{
     margin-left:0 !important;margin-right:0 !important;text-align:left !important;}
-  #canvas.bub-script .g-bub-name.char-name.left,#canvas.bub-script .g-bub-name.char-name.right,
-  .canvas-clone.bub-script .g-bub-name.char-name.left,.canvas-clone.bub-script .g-bub-name.char-name.right{
-    margin-left:0 !important;margin-right:0 !important;text-align:left !important;}
-  /* 대본: 이름·말풍선 좌우 여백 제거(로그와 동일) */
-  #canvas.bub-script .g-bub,#canvas.bub-script .g-bub-name,
-  .canvas-clone.bub-script .g-bub,.canvas-clone.bub-script .g-bub-name{padding-left:0 !important;padding-right:0 !important;}
+  /* 대본: 여백 제거 */
+  #canvas.bub-script .g-bub,#canvas.bub-script .g-bub-name,#canvas.bub-script .g-msg-col,
+  .canvas-clone.bub-script .g-bub,.canvas-clone.bub-script .g-bub-name,.canvas-clone.bub-script .g-msg-col{
+    padding-left:0 !important;padding-right:0 !important;}
   /* 대본: 간격 맞추기 */
-  #canvas.bub-script.script-align .g-msg-group,.canvas-clone.bub-script.script-align .g-msg-group{
-    grid-template-columns:var(--script-name-w,5em) 1fr !important;}
-  #editor.bub-script.script-align .g-msg-group{grid-template-columns:var(--script-name-w,5em) 1fr;}
+  #canvas.bub-script.script-align .g-script-name,.canvas-clone.bub-script.script-align .g-script-name{
+    display:inline-block !important;width:var(--script-name-w,5em) !important;}
+  #editor.bub-script.script-align .g-msg-group{/* 편집창에도 반영 */}
   #editor.bub-simple .g-bub{border-radius:6px;}
   #editor.bub-simple .g-bub-img,#editor.bub-simple .g-bub.img-only .g-bub-img{border-radius:5px;}
   #editor.bub-simple .g-bub>svg.g-tail{display:none;}
@@ -2706,16 +2704,16 @@
     var on = bubbleShape==='script' && $('script-align') && $('script-align').checked;
     canvas.classList.toggle('script-align', on);
     if(!on){ canvas.style.removeProperty('--script-name-w'); return; }
-    var names = canvas.querySelectorAll('.g-bub-name');
+    var names = canvas.querySelectorAll('.g-script-name');
     var maxW = 0;
     [].forEach.call(names, function(n){
-      n.style.display='inline'; n.style.width='auto'; n.style.position='absolute'; n.style.visibility='hidden';
+      // 자연 너비 측정
+      var prev = n.style.width; n.style.width='auto';
       var w = n.offsetWidth;
-      n.style.removeProperty('position'); n.style.removeProperty('visibility');
+      n.style.width = prev || '';
       if(w > maxW) maxW = w;
     });
-    if(maxW > 0) canvas.style.setProperty('--script-name-w', (maxW+2)+'px');
-    // inline-block 복원은 CSS가 처리(.script-align .g-bub-name)
+    if(maxW > 0) canvas.style.setProperty('--script-name-w', maxW+'px');
   }
   if($('script-align')) $('script-align').addEventListener('change', function(){ applyScriptAlign(); render(); scheduleSave(); });
   document.querySelectorAll('#bub-shape-seg button').forEach(function(btn){
@@ -3084,6 +3082,16 @@
         if(c&&c.photo){ var aim=document.createElement('img'); aim.src=c.photo; aim.alt=''; av.appendChild(aim); }
         else { av.className+=' noimg'; av.textContent=(c&&c.name)?c.name.charAt(0):'?'; }
         group.appendChild(av);
+      } else if(bubbleShape==='script'){
+        // 대본 모드: avatar 자리에 이름 텍스트를 넣고, col 안의 이름은 숨긴다
+        var c=findChar(g.cid);
+        var scriptName=document.createElement('span'); scriptName.className='g-script-name '+g.side;
+        scriptName.textContent=(c&&c.name)?c.name:'';
+        if(c&&c.nameColor) scriptName.style.setProperty('color', c.nameColor, 'important');
+        group.appendChild(scriptName);
+        // col 안의 g-bub-name 숨김
+        var colName=col.querySelector('.g-bub-name'); if(colName) colName.style.display='none';
+        group.classList.add('no-av');
       } else {
         group.classList.add('no-av');   // 프사 없음 → 말풍선·이름을 본문 왼쪽에 정렬(들여쓰기 제거)
       }
