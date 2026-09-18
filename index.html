@@ -34,6 +34,10 @@
   @font-face{font-family:'DreamHeumul';font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2608201818@dreamheumulkr/dreamheumulkr/DreamHeumulKR.woff2') format('woff2');}
   @font-face{font-family:'KyoboHand2025';font-weight:normal;font-display:swap;src:url('./KyoboHandwriting2025lyb.otf') format('opentype');}
   @font-face{font-family:'KyoboHand2020';font-weight:normal;font-display:swap;src:url('./KyoboHandwriting2020pdy.otf') format('opentype');}
+  @font-face{font-family:'KoPubDotum';font-weight:500;font-display:swap;src:url('./KoPubWorld_Dotum_Pro_Medium.otf') format('opentype');}
+  @font-face{font-family:'KoPubDotum';font-weight:700;font-display:swap;src:url('./KoPubWorld_Dotum_Pro_Bold.otf') format('opentype');}
+  @font-face{font-family:'KoPubBatang';font-weight:500;font-display:swap;src:url('./KoPubWorld_Batang_Pro_Medium.otf') format('opentype');}
+  @font-face{font-family:'KoPubBatang';font-weight:700;font-display:swap;src:url('./KoPubWorld_Batang_Pro_Bold.otf') format('opentype');}
 
   /* ============================================================
      디자인 토큰 — 순수 모노톤
@@ -370,6 +374,8 @@
   }
   .seg .align-ic{display:flex;height:100%;align-items:center;justify-content:center;color:inherit;}   /* 글자 기준선에 걸려 위로 쏠리던 것 → 버튼 높이 전체 기준 중앙 정렬 */
   .seg .align-ic svg{width:15px;height:15px;display:block;}
+  .seg--wrap{flex-wrap:wrap;height:auto;}
+  .seg--wrap .seg__divider{width:100%;height:0;border:none;border-top:1px solid var(--line);margin:2px 0;flex-shrink:0;pointer-events:none;}
 
   /* 미니 버튼 */
   .mini-row{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
@@ -521,6 +527,10 @@
   .help-sheet{max-width:520px;}
   .help-body{max-height:min(64vh,560px);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 4px 4px;margin-bottom:10px;}
   .help-body .hint{font-size:11.5px;line-height:1.55;margin:0 0 2px;}   /* 각 탭 안내(.hint)와 완전 동일하게 */
+  .help-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin:4px 0 2px;table-layout:fixed;}
+  .help-tbl th,.help-tbl td{padding:5px 6px;border:1px solid var(--line);text-align:center;}
+  .help-tbl th{font-weight:700;background:var(--surface-2);}
+  .help-tbl td:first-child{text-align:center;font-weight:600;}
   .help-body b{color:inherit;font-weight:600;}
   .help-cat{font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line);}
   .help-cat:first-child{margin-top:2px;}
@@ -708,6 +718,8 @@
   .char-chip__av.square{border-radius:7px;}
   .char-chip__name{font-size:12.5px;font-weight:600;color:var(--ink);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .char-chip__dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);}
+  .char-chip__lock{flex:none;display:grid;place-items:center;margin-left:2px;opacity:.5;transition:opacity .14s;}
+  .char-chip__lock:hover{opacity:1;}
   .char-editor{margin-top:14px;padding:14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface-2);}
   .char-photo-row{display:flex;align-items:center;gap:10px;}
   .char-avatar{width:52px;height:52px;flex:none;border-radius:50%;background:var(--surface-3) center/cover no-repeat;display:grid;place-items:center;font-size:11px;color:var(--ink-3);overflow:hidden;border:1px solid var(--line);cursor:pointer;transition:border-color .14s var(--ease),transform .14s;}
@@ -927,39 +939,6 @@
   /* 로그 모드의 사진 모서리 둥글기는 네모와 동일하게 */
   #editor.bub-plain .g-bub-img,#editor.bub-plain .g-bub.img-only .g-bub-img{border-radius:5px;}
   #canvas.bub-plain .g-bub-img,.canvas-clone.bub-plain .g-bub-img,#canvas.bub-plain .g-bub.img-only .g-bub-img,.canvas-clone.bub-plain .g-bub.img-only .g-bub-img{border-radius:.32em !important;}
-  /* ===== 대본 모드 ===== */
-  /* 편집창 */
-  #editor.bub-script .g-avatar{display:none;}
-  #editor.bub-script .g-bub{background:transparent !important;margin:0;padding:0;}
-  #editor.bub-script .g-bub>svg.g-tail{display:none;}
-  /* 캔버스: g-script-name이 avatar 자리에 들어감 */
-  #canvas.bub-script .g-script-name,.canvas-clone.bub-script .g-script-name{
-    font-weight:700 !important;font-size:1em !important;white-space:nowrap !important;
-    flex-shrink:0 !important;align-self:baseline !important;min-width:0 !important;}
-  #canvas.bub-script .g-msg-col,.canvas-clone.bub-script .g-msg-col{
-    align-self:baseline !important;}
-  #canvas.bub-script .g-bub,.canvas-clone.bub-script .g-bub{
-    background:transparent !important;margin:0 !important;padding:0 !important;
-    max-width:none !important;border-radius:0 !important;}
-  #canvas.bub-script .g-bub::before,#canvas.bub-script .g-bub::after,
-  .canvas-clone.bub-script .g-bub::before,.canvas-clone.bub-script .g-bub::after{display:none !important;content:none !important;}
-  #canvas.bub-script .g-bub>svg.g-tail,.canvas-clone.bub-script .g-bub>svg.g-tail{display:none !important;}
-  #canvas.bub-script .g-avatar,.canvas-clone.bub-script .g-avatar{display:none !important;}
-  #canvas.bub-script .g-bub-name,.canvas-clone.bub-script .g-bub-name{display:none !important;}
-  /* 대본: 좌우 정렬 무시 — 항상 왼쪽 */
-  #canvas.bub-script .g-msg-group,.canvas-clone.bub-script .g-msg-group{
-    flex-direction:row !important;gap:var(--script-gap,.8em) !important;}
-  #canvas.bub-script .g-bub.char-bub.left,#canvas.bub-script .g-bub.char-bub.right,
-  .canvas-clone.bub-script .g-bub.char-bub.left,.canvas-clone.bub-script .g-bub.char-bub.right{
-    margin-left:0 !important;margin-right:0 !important;text-align:left !important;}
-  /* 대본: 여백 제거 */
-  #canvas.bub-script .g-bub,#canvas.bub-script .g-bub-name,#canvas.bub-script .g-msg-col,
-  .canvas-clone.bub-script .g-bub,.canvas-clone.bub-script .g-bub-name,.canvas-clone.bub-script .g-msg-col{
-    padding-left:0 !important;padding-right:0 !important;}
-  /* 대본: 간격 맞추기 */
-  #canvas.bub-script.script-align .g-script-name,.canvas-clone.bub-script.script-align .g-script-name{
-    display:inline-block !important;width:var(--script-name-w,5em) !important;}
-  #editor.bub-script.script-align .g-msg-group{/* 편집창에도 반영 */}
   #editor.bub-simple .g-bub{border-radius:6px;}
   #editor.bub-simple .g-bub-img,#editor.bub-simple .g-bub.img-only .g-bub-img{border-radius:5px;}
   #editor.bub-simple .g-bub>svg.g-tail{display:none;}
@@ -1033,6 +1012,37 @@
 
   /* 제목 · 소제목 · 하단: 줄이 늘면 아래로 늘어난다(가로는 안 늘고 그냥 넘어감).
      예전엔 max-height 120px 라 네 줄쯤에서 안쪽 스크롤로 바뀌었는데, 그 위는 안 보여서 상한을 없앰 */
+
+  /* 페이지 탭 (preview__bar 안) */
+  #page-bar{display:inline-flex;align-items:center;gap:3px;overflow-x:auto;flex-shrink:1;min-width:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  #page-bar::-webkit-scrollbar{display:none;}
+  #page-bar:empty{display:none;}
+  /* 그리드 열 레이아웃 */
+  #canvas .g-grid,.canvas-clone .g-grid{gap:var(--pad,40px) !important;}
+  #canvas .g-grid-col,.canvas-clone .g-grid-col{min-width:0 !important;}
+  .share-badge{
+    font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;cursor:pointer;
+    display:none;margin-left:6px;vertical-align:middle;transition:background .14s,color .14s;
+  }
+  .share-badge.is-shared{display:none;}
+  .share-badge.is-split{display:inline-block;background:var(--accent-soft,rgba(0,122,255,.12));color:var(--accent,#007aff);}
+  .share-badge.is-split:hover{background:var(--accent);color:#fff;}
+  .page-tab{
+    border:1px solid var(--line);background:var(--surface);color:var(--ink-3);font-size:10.5px;font-weight:700;
+    min-width:20px;height:20px;padding:0 6px;border-radius:5px;cursor:pointer;flex:none;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:background .14s,color .14s,border-color .14s;line-height:1;
+    box-sizing:border-box;vertical-align:middle;text-indent:0;
+  }
+  .page-tab:hover{background:var(--surface-2);}
+  .page-tab.active{background:var(--ink-3);color:var(--surface);border-color:var(--ink-3);}
+  .page-tab-add{
+    border:1px dashed var(--line);background:transparent;color:var(--ink-3);font-size:11px;font-weight:600;
+    width:20px;height:20px;border-radius:5px;cursor:pointer;flex:none;
+    display:inline-flex;align-items:center;justify-content:center;
+    transition:border-color .14s,color .14s,background .14s;line-height:1;
+  }
+  .page-tab-add:hover{background:var(--surface-2);}
   #name-ed,#title-ed,#subtitle-ed{
     width:100%;min-height:38px;height:auto;overflow:hidden;
     background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-sm);
@@ -1075,27 +1085,27 @@
   #canvas .g-title-rule,.canvas-clone .g-title-rule{
     display:block !important;border:0 !important;
     margin:var(--titleblk-gap,.8em) 0 0 !important;
-    border-top:.05em solid var(--title-hr-color,var(--hr-color,rgba(140,140,140,.5))) !important;
+    border-top:var(--title-hr-thick,1px) solid var(--title-hr-color,var(--hr-color,rgba(140,140,140,.5))) !important;
   }
   #canvas .g-title-rule.dashed,.canvas-clone .g-title-rule.dashed{border-top-style:dashed !important;}
-  #canvas .g-title-rule.dotted,.canvas-clone .g-title-rule.dotted{border-top-style:dotted !important;border-top-width:.08em !important;}
-  #canvas .g-title-rule.double,.canvas-clone .g-title-rule.double{border-top-style:double !important;border-top-width:.14em !important;}
+  #canvas .g-title-rule.dotted,.canvas-clone .g-title-rule.dotted{border-top-style:dotted !important;}
+  #canvas .g-title-rule.double,.canvas-clone .g-title-rule.double{border-top-style:double !important;border-top-width:calc(var(--title-hr-thick,1px) * 3) !important;}
   /* 하단 구분선 — 본문과 하단 사이. 위 여백은 '하단 ↔ 본문' 값을 그대로 써서 위아래가 같아진다 */
   #canvas .g-name-rule,.canvas-clone .g-name-rule{
     display:block !important;border:0 !important;
     margin:var(--name-gap,1.6em) 0 0 !important;
-    border-top:.05em solid var(--title-hr-color,var(--hr-color,rgba(140,140,140,.5))) !important;
+    border-top:var(--title-hr-thick,1px) solid var(--title-hr-color,var(--hr-color,rgba(140,140,140,.5))) !important;
   }
   #canvas .g-name-rule.dashed,.canvas-clone .g-name-rule.dashed{border-top-style:dashed !important;}
-  #canvas .g-name-rule.dotted,.canvas-clone .g-name-rule.dotted{border-top-style:dotted !important;border-top-width:.08em !important;}
-  #canvas .g-name-rule.double,.canvas-clone .g-name-rule.double{border-top-style:double !important;border-top-width:.14em !important;}
+  #canvas .g-name-rule.dotted,.canvas-clone .g-name-rule.dotted{border-top-style:dotted !important;}
+  #canvas .g-name-rule.double,.canvas-clone .g-name-rule.double{border-top-style:double !important;border-top-width:calc(var(--title-hr-thick,1px) * 3) !important;}
   /* 구분선이 있으면 하단 글자는 선 바로 아래에 같은 간격으로 */
   #canvas .g-name-rule + .g-name,.canvas-clone .g-name-rule + .g-name{margin-top:var(--name-gap,1.6em) !important;}
   #canvas .g-title-main,.canvas-clone .g-title-main{display:block !important;font-size:var(--title-size,1.6em) !important;font-weight:700 !important;font-family:var(--title-font,inherit) !important;color:var(--title-color,inherit) !important;line-height:1.25 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-title-sub,.canvas-clone .g-title-sub{display:block !important;font-size:var(--subtitle-size,1.15em) !important;font-weight:400 !important;font-family:var(--title-font,inherit) !important;color:var(--subtitle-color,inherit) !important;margin-top:var(--title-gap,.25em) !important;line-height:1.3 !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-quote,.canvas-clone .g-quote{display:block !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;margin-top:var(--quote-gap,10px) !important;margin-bottom:var(--quote-gap,10px) !important;}
-  #canvas .g-quote.left,.canvas-clone .g-quote.left{border-left:.16em solid var(--quote-color,rgba(140,140,140,.55)) !important;padding-left:.6em !important;}
-  #canvas .g-quote.right,.canvas-clone .g-quote.right{border-right:.16em solid var(--quote-color,rgba(140,140,140,.55)) !important;padding-right:.6em !important;text-align:right !important;}
+  #canvas .g-quote.left,.canvas-clone .g-quote.left{border-left:var(--quote-thick,5px) solid var(--quote-color,rgba(140,140,140,.55)) !important;padding-left:.6em !important;}
+  #canvas .g-quote.right,.canvas-clone .g-quote.right{border-right:var(--quote-thick,5px) solid var(--quote-color,rgba(140,140,140,.55)) !important;padding-right:.6em !important;text-align:right !important;}
   /* 가운데·오른쪽 정렬에서는 인용선 막대가 캔버스 끝이 아니라 '글자 옆'에 붙게.
      블록 폭을 글 길이만큼만 잡고(fit-content) 그 덩어리를 통째로 정렬한다.
      왼쪽·양쪽 정렬은 어차피 글 시작 = 블록 시작이라 손대지 않는다(양쪽 정렬은 폭을 줄이면 깨짐) */
@@ -1103,18 +1113,18 @@
   #canvas[data-align="right"] .g-quote,.canvas-clone[data-align="right"] .g-quote{width:fit-content !important;max-width:100% !important;margin-left:auto !important;margin-right:0 !important;}
   /* 위아래 간격은 '문단 간격'을 그대로 써서 글 전체 리듬과 맞춘다 */
   #canvas .g-hr,.canvas-clone .g-hr{display:flex !important;align-items:center !important;justify-content:center !important;margin:var(--para-gap,.7em) 0 !important;height:0 !important;line-height:0 !important;color:transparent !important;overflow:visible !important;}
-  #canvas .g-hr.line:before,.canvas-clone .g-hr.line:before{content:"" !important;display:block !important;width:100% !important;height:.05em !important;background:var(--hr-color,rgba(140,140,140,.5)) !important;}
+  #canvas .g-hr.line:before,.canvas-clone .g-hr.line:before{content:"" !important;display:block !important;width:100% !important;height:var(--hr-thick,1px) !important;background:var(--hr-color,rgba(140,140,140,.5)) !important;}
   /* 옛 로그의 '점 세 개'는 그대로 보이게 남겨 둔다(새로 만들 수는 없음) */
   #canvas .g-hr.dots,.canvas-clone .g-hr.dots{letter-spacing:.4em !important;font-size:.9em !important;height:auto !important;line-height:1 !important;color:var(--hr-color,rgba(140,140,140,.55)) !important;}
   #canvas .g-hr.dashed:before,#canvas .g-hr.dotted:before,#canvas .g-hr.double:before,
   .canvas-clone .g-hr.dashed:before,.canvas-clone .g-hr.dotted:before,.canvas-clone .g-hr.double:before{
     content:"" !important;display:block !important;width:100% !important;height:0 !important;
-    border-top:.05em solid var(--hr-color,rgba(140,140,140,.5)) !important;
+    border-top:var(--hr-thick,1px) solid var(--hr-color,rgba(140,140,140,.5)) !important;
   }
   #canvas .g-hr.dashed:before,.canvas-clone .g-hr.dashed:before{border-top-style:dashed !important;}
-  #canvas .g-hr.dotted:before,.canvas-clone .g-hr.dotted:before{border-top-style:dotted !important;border-top-width:.08em !important;}
-  #canvas .g-hr.double:before,.canvas-clone .g-hr.double:before{border-top-style:double !important;border-top-width:.14em !important;}
-  #canvas .g-hr.short:before,.canvas-clone .g-hr.short:before{content:"" !important;display:block !important;width:12% !important;height:.05em !important;background:var(--hr-color,rgba(140,140,140,.6)) !important;}
+  #canvas .g-hr.dotted:before,.canvas-clone .g-hr.dotted:before{border-top-style:dotted !important;}
+  #canvas .g-hr.double:before,.canvas-clone .g-hr.double:before{border-top-style:double !important;border-top-width:calc(var(--hr-thick,1px) * 3) !important;}
+  #canvas .g-hr.short:before,.canvas-clone .g-hr.short:before{content:"" !important;display:block !important;width:12% !important;height:var(--hr-thick,1px) !important;background:var(--hr-color,rgba(140,140,140,.6)) !important;}
   #canvas .g-img,.canvas-clone .g-img{display:block !important;margin:.5em 0 !important;text-align:center !important;}
   #canvas .g-img.al-left,.canvas-clone .g-img.al-left{text-align:left !important;}
   #canvas .g-img.al-right,.canvas-clone .g-img.al-right{text-align:right !important;}
@@ -1132,8 +1142,8 @@
   #canvas .g-name.s-bar.right.al-justify,.canvas-clone .g-name.s-bar.right.al-justify{width:fit-content !important;max-width:100% !important;margin-right:auto !important;margin-left:0 !important;}
   #canvas .g-name.s-bold,.canvas-clone .g-name.s-bold{font-weight:700 !important;}
   #canvas .g-name.s-bar,.canvas-clone .g-name.s-bar{font-weight:400 !important;color:var(--name-color,rgba(90,90,90,.85)) !important;}
-  #canvas .g-name.s-bar.left,.canvas-clone .g-name.s-bar.left{border-left:.16em solid var(--bar-color,rgba(140,140,140,.4)) !important;padding-left:.55em !important;}
-  #canvas .g-name.s-bar.right,.canvas-clone .g-name.s-bar.right{border-right:.16em solid var(--bar-color,rgba(140,140,140,.4)) !important;padding-right:.55em !important;}
+  #canvas .g-name.s-bar.left,.canvas-clone .g-name.s-bar.left{border-left:var(--quote-thick,5px) solid var(--bar-color,rgba(140,140,140,.4)) !important;padding-left:.55em !important;}
+  #canvas .g-name.s-bar.right,.canvas-clone .g-name.s-bar.right{border-right:var(--quote-thick,5px) solid var(--bar-color,rgba(140,140,140,.4)) !important;padding-right:.55em !important;}
   #canvas .g-bub,.canvas-clone .g-bub{display:block !important;position:relative !important;max-width:75% !important;width:fit-content !important;margin:var(--stack-gap,.15em) 0 !important;padding:.5em .875em !important;border-radius:1.15em !important;text-align:left !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;word-break:normal !important;line-height:1.25 !important;}
   #canvas .g-bub.cont + .g-bub,.canvas-clone .g-bub.cont + .g-bub,#canvas .g-bub + .g-bub.cont,.canvas-clone .g-bub + .g-bub.cont{margin-top:var(--stack-gap,.15em) !important;}
   #canvas .g-bub:first-child,.canvas-clone .g-bub:first-child{margin-top:0 !important;}
@@ -1167,6 +1177,42 @@
 
   /* 저장 중(exp-notail)엔 pseudo 꼬리를 숨김 — html2canvas가 마스크를 못 그리므로 대신 캔버스에 직접 그림 */
   #canvas.exp-notail .g-bub.tail::before,#canvas.exp-notail .g-bub.tail::after,.canvas-clone.exp-notail .g-bub.tail::before,.canvas-clone.exp-notail .g-bub.tail::after{display:none !important;}
+  /* ===== 대본 모드 (기본 g-bub CSS 뒤에 위치해야 !important 순서로 이김) ===== */
+  /* 편집창 */
+  #editor.bub-script .g-avatar{display:none;}
+  #editor.bub-script .g-bub{background:transparent !important;margin:0;padding:0;}
+  #editor.bub-script .g-bub>svg.g-tail{display:none;}
+  /* 캔버스: g-script-name이 avatar 자리에 들어감 */
+  #canvas.bub-script .g-script-name,.canvas-clone.bub-script .g-script-name{
+    font-weight:700 !important;font-size:1em !important;white-space:nowrap !important;
+    flex-shrink:0 !important;align-self:baseline !important;min-width:0 !important;}
+  #canvas.bub-script .g-msg-col,.canvas-clone.bub-script .g-msg-col{
+    align-self:baseline !important;}
+  #canvas.bub-script .g-bub,.canvas-clone.bub-script .g-bub{
+    background:transparent !important;margin:0 !important;padding:0 !important;
+    max-width:none !important;border-radius:0 !important;text-align:inherit !important;}
+  #canvas.bub-script .g-bub::before,#canvas.bub-script .g-bub::after,
+  .canvas-clone.bub-script .g-bub::before,.canvas-clone.bub-script .g-bub::after{display:none !important;content:none !important;}
+  #canvas.bub-script .g-bub>svg.g-tail,.canvas-clone.bub-script .g-bub>svg.g-tail{display:none !important;}
+  #canvas.bub-script .g-avatar,.canvas-clone.bub-script .g-avatar{display:none !important;}
+  #canvas.bub-script .g-bub-name,.canvas-clone.bub-script .g-bub-name{display:none !important;}
+  #canvas.bub-script .g-bub-name.g-script-name,.canvas-clone.bub-script .g-bub-name.g-script-name{display:block !important;}
+  /* 대본: 좌우 정렬 */
+  #canvas.bub-script .g-msg-group,.canvas-clone.bub-script .g-msg-group{
+    flex-direction:row !important;gap:var(--script-gap,.8em) !important;}
+  #canvas.bub-script .g-msg-group.send,.canvas-clone.bub-script .g-msg-group.send,
+  #canvas.bub-script .g-msg-group.right,.canvas-clone.bub-script .g-msg-group.right{
+    flex-direction:row-reverse !important;}
+  #canvas.bub-script .g-msg-col.right,.canvas-clone.bub-script .g-msg-col.right{
+    text-align:right !important;}
+  /* 대본: 여백 제거 */
+  #canvas.bub-script .g-bub,#canvas.bub-script .g-bub-name,#canvas.bub-script .g-msg-col,
+  .canvas-clone.bub-script .g-bub,.canvas-clone.bub-script .g-bub-name,.canvas-clone.bub-script .g-msg-col{
+    padding-left:0 !important;padding-right:0 !important;margin-left:0 !important;margin-right:0 !important;}
+  /* 대본: 간격 맞추기 */
+  #canvas.bub-script.script-align .g-script-name,.canvas-clone.bub-script.script-align .g-script-name{
+    display:inline-block !important;width:var(--script-name-w,5em) !important;}
+  #editor.bub-script.script-align .g-msg-group{/* 편집창에도 반영 */}
 
   #canvas .g-bub mark.em,.canvas-clone .g-bub mark.em{color:var(--em) !important;}
 
@@ -1324,7 +1370,7 @@
         <div class="panel is-active" data-panel="content" role="tabpanel">
           <details class="fold" id="fold-tools">
             <summary>
-              자동화 도구
+              자동화 도구 · 인용선 · 구분선 · 사진
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
@@ -1337,19 +1383,27 @@
                 <div class="rangewrap"><input id="parensub-size" type="range" min="6" max="72" step="1" value="27"></div>
               </div>
               <p class="hint" style="margin-top:10px">자동화 도구 *색* · (색) · (크기)에 쓰이는 값이에요.<br>말풍선 안의 (색)은 말풍선-인물에서 인물별로 지정한 색깔을 써요.<br>(크기)로 만든 글자는 이 값을 계속 따라가요. 나중에 값을 바꾸면 이전 것까지 반영돼요.</p>
-            </div>
-          </details>
-
-          <details class="fold" id="fold-format">
-            <summary>
-              서식
-              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="fold__body">
-              <p class="section__head">인용선</p>
-              <div class="field" style="margin-top:2px">
-                <span class="label">인용선 여백 <span class="val" id="quote-gap-val">5px</span></span>
-                <div class="rangewrap"><input id="quote-gap" type="range" min="0" max="48" step="1" value="5"></div>
+              <p class="section__head" style="margin-top:18px">인용선</p>
+              <div class="grid-2" style="margin-top:2px">
+                <div class="field">
+                  <span class="label">인용선 두께 <span class="val" id="quote-thick-val">5px</span></span>
+                  <div class="rangewrap"><input id="quote-thick" type="range" min="1" max="20" step="1" value="5"></div>
+                </div>
+                <div class="field">
+                  <span class="label">인용선 여백 <span class="val" id="quote-gap-val">5px</span></span>
+                  <div class="rangewrap"><input id="quote-gap" type="range" min="0" max="48" step="1" value="5"></div>
+                </div>
+              </div>
+              <p class="section__head" style="margin-top:18px">구분선</p>
+              <div class="grid-2" style="margin-top:2px">
+                <div class="field">
+                  <span class="label">본문 구분선 두께 <span class="val" id="hr-thick-val">1px</span></span>
+                  <div class="rangewrap"><input id="hr-thick" type="range" min="1" max="20" step="1" value="1"></div>
+                </div>
+                <div class="field">
+                  <span class="label">제목 · 하단 구분선 두께 <span class="val" id="title-hr-thick-val">1px</span></span>
+                  <div class="rangewrap"><input id="title-hr-thick" type="range" min="1" max="20" step="1" value="1"></div>
+                </div>
               </div>
               <p class="section__head" style="margin-top:18px">(＋로 넣는) 사진</p>
               <div class="grid-2" style="margin-top:2px">
@@ -1389,12 +1443,14 @@
                   <option value='"Pretendard",sans-serif' selected>프리텐다드</option>
                   <option value='"Paperozi",sans-serif'>페이퍼로지</option>
                   <option value="'Presentation',sans-serif">프리젠테이션</option>
+                  <option value="'KoPubDotum',sans-serif">KoPub월드 돋움</option>
                   <option class="optcat" disabled>【 명조 】</option>
                   <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
                   <option value='"Ridibatang",serif'>리디바탕</option>
                   <option value="'MaruBuri',serif">마루 부리</option>
                   <option value="'BookkMyungjo',serif">부크크 명조</option>
                   <option value="'ChosunIlboMyungjo',serif">조선일보명조체</option>
+                  <option value="'KoPubBatang',serif">KoPub월드 바탕</option>
                   <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
                   <option class="optcat" disabled>【 손글씨 】</option>
                   <option value="'OngleipYoonwoo',sans-serif">온글잎 윤우체</option>
@@ -1456,7 +1512,7 @@
                 </span>
                 <input id="size-helper" type="checkbox" style="margin-left:auto">
               </label>
-              <p class="hint" style="margin-top:8px">크기 변경: 제목 · 소제목 · 하단 · (크기)<br>간격 변경: 문단 · 제목 · 하단 (말풍선 관련 간격 X)<br>버튼을 킨 상태에서 다른 크기를 직접 수정해도 돼요. 단, 본문 글자 크기를 바꾸면 다른 크기까지 영향을 받아 수정한 값까지 다시 정해져요.<br>버튼을 끄면 모든 게 켜기 전 값으로 돌아가요. 킨 상태에서 직접 수정한 값도 복구할 수 없어요. 중요한 값은 미리 메모하거나 프리셋에 저장해 주세요. 프리셋 저장 시 크기 도우미를 사용했다는 사실은 남지 않고 값만 저장돼요.</p>
+              <p class="hint" style="margin-top:8px">크기 변경: 제목 · 소제목 · 하단 · (크기) · 인용선 두께<br>간격 변경: 문단 · 제목 · 하단 (말풍선 관련 간격 X)<br>버튼을 킨 상태에서 다른 크기를 직접 수정해도 돼요. 단, 본문 글자 크기를 바꾸면 다른 크기까지 영향을 받아 수정한 값까지 다시 정해져요.<br>버튼을 끄면 모든 게 켜기 전 값으로 돌아가요. 킨 상태에서 직접 수정한 값도 복구할 수 없어요. 중요한 값은 미리 메모하거나 프리셋에 저장해 주세요. 프리셋 저장 시 크기 도우미를 사용했다는 사실은 남지 않고 값만 저장돼요.</p>
 
             </div>
           </details>
@@ -1468,7 +1524,7 @@
             </summary>
             <div class="fold__body">
               <div class="field">
-                <span class="label">제목</span>
+                <span class="label">제목<span class="share-badge" id="title-badge" title="이 페이지만 따로 쓰는 중 · 눌러서 공유로 되돌리기">이 페이지만</span></span>
                 <div id="title-ed" contenteditable="true" role="textbox" spellcheck="false" translate="no"
                      aria-label="제목 입력" data-placeholder="제목 (비워도 됨)"></div>
               </div>
@@ -1495,12 +1551,14 @@
                   <option value='"Pretendard",sans-serif'>프리텐다드</option>
                   <option value='"Paperozi",sans-serif'>페이퍼로지</option>
                   <option value="'Presentation',sans-serif">프리젠테이션</option>
+                  <option value="'KoPubDotum',sans-serif">KoPub월드 돋움</option>
                   <option class="optcat" disabled>【 명조 】</option>
                   <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
                   <option value='"Ridibatang",serif'>리디바탕</option>
                   <option value="'MaruBuri',serif">마루 부리</option>
                   <option value="'BookkMyungjo',serif">부크크 명조</option>
                   <option value="'ChosunIlboMyungjo',serif">조선일보명조체</option>
+                  <option value="'KoPubBatang',serif">KoPub월드 바탕</option>
                   <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
                   <option class="optcat" disabled>【 손글씨 】</option>
                   <option value="'OngleipYoonwoo',sans-serif">온글잎 윤우체</option>
@@ -1562,7 +1620,7 @@
             </summary>
             <div class="fold__body">
               <div class="field">
-                <span class="label">하단</span>
+                <span class="label">하단<span class="share-badge" id="name-badge" title="이 페이지만 따로 쓰는 중 · 눌러서 공유로 되돌리기">이 페이지만</span></span>
                 <div id="name-ed" contenteditable="true" role="textbox" spellcheck="false" translate="no"
                      aria-label="하단 입력" data-placeholder="캐릭터 이름 · 상태창 · 페이지 수 등 (비워도 됨)"></div>
               </div>
@@ -1618,12 +1676,14 @@
                 <option value='"Pretendard",sans-serif'>프리텐다드</option>
                 <option value='"Paperozi",sans-serif'>페이퍼로지</option>
                 <option value="'Presentation',sans-serif">프리젠테이션</option>
+                  <option value="'KoPubDotum',sans-serif">KoPub월드 돋움</option>
                 <option class="optcat" disabled>【 명조 】</option>
                 <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
                 <option value='"Ridibatang",serif'>리디바탕</option>
                 <option value="'MaruBuri',serif">마루 부리</option>
                 <option value="'BookkMyungjo',serif">부크크 명조</option>
                 <option value="'ChosunIlboMyungjo',serif">조선일보명조체</option>
+                  <option value="'KoPubBatang',serif">KoPub월드 바탕</option>
                   <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
                 <option class="optcat" disabled>【 손글씨 】</option>
                 <option value="'OngleipYoonwoo',sans-serif">온글잎 윤우체</option>
@@ -1691,40 +1751,6 @@
           </details>
 
 
-          <details class="fold" id="fold-emph">
-            <summary>
-              강조색
-              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="fold__body">
-              <div class="cgrid cgrid--2">
-                <div class="cchip"><label>강조색 1</label><div class="cchip__box"><input id="c-em" type="color" value="#c25b57"><input class="cchip__hex" id="c-em-txt" type="text" value="#c25b57"></div></div>
-                <div class="cchip"><label>강조색 2</label><div class="cchip__box"><input id="c-em2" type="color" value="#5d74a6"><input class="cchip__hex" id="c-em2-txt" type="text" value="#5d74a6"></div></div>
-                <div class="cchip"><label>강조색 3</label><div class="cchip__box"><input id="c-em3" type="color" value="#5e9b72"><input class="cchip__hex" id="c-em3-txt" type="text" value="#5e9b72"></div></div>
-                <div class="cchip"><label>강조색 4</label><div class="cchip__box"><input id="c-em4" type="color" value="#9a5e8e"><input class="cchip__hex" id="c-em4-txt" type="text" value="#9a5e8e"></div></div>
-                <div class="cchip"><label>강조색 5</label><div class="cchip__box"><input id="c-em5" type="color" value="#a9756a"><input class="cchip__hex" id="c-em5-txt" type="text" value="#a9756a"></div></div>
-                <div class="cchip"><label>강조색 6</label><div class="cchip__box"><input id="c-em6" type="color" value="#6b7280"><input class="cchip__hex" id="c-em6-txt" type="text" value="#6b7280"></div></div>
-              </div>
-              <div class="section">
-                <p class="section__head">프리셋</p>
-                <div class="field" style="margin-bottom:14px">
-                  <span class="label">적용할 색 <span class="val" id="em-slot-val">강조색 1</span></span>
-                  <div class="seg" id="em-slot-seg">
-                    <button type="button" data-slot="1" aria-pressed="true">1</button>
-                    <button type="button" data-slot="2" aria-pressed="false">2</button>
-                    <button type="button" data-slot="3" aria-pressed="false">3</button>
-                    <button type="button" data-slot="4" aria-pressed="false">4</button>
-                    <button type="button" data-slot="5" aria-pressed="false">5</button>
-                    <button type="button" data-slot="6" aria-pressed="false">6</button>
-                    <span class="seg__thumb"></span>
-                  </div>
-                </div>
-                <div class="dots" id="em-presets"></div>
-                <p class="hint">프리셋을 누르면 위에서 고른 슬롯에 색이 들어가요.</p>
-              </div>
-            </div>
-          </details>
-
           <details class="fold" id="fold-hl">
             <summary>
               형광펜
@@ -1754,6 +1780,40 @@
                   </div>
                 </div>
                 <div class="dots" id="hl-presets"></div>
+                <p class="hint">프리셋을 누르면 위에서 고른 슬롯에 색이 들어가요.</p>
+              </div>
+            </div>
+          </details>
+
+          <details class="fold" id="fold-emph">
+            <summary>
+              강조색
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <div class="cgrid cgrid--2">
+                <div class="cchip"><label>강조색 1</label><div class="cchip__box"><input id="c-em" type="color" value="#c25b57"><input class="cchip__hex" id="c-em-txt" type="text" value="#c25b57"></div></div>
+                <div class="cchip"><label>강조색 2</label><div class="cchip__box"><input id="c-em2" type="color" value="#5d74a6"><input class="cchip__hex" id="c-em2-txt" type="text" value="#5d74a6"></div></div>
+                <div class="cchip"><label>강조색 3</label><div class="cchip__box"><input id="c-em3" type="color" value="#5e9b72"><input class="cchip__hex" id="c-em3-txt" type="text" value="#5e9b72"></div></div>
+                <div class="cchip"><label>강조색 4</label><div class="cchip__box"><input id="c-em4" type="color" value="#9a5e8e"><input class="cchip__hex" id="c-em4-txt" type="text" value="#9a5e8e"></div></div>
+                <div class="cchip"><label>강조색 5</label><div class="cchip__box"><input id="c-em5" type="color" value="#a9756a"><input class="cchip__hex" id="c-em5-txt" type="text" value="#a9756a"></div></div>
+                <div class="cchip"><label>강조색 6</label><div class="cchip__box"><input id="c-em6" type="color" value="#6b7280"><input class="cchip__hex" id="c-em6-txt" type="text" value="#6b7280"></div></div>
+              </div>
+              <div class="section">
+                <p class="section__head">프리셋</p>
+                <div class="field" style="margin-bottom:14px">
+                  <span class="label">적용할 색 <span class="val" id="em-slot-val">강조색 1</span></span>
+                  <div class="seg" id="em-slot-seg">
+                    <button type="button" data-slot="1" aria-pressed="true">1</button>
+                    <button type="button" data-slot="2" aria-pressed="false">2</button>
+                    <button type="button" data-slot="3" aria-pressed="false">3</button>
+                    <button type="button" data-slot="4" aria-pressed="false">4</button>
+                    <button type="button" data-slot="5" aria-pressed="false">5</button>
+                    <button type="button" data-slot="6" aria-pressed="false">6</button>
+                    <span class="seg__thumb"></span>
+                  </div>
+                </div>
+                <div class="dots" id="em-presets"></div>
                 <p class="hint">프리셋을 누르면 위에서 고른 슬롯에 색이 들어가요.</p>
               </div>
             </div>
@@ -1812,7 +1872,7 @@
             </summary>
             <div class="fold__body">
               <p class="section__head">인물</p>
-              <p class="hint" style="margin:0 0 12px">만들어 둔 인물을 말풍선 삽입에 사용할 수 있어요.</p>
+              <p class="hint" style="margin:0 0 12px">만들어 둔 인물을 말풍선 삽입에 사용할 수 있어요.<br>자물쇠 아이콘을 누르면 인물이 숨겨져요.<br>숨겨진 인물은 삽입 · 선택지 등에 뜨지 않아요.</p>
               <div class="char-list" id="char-list"></div>
               <button class="btn btn--ghost" id="char-add" type="button" style="height:40px;font-size:12.5px;width:100%">+ 인물 추가</button>
 
@@ -1915,22 +1975,57 @@
               <div class="field">
                 <span class="label">말풍선 모양 (오른쪽 위 ? 도움말 참고!)</span>
                 <div class="seg" id="bub-shape-seg" style="height:auto">
-                  <button type="button" data-shape="imessage" aria-pressed="true" style="padding:7px 2px;line-height:1.35">아이메시지<br><span style="font-size:10px;opacity:.8">(꼬리 선택)</span></button>
-                  <button type="button" data-shape="soft" aria-pressed="false" style="padding:7px 2px;line-height:1.35">심플<br><span style="font-size:10px;opacity:.8">(꼬리 선택)</span></button>
-                  <button type="button" data-shape="simple" aria-pressed="false" style="padding:7px 2px;line-height:1.35">네모<br><span style="font-size:10px;opacity:.8">(꼬리 없음)</span></button>
-                  <button type="button" data-shape="plain" aria-pressed="false" style="padding:7px 2px;line-height:1.35">로그<br><span style="font-size:10px;opacity:.8">(투명, 꼬리 없음)</span></button>
-                  <button type="button" data-shape="script" aria-pressed="false" style="padding:7px 2px;line-height:1.35">대본<br><span style="font-size:10px;opacity:.8">(이름 왼쪽)</span></button>
+                  <button type="button" data-shape="imessage" aria-pressed="true" style="padding:7px 2px;line-height:1.35">메시지</button>
+                  <button type="button" data-shape="soft" aria-pressed="false" style="padding:7px 2px;line-height:1.35">심플</button>
+                  <button type="button" data-shape="simple" aria-pressed="false" style="padding:7px 2px;line-height:1.35">네모</button>
+                  <button type="button" data-shape="plain" aria-pressed="false" style="padding:7px 2px;line-height:1.35">로그</button>
+                  <button type="button" data-shape="script" aria-pressed="false" style="padding:7px 2px;line-height:1.35">대본</button>
                   <span class="seg__thumb"></span>
                 </div>
               </div>
 
               <div id="script-options" style="margin-top:16px;display:none">
-                <label class="switch">
+                <div class="field">
+                  <label class="label" for="script-font">대본 이름 글꼴</label>
+                  <select id="script-font">
+                    <option value="" selected>본문과 동일</option>
+                    <option class="optcat" disabled>【 고딕 】</option>
+                    <option value='"Pretendard",sans-serif'>프리텐다드</option>
+                    <option value='"Paperozi",sans-serif'>페이퍼로지</option>
+                    <option value="'Presentation',sans-serif">프리젠테이션</option>
+                  <option value="'KoPubDotum',sans-serif">KoPub월드 돋움</option>
+                    <option class="optcat" disabled>【 명조 】</option>
+                    <option value="'Nanum Myeongjo','나눔명조',serif">나눔명조</option>
+                    <option value='"Ridibatang",serif'>리디바탕</option>
+                    <option value="'MaruBuri',serif">마루 부리</option>
+                    <option value="'BookkMyungjo',serif">부크크 명조</option>
+                    <option value="'ChosunIlboMyungjo',serif">조선일보명조체</option>
+                  <option value="'KoPubBatang',serif">KoPub월드 바탕</option>
+                    <option value="'OgRenaissanceSecret',serif">OG 르네상스 비밀</option>
+                    <option class="optcat" disabled>【 손글씨 】</option>
+                    <option value="'OngleipYoonwoo',sans-serif">온글잎 윤우체</option>
+                    <option value="'OngleipKonkon',sans-serif">온글잎 콘콘체</option>
+                    <option value="'KyoboHand2025',sans-serif">교보 손글씨 이유빈</option>
+                    <option value="'KyoboHand2020',sans-serif">교보 손글씨 박도연</option>
+                    <option class="optcat" disabled>【 픽셀 】</option>
+                    <option value="'Mona12','Mona12 Text KR',sans-serif">Mona12</option>
+                    <option value="'PfStardust',sans-serif">PF스타더스트</option>
+                    <option value="'DreamHeumul',sans-serif">드림흐물체</option>
+                  </select>
+                </div>
+                <label class="switch" style="margin-top:12px">
                   <span class="switch__text" style="flex:1">
                     <span class="switch__title">간격 맞추기</span>
                     <span class="switch__sub">가장 긴 이름에 맞춰 모든 내용이 같은 위치에서 시작해요</span>
                   </span>
                   <input id="script-align" type="checkbox" style="margin-left:auto">
+                </label>
+                <label class="switch" id="script-justify-wrap" style="margin-top:6px;display:none">
+                  <span class="switch__text" style="flex:1">
+                    <span class="switch__title">이름 균등 배분</span>
+                    <span class="switch__sub">짧은 이름의 글자를 양쪽 끝에 맞춰 고르게 벌려요</span>
+                  </span>
+                  <input id="script-justify" type="checkbox" style="margin-left:auto">
                 </label>
               </div>
 
@@ -2151,7 +2246,7 @@
 
               <div class="field" id="ratio-sel-row" style="display:none;margin-top:18px">
                 <span class="label">비율</span>
-                <div class="seg" id="ratio-seg"></div>
+                <div class="seg seg--wrap" id="ratio-seg"></div>
               </div>
 
               <div class="grid-2" style="margin-top:18px">
@@ -2239,6 +2334,7 @@
     <section class="previewcol">
       <div class="preview__bar">
         <span class="preview__label">Preview</span>
+        <span id="page-bar"></span>
         <span class="preview__meta" id="preview-meta">1200 px</span>
       </div>
       <div class="preview__scroll">
@@ -2270,8 +2366,11 @@
     <div class="sheet__grip"></div>
     <div class="sheet__title">로그 이미지 발췌기 업데이트 중!</div>
     <div class="help-body">
-      <p class="help-cat">고정 비율</p>
-      <p class="hint">· 고정 비율 시스템을 대폭 최적화했어요.<br>· 고정 비율 사용 시 본문이 잘리지 않도록 여백을 보정하는 기능이 추가됐어요.<br>· 비율을 전환해도 가로 크기가 리셋되지 않고 유지돼요.</p>
+      <p class="help-cat">서식 아코디언</p>
+      <p class="hint">· 내용 탭에 <b>서식</b> 아코디언이 새로 생겼어요.<br>· 인용선 여백과 (＋로 넣는) 사진 설정이 여기로 이동했어요.</p>
+
+      <p class="help-cat">인용선 · 말풍선</p>
+      <p class="hint">· 인용선 위아래 간격 오류가 수정됐어요.<br>· <b>인용선 여백</b>이 추가됐어요. 인용선 위아래 간격을 조절할 수 있어요.<br>· <b>말풍선 ↔ 본문 간격</b>이 삭제되고, <b>말풍선 여백</b>이 새로 생겼어요. 말풍선 위아래 간격을 조절할 수 있어요.</p>
 
       <p class="help-cat">제목 · 소제목</p>
       <p class="hint">· 제목 · 소제목에 <b>별도 정렬</b>이 생겼어요.</p>
@@ -2279,11 +2378,11 @@
       <p class="help-cat">구분선</p>
       <p class="hint">· 제목 · 소제목 · 하단과 본문을 연결할 때 구분선을 넣을 수 있어요.<br>· 본문의 구분선 모양이 추가됐어요.</p>
 
-      <p class="help-cat">인용선 · 말풍선</p>
-      <p class="hint">· 인용선 위아래 간격 오류가 수정됐어요.<br>· <b>인용선 여백</b>이 추가됐어요. 인용선 위아래 간격을 조절할 수 있어요.<br>· <b>말풍선 ↔ 본문 간격</b>이 삭제되고, <b>말풍선 여백</b>이 새로 생겼어요. 말풍선 위아래 간격을 조절할 수 있어요.</p>
+      <p class="help-cat">대본</p>
+      <p class="hint">· 말풍선 모양에 <b>대본</b>이 추가됐어요. 이름이 왼쪽에 고정되고 내용이 오른쪽에 이어지는 대본 형식이에요.<br>· 좌우 방향을 지정할 수 있어요. 오른쪽이면 이름이 오른쪽에, 내용이 왼쪽에 배치돼요.<br>· <b>간격 맞추기</b>를 켜면 가장 긴 이름에 맞춰 모든 내용의 시작점이 통일돼요.<br>· 대본 전용 <b>이름 글꼴</b>을 따로 설정할 수 있어요.</p>
 
-      <p class="help-cat">서식 아코디언</p>
-      <p class="hint">· 내용 탭에 <b>서식</b> 아코디언이 새로 생겼어요.<br>· 인용선 여백과 (＋로 넣는) 사진 설정이 여기로 이동했어요.</p>
+      <p class="help-cat">고정 비율</p>
+      <p class="hint">· 고정 비율 시스템을 대폭 최적화했어요.<br>· 고정 비율 사용 시 본문이 잘리지 않도록 여백을 보정하는 기능이 추가됐어요.<br>· 비율을 전환해도 가로 크기가 리셋되지 않고 유지돼요.</p>
 
       <p class="help-cat">이어서 편집하기</p>
       <p class="hint">· 편의성 탭에 <b>이어서 편집하기</b>가 추가됐어요.<br>· 현재 편집 중인 모든 것을 내용 포함 저장하고 나중에 불러올 수 있어요.<br>· 프리셋처럼 여러 개를 저장할 수 있어요.</p>
@@ -2292,7 +2391,7 @@
       <p class="hint">· 손글씨에 <b>교보 손글씨 이유빈</b> · <b>교보 손글씨 박도연</b>이 추가됐어요.<br>· 픽셀에 <b>드림흐물체</b>가 추가됐어요.<br>· 장식 카테고리가 <b>픽셀</b>로 이름이 바뀌었어요.</p>
 
       <p class="help-cat">기타</p>
-      <p class="hint">· 내 프리셋 · 이어서 편집하기 칩을 클릭하면 <b>불러오기</b>와 <b>현재 상태로 덮어쓰기</b> 중 선택할 수 있어요.<br>· 여러 슬라이더의 최소값과 최대값이 확장됐어요.<br>· 도움말이 전면 개편됐어요. 발췌기 사용 시 헷갈리는 게 있다면 참고해 주세요.<br>· 웹폰트 전환 시 고정 비율 측정이 어긋나던 문제가 수정됐어요.</p>
+      <p class="hint">· 내 프리셋 · 이어서 편집하기 칩을 클릭하면 <b>불러오기</b>와 <b>현재 상태로 덮어쓰기</b> 중 선택할 수 있어요.<br>· 프리셋의 <b>내보내기 · 가져오기</b> 기능이 추가됐어요. 다른 기기에서 설정을 공유할 수 있어요.<br>· 여러 슬라이더의 최소값과 최대값이 확장됐어요.<br>· 도움말이 전면 개편됐어요. 발췌기 사용 시 헷갈리는 게 있다면 참고해 주세요.<br>· 웹폰트 전환 시 고정 비율 측정이 어긋나던 문제가 수정됐어요.</p>
     </div>
     <div class="notice-btns">
       <button class="sheet__cancel" id="notice-never" type="button">다시 보지 않기</button>
@@ -2309,13 +2408,72 @@
       <p class="help-cat">자동화 도구</p>
       <p class="hint">· <b>*색*</b>: *영역*을 *색*의 색깔로 변경해요.<br><br>· <b>(색)</b>: (영역)을 (색)의 색깔로 변경해요. 말풍선 안의 (영역)은 각 인물별로 지정된 (색)을 사용해요.<br>· <b>(휨)</b>: (영역)을 이탤릭으로 변경해요.<br>· <b>(크기)</b>: (영역)의 글자 크기를 변환해요. 어떤 크기로 변환할지는 내용-자동화 도구에서 설정하며, 값을 바꾸면 이미 적용한 것도 함께 반영돼요.<br><br>· <b>&quot;넣&quot;</b>: 문단 앞뒤에 &quot; &quot;를 넣어요. 문단이 별표·괄호·따옴표로 시작하거나 끝나면 건너뛰어요.<br>· <b>&quot;색&quot;</b>: &quot;영역&quot;을 강조색으로 변경해요. 강조색 1~6 중에서 고를 수 있으며, 적용 후에는 일반적인 강조색과 똑같이 조정돼요.<br>· <b>&quot;인&quot;</b>: &quot;영역&quot;을 인용선으로 변경해요. 바로 아래 줄에 (영역)·*(영역)*이 있으면 하나의 인용선에 같이 들어가요. 인용선 1~6 중에서 고를 수 있으며, 적용 후에는 일반적인 인용선과 똑같이 조정돼요.<br>· <b>&quot;말&quot;</b>: &quot;영역&quot;을 말풍선으로 변경해요. 바로 아래 줄에 (영역)·*(영역)*이 있으면 하나의 말풍선에 같이 들어가요.<br><br><b>TIP!</b><br>· *색*과 (색)에 사용되는 색깔은 내용-자동화 도구에서 설정해요.<br>· 말풍선 안의 (색)에 사용되는 색깔은 말풍선-인물에서 인물별로 변경돼요.<br>· 프리셋-텍스트 대치에서 특정 글자를 다른 글자로 변환 · 삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
-      <p class="hint">· <b>서식 종류</b>: 볼드, 이탤릭, 밑줄, 취소선, 형광펜, 강조색, 개별 크기, 삽입.<br><br>· <b>강조색 · 형광펜 · 인용선</b>: 칠해진 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br><br>· <b>개별 크기</b>: 드래그한 부분만 크기를 따로 적용해요. 본문보다 작게도, 크게도 만들 수 있어요. 나중에 값을 변경해도 이전 것은 적용 당시 크기를 그대로 유지해요. 이전 것까지 바꾸고 싶다면 해당 영역을 다시 적용해 주세요.<br>· <b>글자 크기 불러오기</b>: 입력이나 미리보기의 글자를 누르면 해당 글자의 크기를 그대로 가져와요. 일반 본문 · 제목 · 하단을 눌러도 돼요.<br><br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br><br><b>TIP!</b><br>· 강조색 · 형광펜 · 인용선을 삭제하거나 슬롯(색)을 변경하고 싶을 경우, 칠해진 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· 개별 글자를 되돌리거나 값을 변경하고 싶을 경우, 해당 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· 인용선 여백은 인용선의 위아래를 항상 감싸고 있는 여백이에요. 인용선 앞뒤로 빈 문단이 있다면 문단 간격+인용선 여백 값이 돼요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.</p>
+      <p class="hint">· <b>서식 종류</b>: 볼드, 이탤릭, 밑줄, 취소선, 형광펜, 강조색, 개별 크기, 삽입.<br><br>· <b>형광펜 · 강조색 · 인용선</b>: 적용된 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br><br>· <b>개별 크기</b>: 드래그한 부분만 크기를 따로 적용해요. 본문보다 작게도, 크게도 만들 수 있어요. 나중에 값을 변경해도 이전 것은 적용 당시 크기를 그대로 유지해요. 이전 것까지 바꾸고 싶다면 해당 영역을 다시 적용해 주세요.<br>· <b>글자 크기 불러오기</b>: 입력이나 미리보기의 글자를 누르면 해당 글자의 크기를 그대로 가져와요. 일반 본문 · 제목 · 하단을 눌러도 돼요.<br><br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br><br><b>TIP!</b><br>· 강조색 · 형광펜 · 인용선을 삭제하거나 슬롯(색)을 변경하고 싶을 경우, 칠해진 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· 개별 글자를 되돌리거나 값을 변경하고 싶을 경우, 해당 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.<br>· 인용선 여백은 인용선의 위아래를 항상 감싸는 여백이에요.<br>
+<svg viewBox="0 0 360 100" width="100%" style="display:block;margin:8px auto 2px;max-width:500px" fill="none" xmlns="http://www.w3.org/2000/svg">
+<text x="55" y="10" font-size="8" fill="#888" text-anchor="middle">여백 0 설정</text>
+<text x="155" y="10" font-size="8" fill="#888" text-anchor="middle">여백 있음</text>
+<text x="267" y="10" font-size="8" fill="#888" text-anchor="middle">빈 문단 · 여백 있음</text>
+<rect x="20" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="55" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<rect x="24" y="29" width="2" height="20" rx="1" fill="#999"/>
+<rect x="29" y="29" width="61" height="20" rx="2" fill="#f7f7f7"/><text x="59" y="42" font-size="7" fill="#555" text-anchor="middle">인용 내용</text>
+<rect x="20" y="49" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="55" y="58" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<rect x="120" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<line x1="120" y1="33" x2="190" y2="33" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="194" y="36" font-size="5" fill="#e06050">인용선 여백</text>
+<rect x="124" y="37" width="2" height="20" rx="1" fill="#999"/>
+<rect x="129" y="37" width="61" height="20" rx="2" fill="#f7f7f7"/><text x="159" y="50" font-size="7" fill="#555" text-anchor="middle">인용 내용</text>
+<line x1="120" y1="61" x2="190" y2="61" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="194" y="64" font-size="5" fill="#e06050">인용선 여백</text>
+<rect x="120" y="65" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="74" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<rect x="232" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<line x1="232" y1="33" x2="302" y2="33" stroke="#5090d0" stroke-dasharray="2 2"/>
+<text x="306" y="36" font-size="5" fill="#5090d0">문단 간격</text>
+<line x1="232" y1="41" x2="302" y2="41" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="306" y="44" font-size="5" fill="#e06050">인용선 여백</text>
+<rect x="236" y="45" width="2" height="20" rx="1" fill="#999"/>
+<rect x="241" y="45" width="61" height="20" rx="2" fill="#f7f7f7"/><text x="271" y="58" font-size="7" fill="#555" text-anchor="middle">인용 내용</text>
+<line x1="232" y1="69" x2="302" y2="69" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="306" y="72" font-size="5" fill="#e06050">인용선 여백</text>
+<line x1="232" y1="77" x2="302" y2="77" stroke="#5090d0" stroke-dasharray="2 2"/>
+<text x="306" y="80" font-size="5" fill="#5090d0">문단 간격</text>
+<rect x="232" y="84" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="93" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+</svg>
+</p>
       <p class="help-cat">말풍선</p>
-      <p class="hint">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 이름</b>: 말풍선 이름은 입력에서 조정 가능한 텍스트가 아니에요. 이름을 바꾸고 싶다면 말풍선-인물에서 변경해 주세요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.</p>
-      <p class="help-cat">말풍선 간격</p>
-      <p class="hint">· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 말풍선끼리의 간격이에요. 빈 문단은 본문으로 인식되어서, 말풍선과 말풍선 사이에 빈 문단이 있다면 각 말풍선 기준 말풍선 여백이 적용돼요.<br>· <b>연속 말풍선 간격</b>: 같은 인물, 같은 방향, 중간에 빈 문단이 없는 말풍선들을 연속 말풍선으로 처리해요. 이때 연속 말풍선끼리의 간격이에요.<br><br><b>TIP!</b><br>· 말풍선 여백은 말풍선의 위아래를 감싸고 있는 여백이에요. 말풍선 앞뒤로 빈 문단 · 일반 글이 있다면 적용돼요. 말풍선 앞뒤로 빈 문단이 있다면 문단 간격+말풍선 여백 값이 돼요.</p>
-      <p class="help-cat">말풍선 모양</p>
-      <p class="hint">· <b>아이메시지</b>: 메시지를 추천해요. 그라데이션, 사진 배경의 경우 미리보기에서 말풍선 꼬리가 이상하게 뜨지만 저장 시 정상적으로 자리 잡아요.<br>· <b>심플</b>: 메시지와 일반 대화 모두 추천해요.<br>· <b>네모</b>: 메시지와 일반 대화에 모두 호환되지만, 일반 대화를 추천해요.<br>· <b>로그</b>: 말풍선이 투명으로 처리돼요.<br><br><b>TIP!</b><br>· 메시지: 프로필 사진 없는 대화.<br>· 일반 대화: 프로필 사진이 있는 대화.</p>
+      <table class="help-tbl">
+        <tr><th></th><th>메시지</th><th>심플</th><th>네모</th><th>로그</th><th>대본</th></tr>
+        <tr><td>꼬리</td><td>O</td><td>O</td><td>X</td><td>X</td><td>X</td></tr>
+        <tr><td>프사</td><td>O</td><td>O</td><td>O</td><td>O</td><td>X</td></tr>
+        <tr><td>배경</td><td>O</td><td>O</td><td>O</td><td>X</td><td>X</td></tr>
+        <tr><td>이름</td><td>위</td><td>위</td><td>위</td><td>위</td><td>옆</td></tr>
+      </table>
+      <p class="hint" style="margin-top:18px">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 이름</b>: 말풍선 이름은 입력에서 조정 가능한 텍스트가 아니에요. 이름을 바꾸고 싶다면 말풍선-인물에서 변경해 주세요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.<br><br>· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 말풍선끼리의 간격이에요. 빈 문단은 본문으로 인식되어서, 말풍선과 말풍선 사이에 빈 문단이 있다면 각 말풍선 기준 말풍선 여백이 적용돼요.<br>· <b>연속 말풍선 간격</b>: 같은 인물, 같은 방향, 중간에 빈 문단이 없는 말풍선들을 연속 말풍선으로 처리해요. 이때 연속 말풍선끼리의 간격이에요.<br><br><b>TIP!</b><br>· 말풍선 여백은 말풍선의 위아래를 감싸는 여백이에요. 말풍선 앞뒤로 빈 문단 · 일반 글이 있을 때 적용돼요.<br>
+<svg viewBox="0 0 360 100" width="100%" style="display:block;margin:8px auto 2px;max-width:500px" fill="none" xmlns="http://www.w3.org/2000/svg">
+<text x="55" y="10" font-size="8" fill="#888" text-anchor="middle">여백 0 설정</text>
+<text x="155" y="10" font-size="8" fill="#888" text-anchor="middle">여백 있음</text>
+<text x="267" y="10" font-size="8" fill="#888" text-anchor="middle">빈 문단 · 여백 있음</text>
+<rect x="20" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="55" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<rect x="20" y="29" width="52" height="18" rx="8" fill="#e5e5ea"/><text x="46" y="41" font-size="7" fill="#555" text-anchor="middle">말풍선</text>
+<rect x="20" y="47" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="55" y="56" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<rect x="120" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<line x1="120" y1="33" x2="190" y2="33" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="194" y="36" font-size="5" fill="#e06050">말풍선 여백</text>
+<rect x="120" y="37" width="52" height="18" rx="8" fill="#e5e5ea"/><text x="146" y="49" font-size="7" fill="#555" text-anchor="middle">말풍선</text>
+<line x1="120" y1="59" x2="190" y2="59" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="194" y="62" font-size="5" fill="#e06050">말풍선 여백</text>
+<rect x="120" y="63" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="72" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<rect x="232" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+<line x1="232" y1="33" x2="302" y2="33" stroke="#5090d0" stroke-dasharray="2 2"/>
+<text x="306" y="36" font-size="5" fill="#5090d0">문단 간격</text>
+<line x1="232" y1="41" x2="302" y2="41" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="306" y="44" font-size="5" fill="#e06050">말풍선 여백</text>
+<rect x="232" y="45" width="52" height="18" rx="8" fill="#e5e5ea"/><text x="258" y="57" font-size="7" fill="#555" text-anchor="middle">말풍선</text>
+<line x1="232" y1="67" x2="302" y2="67" stroke="#e06050" stroke-dasharray="2 2"/>
+<text x="306" y="70" font-size="5" fill="#e06050">말풍선 여백</text>
+<line x1="232" y1="75" x2="302" y2="75" stroke="#5090d0" stroke-dasharray="2 2"/>
+<text x="306" y="78" font-size="5" fill="#5090d0">문단 간격</text>
+<rect x="232" y="82" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="91" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
+</svg>
       <p class="help-cat">고정 비율</p>
       <p class="hint">· 고정 비율은 가로 크기에 따른 여백 제한이 있어요. 일정 여백을 넘어가면 본문이 캔버스 밖으로 나가 잘리기 때문이에요.<br>· 추천 가로 크기는 현재 상태와 여백을 고려했을 때 본문이 완벽한 중심에 있도록, 즉 온 사방이 같은 여백을 갖도록 하는 크기예요. 추천 가로 크기는 글자 설정 · 본문 길이 · 여백 등에 영향을 받아요.</p>
       <p class="help-cat">프리셋</p>
@@ -2373,6 +2531,16 @@
   var titleRuleStyle = 'solid';   // 제목 구분선 모양: solid | dashed | dotted | double
   var nameRuleStyle  = 'solid';   // 하단 구분선 모양
   var bubbleShape = 'imessage';  // 'imessage' | 'soft' | 'simple' | 'plain'(배경 없음)
+
+  /* ── 멀티페이지 ── */
+  var pages = [{ id:'p1', body:'', title:null, subtitle:null, name:null }];
+  var pageIdx = 0;
+  var _nextPageId = 2;
+  var _switching = false;
+  var sharedTitle = '';
+  var sharedSubtitle = '';
+  var sharedName = '';
+  var gridCols = 0; // 0=단일(현재 페이지만), 2=2열, 3=3열, 4=4열
 
   /* 형광펜·강조색: 슬롯 1/2/3 (슬롯1은 기존 c-hl / c-em 을 그대로 사용) */
   var hlSlot = 1, emSlot = 1, quoteSlot = 1;
@@ -2695,6 +2863,183 @@
     moveThumb($('bub-shape-seg'));
   }
   function setBubbleShape(shape){ bubbleShape=shape; applyBubbleShape(); syncShapeSeg(); updateScriptOptions(); render(); updateFormatButtons(); }
+  /* ── 멀티페이지: 탭 렌더·전환·추가·삭제 ── */
+  function flushPage(){
+    // 현재 에디터 내용을 pages 배열에 저장
+    if(!pages[pageIdx]) return;
+    pages[pageIdx].body = editor.innerHTML;
+    // 제목·소제목·하단: 분리 상태면 현재 에디터 값 저장
+    if(pages[pageIdx].title != null) pages[pageIdx].title = $('title-ed') ? $('title-ed').innerHTML : '';
+    if(pages[pageIdx].subtitle != null) pages[pageIdx].subtitle = $('subtitle-ed') ? $('subtitle-ed').innerHTML : '';
+    if(pages[pageIdx].name != null) pages[pageIdx].name = nameEd ? nameEd.innerHTML : '';
+  }
+  function renderPageTabs(){
+    var bar = $('page-bar');
+    if(!bar) return;
+    bar.innerHTML = '';
+    // 탭 버튼 생성
+    pages.forEach(function(p, i){
+      var tab = document.createElement('button');
+      tab.className = 'page-tab' + (i === pageIdx ? ' active' : '');
+      tab.type = 'button';
+      tab.textContent = (i + 1);
+      tab.addEventListener('click', function(){ switchPage(i); });
+      // 길게 누르면 삭제
+      var _lp = null;
+      tab.addEventListener('pointerdown', function(){
+        _lp = setTimeout(function(){
+          _lp = null;
+          if(pages.length <= 1) return;
+          if(!confirm((i+1) + '번 페이지를 삭제할까요?')) return;
+          deletePage(i);
+        }, 600);
+      });
+      tab.addEventListener('pointerup', function(){ if(_lp){ clearTimeout(_lp); _lp=null; } });
+      tab.addEventListener('pointerleave', function(){ if(_lp){ clearTimeout(_lp); _lp=null; } });
+      bar.appendChild(tab);
+    });
+    // ＋ 버튼
+    var addBtn = document.createElement('button');
+    addBtn.className = 'page-tab-add';
+    addBtn.type = 'button';
+    addBtn.title = '페이지 추가';
+    addBtn.textContent = '＋';
+    addBtn.addEventListener('click', function(){ addPage(); });
+    bar.appendChild(addBtn);
+    // 그리드 토글 (2페이지 이상일 때)
+    if(pages.length > 1){
+      var sep = document.createElement('span');
+      sep.style.cssText = 'width:1px;height:14px;background:var(--line);margin:0 4px;flex:none;';
+      bar.appendChild(sep);
+      var gt = document.createElement('button');
+      gt.className = 'page-tab' + (gridCols > 0 ? ' active' : '');
+      gt.type = 'button';
+      gt.textContent = gridCols > 0 ? gridCols + '열' : '단일';
+      gt.title = '레이아웃 전환';
+      gt.addEventListener('click', function(){
+        var opts = [0];
+        if(pages.length >= 2) opts.push(2);
+        if(pages.length >= 3) opts.push(3);
+        if(pages.length >= 4) opts.push(4);
+        var idx = opts.indexOf(gridCols);
+        gridCols = opts[(idx + 1) % opts.length];
+        render(); scheduleSave();
+      });
+      bar.appendChild(gt);
+    }
+  }
+  function switchPage(newIdx){
+    if(newIdx === pageIdx) return;
+    if(newIdx < 0 || newIdx >= pages.length) return;
+    _switching = true;
+    flushPage();
+    // 공유 상태인 에디터의 현재 값을 shared에 반영
+    if(pages[pageIdx].title == null && $('title-ed')) sharedTitle = $('title-ed').innerHTML;
+    if(pages[pageIdx].subtitle == null && $('subtitle-ed')) sharedSubtitle = $('subtitle-ed').innerHTML;
+    if(pages[pageIdx].name == null && nameEd) sharedName = nameEd.innerHTML;
+    pageIdx = newIdx;
+    editor.innerHTML = pages[pageIdx].body || '';
+    // 제목·소제목·하단: 분리면 페이지 값, 아니면 공유 값 (빈 값도 안전)
+    if($('title-ed')) $('title-ed').innerHTML = (pages[pageIdx].title != null ? pages[pageIdx].title : sharedTitle) || '';
+    if($('subtitle-ed')) $('subtitle-ed').innerHTML = (pages[pageIdx].subtitle != null ? pages[pageIdx].subtitle : sharedSubtitle) || '';
+    if(nameEd) nameEd.innerHTML = (pages[pageIdx].name != null ? pages[pageIdx].name : sharedName) || '';
+    syncTails(editor);
+    clearHrSel();
+    [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode);
+    renderPageTabs();
+    updateShareBadges();
+    _switching = false;
+    render();
+    _histClear();
+    scheduleSave();
+  }
+  var PAGE_LIMIT = 4;
+  function addPage(){
+    if(pages.length >= PAGE_LIMIT){ alert('페이지는 최대 ' + PAGE_LIMIT + '개까지 만들 수 있어요.'); return; }
+    _switching = true;
+    flushPage();
+    var newPage = { id: 'p' + (_nextPageId++), body: '', title: null, subtitle: null, name: null };
+    pages.push(newPage);
+    pageIdx = pages.length - 1;
+    editor.innerHTML = '';
+    renderPageTabs();
+    _switching = false;
+    render();
+    _histClear();
+    scheduleSave();
+    editor.focus();
+  }
+  function deletePage(idx){
+    if(pages.length <= 1) return;
+    _switching = true;
+    pages.splice(idx, 1);
+    // pageIdx 보정
+    if(pageIdx >= pages.length) pageIdx = pages.length - 1;
+    else if(pageIdx > idx) pageIdx--;
+    else if(pageIdx === idx) pageIdx = Math.min(idx, pages.length - 1);
+    editor.innerHTML = pages[pageIdx].body || '';
+    syncTails(editor);
+    clearHrSel();
+    [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode);
+    renderPageTabs();
+    _switching = false;
+    render();
+    _histClear();
+    scheduleSave();
+  }
+
+  /* ── 제목·하단 공유/분리 ── */
+  function updateShareBadges(){
+    var p = pages[pageIdx];
+    var tb = $('title-badge'), nb = $('name-badge');
+    if(tb) tb.className = 'share-badge ' + (p && p.title != null ? 'is-split' : 'is-shared');
+    if(nb) nb.className = 'share-badge ' + (p && p.name != null ? 'is-split' : 'is-shared');
+  }
+  // 뱃지 클릭 → 공유로 되돌리기
+  if($('title-badge')) $('title-badge').addEventListener('click', function(){
+    if(!pages[pageIdx] || pages[pageIdx].title == null) return;
+    if(!confirm('이 페이지의 제목·소제목을 공유로 되돌릴까요?')) return;
+    pages[pageIdx].title = null;
+    pages[pageIdx].subtitle = null;
+    _switching = true;
+    if($('title-ed')) $('title-ed').innerHTML = sharedTitle;
+    if($('subtitle-ed')) $('subtitle-ed').innerHTML = sharedSubtitle;
+    _switching = false;
+    updateShareBadges(); render(); scheduleSave();
+  });
+  if($('name-badge')) $('name-badge').addEventListener('click', function(){
+    if(!pages[pageIdx] || pages[pageIdx].name == null) return;
+    if(!confirm('이 페이지의 하단을 공유로 되돌릴까요?')) return;
+    pages[pageIdx].name = null;
+    _switching = true;
+    if(nameEd) nameEd.innerHTML = sharedName;
+    _switching = false;
+    updateShareBadges(); render(); scheduleSave();
+  });
+  // 제목·소제목 편집 → 자동 분리
+  function _onTitleInput(){
+    if(_switching) return;
+    var p = pages[pageIdx]; if(!p) return;
+    if(pages.length <= 1) return; // 페이지 1개면 분리 불필요
+    if(p.title == null){
+      p.title = $('title-ed') ? $('title-ed').innerHTML : '';
+      p.subtitle = $('subtitle-ed') ? $('subtitle-ed').innerHTML : '';
+      updateShareBadges();
+    }
+  }
+  function _onNameInput(){
+    if(_switching) return;
+    var p = pages[pageIdx]; if(!p) return;
+    if(pages.length <= 1) return;
+    if(p.name == null){
+      p.name = nameEd ? nameEd.innerHTML : '';
+      updateShareBadges();
+    }
+  }
+  if($('title-ed')) $('title-ed').addEventListener('input', _onTitleInput);
+  if($('subtitle-ed')) $('subtitle-ed').addEventListener('input', _onTitleInput);
+  if(nameEd) nameEd.addEventListener('input', _onNameInput);
+
   /* 대본 모드 전용 옵션 표시/숨김 */
   function updateScriptOptions(){
     var opt=$('script-options'); if(opt) opt.style.display = (bubbleShape==='script')?'':'none';
@@ -2702,20 +3047,55 @@
   /* 간격 맞추기: 가장 긴 이름의 너비를 측정해 CSS 변수로 세팅 */
   function applyScriptAlign(){
     var on = bubbleShape==='script' && $('script-align') && $('script-align').checked;
-    canvas.classList.toggle('script-align', on);
-    if(!on){ canvas.style.removeProperty('--script-name-w'); return; }
+    var justifyOn = on && $('script-justify') && $('script-justify').checked;
+    // 균등 배분 체크박스 표시/숨김
+    var jw=$('script-justify-wrap'); if(jw) jw.style.display = on ? '' : 'none';
+    // 기존 justify 스타일 제거
+    var allNames = canvas.querySelectorAll('.g-script-name');
+    [].forEach.call(allNames, function(n){
+      n.style.removeProperty('letter-spacing'); n.style.removeProperty('margin-right');
+    });
+    if(!on){ canvas.classList.remove('script-align'); canvas.style.removeProperty('--script-name-w'); return; }
+    // 측정 전 클래스 제거 → 자연 너비로 측정
+    canvas.classList.remove('script-align');
+    canvas.style.removeProperty('--script-name-w');
     var names = canvas.querySelectorAll('.g-script-name');
     var maxW = 0;
+    var naturalWidths = [];
     [].forEach.call(names, function(n){
-      // 자연 너비 측정
-      var prev = n.style.width; n.style.width='auto';
       var w = n.offsetWidth;
-      n.style.width = prev || '';
+      naturalWidths.push(w);
       if(w > maxW) maxW = w;
     });
+    // 측정 후 클래스 복원 + 변수 세팅
     if(maxW > 0) canvas.style.setProperty('--script-name-w', maxW+'px');
+    canvas.classList.add('script-align');
+    // 균등 배분 적용
+    if(justifyOn && maxW > 0){
+      [].forEach.call(names, function(n, i){
+        var charCount = n.textContent.trim().length;
+        if(charCount <= 1) return;
+        var nw = naturalWidths[i];
+        if(nw >= maxW) return; // 가장 긴 이름은 건너뜀
+        var gap = (maxW - nw) / (charCount - 1);
+        if(gap > 0){
+          n.style.letterSpacing = gap + 'px';
+          n.style.marginRight = -gap + 'px';
+        }
+      });
+    }
   }
   if($('script-align')) $('script-align').addEventListener('change', function(){ applyScriptAlign(); render(); scheduleSave(); });
+  if($('script-justify')) $('script-justify').addEventListener('change', function(){ applyScriptAlign(); render(); scheduleSave(); });
+  function applyScriptFont(root){
+    if(bubbleShape!=='script') return;
+    var sf=$('script-font'); if(!sf) return;
+    var fv=sf.value;
+    [].forEach.call((root||canvas).querySelectorAll('.g-script-name'), function(n){
+      if(fv) n.style.fontFamily=fv; else n.style.removeProperty('font-family');
+      n.style.setProperty('font-weight','700','important');
+    });
+  }
   document.querySelectorAll('#bub-shape-seg button').forEach(function(btn){
     btn.addEventListener('click', function(){
       setBubbleShape(btn.getAttribute('data-shape'));
@@ -3079,8 +3459,11 @@
       if(bubbleShape==='script'){
         // 대본 모드: avatar 대신 이름 텍스트를 왼쪽에
         var c=findChar(g.cid);
-        var scriptName=document.createElement('span'); scriptName.className='g-script-name '+g.side;
-        scriptName.textContent=(c&&c.name)?c.name:'';
+        var scriptName=document.createElement('span'); scriptName.className='g-script-name g-bub-name '+g.side;
+        scriptName.style.setProperty('font-weight','700','important');
+        scriptName.style.setProperty('display','block','important');
+        var bold=document.createElement('b'); bold.textContent=(c&&c.name)?c.name:'';
+        scriptName.appendChild(bold);
         if(c&&c.nameColor) scriptName.style.setProperty('color', c.nameColor, 'important');
         group.appendChild(scriptName);
         var colName=col.querySelector('.g-bub-name'); if(colName) colName.style.display='none';
@@ -4194,7 +4577,34 @@
     inp.value=subSizeNow()+'px';
     function setV(v){ setSubSizeNow(v); inp.value=subSizeNow()+'px'; }   // 평소엔 단위까지 붙여 보여 준다
     [].forEach.call(row.querySelectorAll('.sheet__num-b'), function(b){
-      b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); setV(subSizeNow()+parseFloat(b.getAttribute('data-d'))); });
+      var repT=null, ticks=0;
+      function doStep(){ setV(subSizeNow()+parseFloat(b.getAttribute('data-d'))); }
+      function stopRep(){ if(repT){ clearTimeout(repT); clearInterval(repT); repT=null; } ticks=0; }
+      function startRep(){
+        stopRep();
+        repT=setTimeout(function(){
+          repT=setInterval(function(){
+            ticks++; doStep();
+            if(ticks===8){ clearInterval(repT); repT=setInterval(doStep, 35); }
+          }, 70);
+        }, 300);
+      }
+      function down(e){ e.preventDefault(); e.stopPropagation(); doStep(); startRep(); }
+      function up(e){ if(e) e.stopPropagation(); stopRep(); }
+      if(window.PointerEvent){
+        b.addEventListener('pointerdown', down);
+        b.addEventListener('pointerup', up);
+        b.addEventListener('pointercancel', up);
+        b.addEventListener('pointerleave', up);
+      } else {
+        b.addEventListener('touchstart', down, {passive:false});
+        b.addEventListener('touchend', up);
+        b.addEventListener('touchcancel', up);
+        b.addEventListener('mousedown', down);
+        b.addEventListener('mouseup', up);
+        b.addEventListener('mouseleave', up);
+      }
+      b.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); });
     });
     inp.addEventListener('focus', function(){ inp.value=String(subSizeNow()); setTimeout(function(){ try{ inp.select(); }catch(e){} }, 0); });   // 고칠 땐 숫자만 남겨 바로 덮어쓰게
     inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } });
@@ -4609,7 +5019,7 @@
       var isPhoto = !!(b && b.querySelector && b.querySelector('img'));
       if(!(IS_TOUCH && isPhoto)){ editor.focus(); restoreSel(); b = caretInBubble() || b; }
       if(!isCharBub(b) || !characters.length) return;
-      openSheetDef({ title:'인물 변경', grid2:true, options: characters.map(function(c){
+      openSheetDef({ title:'인물 변경', grid2:true, options: characters.filter(function(c){ return !c.hidden; }).map(function(c){
         return { label:c.name||'(이름 없음)', preview:function(){ return '<span class="s-preview"><i style="display:block;width:20px;height:20px;border-radius:50%;background:'+c.bub+'"></i></span>'; },
           run:function(){ b.setAttribute('data-char', c.id); var nm=bubNameBefore(b); if(nm) nm.setAttribute('data-char', c.id); cleanEditor(); styleCharBubbles(editor); render(); saveSel(); } };
       }) });
@@ -4687,8 +5097,12 @@
     // 네모·투명 모양은 꼬리 자체가 안 그려지므로 버튼도 숨긴다(눌러도 아무 일이 없어 헷갈림)
     var noTailShape = (bubbleShape==='simple' || bubbleShape==='plain' || bubbleShape==='script');
     var hideTail = imgOnly || noTailShape;
+    var isScript = bubbleShape==='script';
     var cbTail = $('cb-tail'); if(cbTail){ cbTail.hidden = hideTail; }
-    if(cbTools){ cbTools.style.gridTemplateColumns = 'repeat('+(hideTail?5:6)+',1fr)'; }
+    var cbName = $('cb-name'); if(cbName){ cbName.hidden = isScript; }
+    var cbAv = $('cb-av'); if(cbAv){ cbAv.hidden = isScript; }
+    var visCount = 6 - (hideTail?1:0) - (isScript?2:0);
+    if(cbTools){ cbTools.style.gridTemplateColumns = 'repeat('+visCount+',1fr)'; }
   }
   editor.addEventListener('keyup', updateFormatButtons);
   editor.addEventListener('mouseup', updateFormatButtons);
@@ -4909,6 +5323,12 @@
     var pad = 3;
     thumb.style.width = aRect.width + 'px';
     thumb.style.transform = 'translateX(' + (aRect.left - segRect.left - pad) + 'px)';
+    // wrap seg: thumb의 세로 위치를 활성 버튼 줄에 맞춤
+    if(seg.classList.contains('seg--wrap')){
+      thumb.style.top = (aRect.top - segRect.top) + 'px';
+      thumb.style.bottom = 'auto';
+      thumb.style.height = aRect.height + 'px';
+    }
   }
   function moveAllThumbs(){ [].forEach.call(document.querySelectorAll('.seg'), moveThumb); }
   // 세그가 '숨김→보임'으로 바뀌는 순간(아코디언 열기·탭 전환 등) 폭이 0이라 막대 위치를 못 잡던 문제:
@@ -5001,11 +5421,20 @@
   var ratios = [
     {w:1,h:1,label:'1:1'}, {w:4,h:5,label:'4:5'},
     {w:3,h:4,label:'3:4'}, {w:2,h:3,label:'2:3'},
-    {w:9,h:16,label:'9:16'}, {w:16,h:9,label:'16:9'}
+    {w:9,h:16,label:'9:16'},
+    {w:2,h:1,label:'2:1'}, {w:5,h:4,label:'5:4'}, {w:4,h:3,label:'4:3'},
+    {w:3,h:2,label:'3:2'}, {w:16,h:9,label:'16:9'}
   ];
   var rSeg = $('ratio-seg');
+  var _ratioSplitAt = 5; // 세로형 5개 뒤에 구분선
   ratios.forEach(function(p, idx){
+    if(idx === _ratioSplitAt){
+      var divider = document.createElement('span');
+      divider.className = 'seg__divider';
+      rSeg.appendChild(divider);
+    }
     var b=document.createElement('button'); b.type='button'; b.textContent=p.label;
+    b.style.height='32px';
     b.setAttribute('aria-pressed', idx===1 ? 'true' : 'false');
     b.addEventListener('click', function(){
       [].forEach.call(rSeg.querySelectorAll('button'), function(x){ x.setAttribute('aria-pressed','false'); });
@@ -5014,7 +5443,6 @@
     });
     rSeg.appendChild(b);
   });
-  // ratio-seg thumb 요소 추가 (동적 생성 후)
   var rThumb=document.createElement('span'); rThumb.className='seg__thumb'; rSeg.appendChild(rThumb);
 
   function baseW(){
@@ -5113,6 +5541,12 @@
     if(bbg){ el.style.setProperty('--bub-body-gap', parseFloat(bbg.value)+'px'); }
     var qg=$('quote-gap');
     if(qg){ el.style.setProperty('--quote-gap', parseFloat(qg.value)+'px'); }
+    var qt=$('quote-thick');
+    if(qt){ el.style.setProperty('--quote-thick', parseFloat(qt.value)+'px'); }
+    var ht=$('hr-thick');
+    if(ht){ el.style.setProperty('--hr-thick', parseFloat(ht.value)+'px'); }
+    var tht=$('title-hr-thick');
+    if(tht){ el.style.setProperty('--title-hr-thick', parseFloat(tht.value)+'px'); }
     if(pg){ el.style.setProperty('--para-gap', parseFloat(pg.value)+'px'); }
     if(sg){ el.style.setProperty('--stack-gap', parseFloat(sg.value)+'px'); }
     var subsz=$('subtext-size'); if(subsz){ var _ss=parseFloat(subsz.value); if(isNaN(_ss)) _ss=26; el.style.setProperty('--sub-size', _ss+'px'); }
@@ -5350,9 +5784,9 @@
     walk(root);
   }
 
-  function buildHtml(){
+  function processBodyRaw(rawHtml){
     var tmp = document.createElement('div');
-    for(var i=0;i<editor.childNodes.length;i++){ tmp.appendChild(editor.childNodes[i].cloneNode(true)); }
+    tmp.innerHTML = (typeof rawHtml === 'string') ? rawHtml : '';
     sanitize(tmp);
     var tw = document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT, null, false), zs=[];
     while(tw.nextNode()){ if(tw.currentNode.nodeValue.indexOf('\u200b')!==-1){ zs.push(tw.currentNode); } }
@@ -5360,29 +5794,68 @@
     [].forEach.call(tmp.querySelectorAll('.g-bub'), function(b){ if(b.textContent.trim()==='' && !b.querySelector('img')){ if(b.parentNode) b.parentNode.removeChild(b); } });
     [].forEach.call(tmp.querySelectorAll('.g-bub-name'), function(n){ if(n.textContent.replace(/\u200b/g,'').trim()===''){ if(n.parentNode) n.parentNode.removeChild(n); } });
     syncTails(tmp);
-    var html = tmp.innerHTML;
-    // 제목/소제목 (별도 입력창) → 맨 앞
-    var tEmpty = titleIsEmpty(), sEmpty = subtitleIsEmpty();
-    if(!tEmpty || !sEmpty){
-      var titleBlk = '<div class="g-title-blk">';
-      if(!tEmpty){ titleBlk += '<div class="g-title-main">'+ edToHtml($('title-ed')) +'</div>'; }
-      if(!sEmpty){ titleBlk += '<div class="g-title-sub">'+ edToHtml($('subtitle-ed')) +'</div>'; }
-      if($('title-rule') && $('title-rule').checked){ titleBlk += '<div class="g-title-rule '+titleRuleStyle+'"></div>'; }
-      titleBlk += '</div>';
-      html = titleBlk + html;
-    }
-    if(!nameIsEmpty()){
-      if($('name-rule') && $('name-rule').checked){ html += '<div class="g-name-rule '+nameRuleStyle+'"></div>'; }
-      var opt = $('name-pos').value || 'plain-left';
-      var parts = opt.split('-'), style=parts[0]||'plain', align=parts[1]||'left';
-      // barl/barr = 인용선(막대 좌/우). 옛 저장값 'bar-*' 는 좌로 취급
-      var isBar = (style==='barl' || style==='barr' || style==='bar');
-      var side  = (style==='barr') ? 'right' : 'left';
-      var cls   = isBar ? ('s-bar '+side) : ('s-'+style);
-      var nameColor = $('c-name').value || '#737373', barColor = $('c-bar').value || '#d1d1d1';
-      html += '<span class="g-name '+cls+' al-'+align+'" style="--name-color:'+nameColor+';--bar-color:'+barColor+';">'+ nameHtml() +'</span>';
-    }
+    return tmp.innerHTML;
+  }
+
+  function buildTitleBlock(titleSrc, subtitleSrc){
+    var tHtml = (typeof titleSrc === 'string') ? titleSrc : '';
+    var sHtml = (typeof subtitleSrc === 'string') ? subtitleSrc : '';
+    var tEmpty = tHtml.replace(/<br>/g,'').replace(/\u00a0/g,' ').trim() === '';
+    var sEmpty = sHtml.replace(/<br>/g,'').replace(/\u00a0/g,' ').trim() === '';
+    if(tEmpty && sEmpty) return '';
+    var blk = '<div class="g-title-blk">';
+    if(!tEmpty) blk += '<div class="g-title-main">'+ tHtml +'</div>';
+    if(!sEmpty) blk += '<div class="g-title-sub">'+ sHtml +'</div>';
+    if($('title-rule') && $('title-rule').checked) blk += '<div class="g-title-rule '+titleRuleStyle+'"></div>';
+    blk += '</div>';
+    return blk;
+  }
+
+  function buildNameBlock(nameSrc){
+    var nHtml = (typeof nameSrc === 'string') ? nameSrc : '';
+    var nEmpty = nHtml.replace(/<br>/g,'').replace(/\u00a0/g,' ').trim() === '';
+    if(nEmpty) return '';
+    var out = '';
+    if($('name-rule') && $('name-rule').checked) out += '<div class="g-name-rule '+nameRuleStyle+'"></div>';
+    var opt = $('name-pos').value || 'plain-left';
+    var parts = opt.split('-'), style=parts[0]||'plain', align=parts[1]||'left';
+    var isBar = (style==='barl' || style==='barr' || style==='bar');
+    var side  = (style==='barr') ? 'right' : 'left';
+    var cls   = isBar ? ('s-bar '+side) : ('s-'+style);
+    var nameColor = $('c-name').value || '#737373', barColor = $('c-bar').value || '#d1d1d1';
+    out += '<span class="g-name '+cls+' al-'+align+'" style="--name-color:'+nameColor+';--bar-color:'+barColor+';">'+ nHtml +'</span>';
+    return out;
+  }
+
+  function buildHtml(){
+    var html = processBodyRaw(editor.innerHTML);
+    // 제목/소제목 → 맨 앞
+    var titleBlk = buildTitleBlock(edToHtml($('title-ed')), edToHtml($('subtitle-ed')));
+    if(titleBlk) html = titleBlk + html;
+    // 하단 → 맨 뒤
+    html += buildNameBlock(nameHtml());
     return html;
+  }
+
+  function buildGridHtml(){
+    flushPage();
+    // 공유 상태 반영
+    if(pages[pageIdx] && pages[pageIdx].title == null && $('title-ed')) sharedTitle = $('title-ed').innerHTML;
+    if(pages[pageIdx] && pages[pageIdx].subtitle == null && $('subtitle-ed')) sharedSubtitle = $('subtitle-ed').innerHTML;
+    if(pages[pageIdx] && pages[pageIdx].name == null && nameEd) sharedName = nameEd.innerHTML;
+    // 제목 블록 (한 번만, 전체 너비)
+    var titleBlk = buildTitleBlock(edToHtml($('title-ed')), edToHtml($('subtitle-ed')));
+    // 각 열 (본문만)
+    var cols = '';
+    for(var i = 0; i < pages.length; i++){
+      var body = processBodyRaw((pages[i] && pages[i].body) || '');
+      cols += '<div class="g-grid-col">' + body + '</div>';
+    }
+    var gc = gridCols || pages.length;
+    var gridHtml = '<div class="g-grid" style="display:grid;grid-template-columns:repeat('+gc+',1fr)">' + cols + '</div>';
+    // 하단 블록 (한 번만, 전체 너비)
+    var nameBlk = buildNameBlock(nameHtml());
+    return titleBlk + gridHtml + nameBlk;
   }
 
   /* ============================================================
@@ -5455,9 +5928,9 @@
           repT=setInterval(function(){
             ticks++;
             if(!bump(dir)){ stopRepeat(true); return; }
-            if(ticks===10){ clearInterval(repT); repT=setInterval(function(){ if(!bump(dir)) stopRepeat(true); }, 55); }
-          }, 110);
-        }, 400);
+            if(ticks===8){ clearInterval(repT); repT=setInterval(function(){ if(!bump(dir)) stopRepeat(true); }, 35); }
+          }, 70);
+        }, 300);
       }
       function press(b, dir){
         function down(e){
@@ -5578,8 +6051,8 @@
     updateEmptyBubbles();
     styleCharBubbles(editor);
     syncSubFixedEm();
-    canvas.innerHTML = '<div class="g-inner">' + buildHtml() + '</div>';
-    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); neutralizeStretch(canvas); wrapParaGaps(canvas); tagMsgGroupNeighbors(canvas); stripLastGap(canvas); trimImgMargins(canvas); fitStage();
+    canvas.innerHTML = '<div class="g-inner">' + (gridCols > 0 && pages.length > 1 ? buildGridHtml() : buildHtml()) + '</div>';
+    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); neutralizeStretch(canvas); wrapParaGaps(canvas); tagMsgGroupNeighbors(canvas); stripLastGap(canvas); trimImgMargins(canvas); applyScriptFont(canvas); fitStage();
     setVal('font-size', $('font-size').value+'px');
     if($('subtext-size')) setVal('subtext-size', $('subtext-size').value+'px');
     if($('parensub-size')) setVal('parensub-size', $('parensub-size').value+'px');
@@ -5818,6 +6291,12 @@
     if(bbg){ var bbgv=$('bub-body-gap-val'); if(bbgv) bbgv.textContent=parseFloat(bbg.value)+'px'; }
     var qg=$('quote-gap');
     if(qg){ var qgv=$('quote-gap-val'); if(qgv) qgv.textContent=parseFloat(qg.value)+'px'; }
+    var qt=$('quote-thick');
+    if(qt){ var qtv=$('quote-thick-val'); if(qtv) qtv.textContent=parseFloat(qt.value)+'px'; }
+    var ht=$('hr-thick');
+    if(ht){ var htv=$('hr-thick-val'); if(htv) htv.textContent=parseFloat(ht.value)+'px'; }
+    var tht=$('title-hr-thick');
+    if(tht){ var thtv=$('title-hr-thick-val'); if(thtv) thtv.textContent=parseFloat(tht.value)+'px'; }
     if(pg){ var pgv=$('para-gap-val'); if(pgv) pgv.textContent=parseFloat(pg.value)+'px'; }
     if(sg){ var sgv=$('stack-gap-val'); if(sgv) sgv.textContent=parseFloat(sg.value)+'px'; }
     var barg=$('bar-body-gap');
@@ -5827,7 +6306,7 @@
     var lisz=$('logimg-size'); if(lisz){ var liszv=$('logimg-size-val'); if(liszv) liszv.textContent=parseFloat(lisz.value)+'%'; }
     var lirad=$('logimg-radius'); if(lirad){ var liradv=$('logimg-radius-val'); if(liradv) liradv.textContent=parseFloat(lirad.value)+'px'; }
   }
-  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-gap','title-font','name-font'].forEach(function(id){
+  ['title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-thick','quote-gap','hr-thick','title-hr-thick','script-font','title-font','name-font'].forEach(function(id){
     var e=$(id); if(e){ e.addEventListener('input', function(){ updateTitleSizeLabels(); render(); }); e.addEventListener('change', function(){ updateTitleSizeLabels(); render(); }); }
   });
 
@@ -6169,10 +6648,12 @@
       });
       function restoreAvatars(){ avHidden.forEach(function(p){ if(p[1]) p[0].style.visibility=p[1]; else p[0].style.removeProperty('visibility'); }); }
       var hrRects=[];
+      var _hrThick = parseFloat(canvas.style.getPropertyValue('--hr-thick')) || 1;
       [].forEach.call(canvas.querySelectorAll('.g-hr.line, .g-hr.short'), function(hr){
-        var r=hr.getBoundingClientRect(); if(r.width<=0||r.height<=0) return;
-        var isShort=hr.classList.contains('short'), lineH=2, fullW=r.width, lineW=isShort?(fullW*0.12):fullW;
-        var cx=(r.left-canvasRect.left)+fullW/2, cy=(r.top-canvasRect.top)+r.height/2;
+        var r=hr.getBoundingClientRect(); if(r.width<=0) return;
+        var isShort=hr.classList.contains('short'), lineH=_hrThick, fullW=r.width, lineW=isShort?(fullW*0.12):fullW;
+        var cy=(r.top-canvasRect.top) + (r.height > 0 ? r.height/2 : 0);
+        var cx=(r.left-canvasRect.left)+fullW/2;
         hrRects.push({ x:cx-lineW/2, y:cy-lineH/2, w:lineW, h:lineH, color:$('c-hr').value||'#d1d1d1' });
       });
       var hrBackup=[];
@@ -6193,9 +6674,38 @@
         if(hlLayer && prevLayerDisplay!==null){ hlLayer.style.display=prevLayerDisplay; }
       }
 
+      // bold 웨이트가 없는 폰트의 b/strong에 text-stroke 보정 (html2canvas faux bold 미지원 대응)
+      var BOLD_FONTS = ['pretendard','paperozi','paperlogy','presentation','freesentation','bookkmyungjo','maruburi','kopubdotum','kopubbatang','nanum myeongjo','nanummyeongjo'];
+      var boldStrokeBackup=[];
+      [].forEach.call(canvas.querySelectorAll('b,strong,.g-script-name'), function(el){
+        var ff = window.getComputedStyle(el).fontFamily.toLowerCase();
+        var hasBold = BOLD_FONTS.some(function(f){ return ff.indexOf(f)!==-1; });
+        if(!hasBold){
+          boldStrokeBackup.push([el, el.style.getPropertyValue('-webkit-text-stroke')]);
+          el.style.setProperty('-webkit-text-stroke','0.5px currentColor');
+        }
+      });
+      function restoreBoldStroke(){ boldStrokeBackup.forEach(function(p){ if(p[1]) p[0].style.setProperty('-webkit-text-stroke',p[1]); else p[0].style.removeProperty('-webkit-text-stroke'); }); }
+
+      // html2canvas가 CSS 변수(var())를 못 읽을 수 있으므로 실제 px 값으로 풀어준다
+      var _titleHrThick = parseFloat(canvas.style.getPropertyValue('--title-hr-thick')) || 1;
+      var _resolveStyle = document.createElement('style');
+      _resolveStyle.textContent =
+        '#canvas .g-hr.dashed:before,#canvas .g-hr.dotted:before{border-top-width:'+_hrThick+'px !important;}' +
+        '#canvas .g-hr.double:before{border-top-width:'+(_hrThick*3)+'px !important;}' +
+        '#canvas .g-title-rule{border-top-width:'+_titleHrThick+'px !important;}' +
+        '#canvas .g-title-rule.double{border-top-width:'+(_titleHrThick*3)+'px !important;}' +
+        '#canvas .g-name-rule{border-top-width:'+_titleHrThick+'px !important;}' +
+        '#canvas .g-name-rule.double{border-top-width:'+(_titleHrThick*3)+'px !important;}';
+      document.head.appendChild(_resolveStyle);
+      function removeResolveStyle(){ if(_resolveStyle.parentNode) _resolveStyle.remove(); }
+
       html2canvas(canvas, { scale:2, backgroundColor:null, useCORS:true, logging:false, width:w, height:h, scrollX:0, scrollY:0, x:0, y:0, windowWidth:w, windowHeight:h })
       .then(function(textCanvas){
-        restoreMarks(); restoreTails(); restoreHrs(); restoreAvatars(); restoreCanvasBg();
+        // DEBUG: script name bold check
+        var _dbgNames=canvas.querySelectorAll('.g-script-name');
+        [].forEach.call(_dbgNames, function(n){ console.log('g-script-name font-weight:', window.getComputedStyle(n).fontWeight, 'inline:', n.style.fontWeight, 'text:', n.textContent); });
+        restoreMarks(); restoreTails(); restoreHrs(); restoreAvatars(); restoreCanvasBg(); restoreBoldStroke(); removeResolveStyle();
         prepareBackground(function(bakedPhotoImg){
           var out=document.createElement('canvas'); out.width=outW; out.height=outH;
           var ctx=out.getContext('2d');
@@ -6208,7 +6718,7 @@
           ctx.drawImage(textCanvas, 0, 0, outW, outH);
           drawBakedAvatars(ctx, avBakes, function(){ deliverImage(out, type, cleanup, mode); });
         });
-      }).catch(function(){ restoreMarks(); restoreTails(); restoreHrs(); restoreAvatars(); restoreCanvasBg(); cleanup(); });
+      }).catch(function(){ restoreMarks(); restoreTails(); restoreHrs(); restoreAvatars(); restoreCanvasBg(); restoreBoldStroke(); removeResolveStyle(); cleanup(); });
     }
 
     function prepareBackground(cb){
@@ -6334,7 +6844,6 @@
             var names=[]; if(clearTargets.body) names.push('본문'); if(clearTargets.title) names.push('제목');
             if(clearTargets.subtitle) names.push('소제목'); if(clearTargets.name) names.push('하단');
             if(!names.length){ alert('비울 항목을 하나 이상 골라 주세요.'); return; }
-            if(!confirm(names.join(' · ')+'을(를) 비울까요?')) return;
             runClear();
           } }
       ])
@@ -6576,7 +7085,7 @@
   }
   function openQuoteBubbleSheet(){
     if(!characters || !characters.length){ openQuoteStyleSheet(null); return; }
-    openSheetDef({ title:'따옴표 → 말풍선 · 인물 선택', grid2:true, options: characters.map(function(c){
+    openSheetDef({ title:'따옴표 → 말풍선 · 인물 선택', grid2:true, options: characters.filter(function(c){ return !c.hidden; }).map(function(c){
       return { label:c.name||'(이름 없음)', preview:function(){ return '<span class="s-preview"><i style="display:block;width:20px;height:20px;border-radius:50%;background:'+c.bub+'"></i></span>'; }, noFocus:true, run:function(){ openQuoteStyleSheet(c.id); } };
     }) });
   }
@@ -6690,7 +7199,8 @@
     'para-gap':      0.63,            // 문단 간격 20
     'title-gap':     0.28,            // 제목 ↔ 소제목 9
     'titleblk-gap':  0.81,            // 제목 ↔ 본문 26
-    'name-gap':      0.81              // 하단 ↔ 본문 26
+    'name-gap':      0.81,             // 하단 ↔ 본문 26
+    'quote-thick':   0.16              // 인용선 두께 5
     /* 서식 툴바 ↕A(subtext-size)는 뺐다: '앞으로 적용할 값'이라 켜도 화면이 안 바뀌어 오히려 헷갈림.
        말풍선 쪽 간격(msg-gap·stack-gap·bub-body-gap·bar-body-gap)도 뺐다: 대화 UI의 리듬이라
        본문 글자 크기와 직접 관계가 약하고, 말풍선 모양·프사 유무에 더 좌우된다 */
@@ -6738,7 +7248,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-gap','font-size','subtext-size','parensub-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-thick','quote-gap','hr-thick','title-hr-thick','script-font','font-size','subtext-size','parensub-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-hl5','c-hl5-txt','c-hl6','c-hl6-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-em5','c-em5-txt','c-em6','c-em6-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-quote2','c-quote2-txt','c-quote3','c-quote3-txt','c-quote4','c-quote4-txt','c-quote5','c-quote5-txt','c-quote6','c-quote6-txt','c-hr','c-hr-txt','c-title-hr','c-title-hr-txt',
@@ -6748,11 +7258,18 @@
   function saveState(){
     if(_restoring) return;
     try{
+      flushPage(); // 현재 에디터 내용을 pages에 반영
+      // 공유 상태인 에디터 값을 shared에 반영
+      if(pages[pageIdx] && pages[pageIdx].title == null && $('title-ed')) sharedTitle = $('title-ed').innerHTML;
+      if(pages[pageIdx] && pages[pageIdx].subtitle == null && $('subtitle-ed')) sharedSubtitle = $('subtitle-ed').innerHTML;
+      if(pages[pageIdx] && pages[pageIdx].name == null && nameEd) sharedName = nameEd.innerHTML;
       var vals={}; TEXT_IDS.forEach(function(id){ var e=$(id); if(e) vals[id]=e.value; });
-      var data={ vals:vals, editorHtml:editor.innerHTML, nameHtml:nameEd?nameEd.innerHTML:'',
-        titleHtml:($('title-ed')?$('title-ed').innerHTML:''), subtitleHtml:($('subtitle-ed')?$('subtitle-ed').innerHTML:''),
-        bgValue:bgValue, align:currentAlign, titleAlign:titleAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, scriptAlign:(!!($('script-align')&&$('script-align').checked)), titleRule:(!!($('title-rule')&&$('title-rule').checked)), titleRuleStyle:titleRuleStyle, nameRule:(!!($('name-rule')&&$('name-rule').checked)), nameRuleStyle:nameRuleStyle, photoOn:photoOn, photoData:photoData, framePos:framePos, frameData:frameData, chrome:chrome,
-        sizeHelper: sizeHelperOn() ? { on:1, snap:_sizeSnap } : null };
+      var data={ vals:vals, editorHtml:pages[0].body||'', nameHtml:sharedName,
+        titleHtml:sharedTitle, subtitleHtml:sharedSubtitle,
+        bgValue:bgValue, align:currentAlign, titleAlign:titleAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, scriptAlign:(!!($('script-align')&&$('script-align').checked)), scriptJustify:(!!($('script-justify')&&$('script-justify').checked)), titleRule:(!!($('title-rule')&&$('title-rule').checked)), titleRuleStyle:titleRuleStyle, nameRule:(!!($('name-rule')&&$('name-rule').checked)), nameRuleStyle:nameRuleStyle, photoOn:photoOn, photoData:photoData, framePos:framePos, frameData:frameData, chrome:chrome,
+        sizeHelper: sizeHelperOn() ? { on:1, snap:_sizeSnap } : null,
+        multiPage: { pages:pages, pageIdx:pageIdx, nextId:_nextPageId, sharedTitle:sharedTitle, sharedSubtitle:sharedSubtitle, sharedName:sharedName, gridCols:gridCols }
+      };
       try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
       catch(e){ try{ data.photoData=null; localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e2){} }
     }catch(e){}
@@ -6794,8 +7311,37 @@
     try{
       if(data.vals){ TEXT_IDS.forEach(function(id){ if(data.vals[id]!=null){ safeRestoreValue(id, data.vals[id]); } }); }
       ensureFontValid();
-      if(typeof data.editorHtml==='string'){ editor.innerHTML=data.editorHtml; syncTails(editor); clearHrSel(); [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode); }
-      if(nameEd && typeof data.nameHtml==='string'){ nameEd.innerHTML=data.nameHtml; }
+
+      // ── 멀티페이지 복원 또는 마이그레이션 ──
+      if(data.multiPage && data.multiPage.pages && data.multiPage.pages.length > 0){
+        pages = data.multiPage.pages;
+        pageIdx = data.multiPage.pageIdx || 0;
+        if(pageIdx >= pages.length) pageIdx = 0;
+        _nextPageId = data.multiPage.nextId || (pages.length + 1);
+        sharedTitle = data.multiPage.sharedTitle || '';
+        sharedSubtitle = data.multiPage.sharedSubtitle || '';
+        sharedName = data.multiPage.sharedName || '';
+        gridCols = parseInt(data.multiPage.gridCols) || 0;
+      } else {
+        // 기존 v1 데이터 → 단일 페이지로 마이그레이션
+        pages = [{ id:'p1', body: (typeof data.editorHtml==='string' ? data.editorHtml : ''), title:null, subtitle:null, name:null }];
+        pageIdx = 0;
+        _nextPageId = 2;
+        sharedTitle = (typeof data.titleHtml==='string') ? data.titleHtml : '';
+        sharedSubtitle = (typeof data.subtitleHtml==='string') ? data.subtitleHtml : '';
+        sharedName = (typeof data.nameHtml==='string') ? data.nameHtml : '';
+      }
+      editor.innerHTML = pages[pageIdx].body || '';
+      syncTails(editor); clearHrSel();
+      [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode);
+      renderPageTabs();
+
+      // 제목·소제목·하단: 분리면 페이지 값, 아니면 공유 값
+      var _p = pages[pageIdx];
+      if($('title-ed')) $('title-ed').innerHTML = (_p && _p.title != null ? _p.title : sharedTitle) || '';
+      if($('subtitle-ed')) $('subtitle-ed').innerHTML = (_p && _p.subtitle != null ? _p.subtitle : sharedSubtitle) || '';
+      if(nameEd) nameEd.innerHTML = (_p && _p.name != null ? _p.name : sharedName) || '';
+      updateShareBadges();
       if($('title-rule')){ $('title-rule').checked = !!data.titleRule; }
       titleRuleStyle = ({solid:1,dashed:1,dotted:1,double:1})[data.titleRuleStyle] ? data.titleRuleStyle : 'solid';
       if($('name-rule')){ $('name-rule').checked = !!data.nameRule; }
@@ -6825,7 +7371,8 @@
       document.querySelectorAll('#size-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-mode')===sizeMode?'true':'false'); });
       applySizeModeUI();
       if(data.ratio){ ratio=data.ratio;
-        [].forEach.call(rSeg.querySelectorAll('button'), function(x, idx){ x.setAttribute('aria-pressed', (ratios[idx] && ratios[idx].w===ratio.w && ratios[idx].h===ratio.h)?'true':'false'); }); }
+        [].forEach.call(rSeg.querySelectorAll('button'), function(x, idx){ x.setAttribute('aria-pressed', (ratios[idx] && ratios[idx].w===ratio.w && ratios[idx].h===ratio.h)?'true':'false'); });
+        moveThumb(rSeg); }
       clearBgOn();
       photoData = (typeof data.photoData==='string') ? data.photoData : null;
       bgMode = data.bgMode || (data.photoOn && photoData ? 'photo' : (String(data.bgValue).indexOf('gradient')!==-1 ? 'gradient' : 'solid'));
@@ -6843,6 +7390,7 @@
       syncShapeSeg();
       applyBubbleShape();
       if($('script-align')) $('script-align').checked = !!data.scriptAlign;
+      if($('script-justify')) $('script-justify').checked = !!data.scriptJustify;
       updateScriptOptions();
       if(data.chrome){ chrome.topbar=!!data.chrome.topbar; chrome.src=(data.chrome.src==='custom')?'custom':'char'; chrome.charId=data.chrome.charId||null; chrome.name=data.chrome.name||''; chrome.photo=data.chrome.photo||null; chrome.inputbar=!!data.chrome.inputbar; }
       if(typeof syncChromeUI==='function') syncChromeUI();
@@ -6928,8 +7476,7 @@
           }},
         ]});
       });
-      var del=document.createElement('button'); del.className='mychip__del'; del.type='button';
-      del.textContent='✕'; del.title='삭제';
+      var del=document.createElement('span'); del.className='mychip__x'; del.textContent='×'; del.title='삭제';
       del.addEventListener('click', function(e){
         e.stopPropagation();
         if(!confirm('「'+s.name+'」을(를) 삭제할까요?')) return;
@@ -7047,6 +7594,11 @@
     if(_hist.length > HISTORY_LIMIT) _hist.shift();
     _histIdx = _hist.length-1;
     _histLast = html;
+    _histButtons();
+  }
+  function _histClear(){
+    _hist = []; _histIdx = -1; _histLast = null;
+    clearTimeout(_histTimer);
     _histButtons();
   }
   function _histSchedule(){
@@ -7169,7 +7721,8 @@
     document.querySelectorAll('#size-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-mode')===sizeMode?'true':'false'); });
     applySizeModeUI();
     if(s.ratio){ ratio=s.ratio;
-      [].forEach.call(rSeg.querySelectorAll('button'), function(x, idx){ x.setAttribute('aria-pressed', (ratios[idx] && ratios[idx].w===ratio.w && ratios[idx].h===ratio.h)?'true':'false'); }); }
+      [].forEach.call(rSeg.querySelectorAll('button'), function(x, idx){ x.setAttribute('aria-pressed', (ratios[idx] && ratios[idx].w===ratio.w && ratios[idx].h===ratio.h)?'true':'false'); });
+      moveThumb(rSeg); }
     bgMode = s.bgMode || (String(bgValue).indexOf('gradient')!==-1 ? 'gradient' : 'solid');
     document.querySelectorAll('#bg-mode-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-bgmode')===bgMode?'true':'false'); });
     applyBgViews();
@@ -7707,11 +8260,22 @@
     var wrap=$('char-list'); if(!wrap) return; wrap.innerHTML='';
     characters.forEach(function(c){
       var chip=document.createElement('button'); chip.type='button'; chip.className='char-chip reorderable'; chip.title=(c.name||'')+' 편집';
+      if(c.hidden) chip.style.opacity='.4';
       var av=document.createElement('span'); av.className='char-chip__av'+(c.photoShape==='square'?' square':'');
       if(c.photo){ av.style.backgroundImage='url("'+c.photo+'")'; } else { av.textContent=charInitial(c.name); }
       var nm=document.createElement('span'); nm.className='char-chip__name'; nm.textContent=c.name||'(이름 없음)';
       var dot=document.createElement('span'); dot.className='char-chip__dot'; dot.style.background=c.bub||'#cccccc';
-      chip.appendChild(av); chip.appendChild(nm); chip.appendChild(dot);
+      // 잠금 토글 (열린 자물쇠=삽입에 보임, 닫힌 자물쇠=숨김)
+      var lock=document.createElement('span'); lock.className='char-chip__lock'; lock.title=c.hidden?'삽입에서 숨김':'삽입에 표시';
+      lock.innerHTML=c.hidden
+        ?'<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8.5" width="13" height="9" rx="2"/><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5"/></svg>'
+        :'<svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8.5" width="13" height="9" rx="2"/><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v-1"/></svg>';
+      lock.addEventListener('click', function(e){
+        e.preventDefault(); e.stopPropagation();
+        c.hidden=!c.hidden; saveChars(); renderCharList(); renderCharInsert();
+        if(typeof renderTopbarCharList==='function') renderTopbarCharList();
+      });
+      chip.appendChild(av); chip.appendChild(nm); chip.appendChild(dot); chip.appendChild(lock);
       chip.addEventListener('click', function(){
         if(editingCharId===c.id && !$('char-editor').hidden){ closeCharEditor(); }
         else { openCharEditor(c.id); }
@@ -7722,6 +8286,7 @@
   function renderCharInsert(){
     var wrap=$('char-insert-list'); if(!wrap) return; wrap.innerHTML='';
     characters.forEach(function(c){
+      if(c.hidden) return;
       var chip=document.createElement('button'); chip.type='button'; chip.className='char-chip'; chip.title=(c.name||'')+' 말풍선 넣기';
       var av=document.createElement('span'); av.className='char-chip__av'+(c.photoShape==='square'?' square':'');
       if(c.photo){ av.style.backgroundImage='url("'+c.photo+'")'; } else { av.textContent=charInitial(c.name); }
@@ -7901,6 +8466,7 @@
      초기화
      ============================================================ */
   restoreState();
+  renderPageTabs(); // 저장 데이터 없어도 탭 바 초기화
   restoreUIState();
   renderMyPresets();
   renderReplacePresets();
