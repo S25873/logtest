@@ -2204,6 +2204,7 @@
                   <button type="button" data-fpos="top" aria-pressed="false">위</button>
                   <button type="button" data-fpos="bottom" aria-pressed="false">아래</button>
                   <button type="button" data-fpos="all" aria-pressed="false">사방</button>
+                  <button type="button" data-fpos="inner" aria-pressed="false">안쪽</button>
                   <span class="seg__thumb"></span>
                 </div>
               </div>
@@ -5631,44 +5632,50 @@
       fThick = Math.round(el.clientWidth * fp/100);   // 두께는 '전체 폭' 기준
     }
     // 띠가 차지하는 만큼 안쪽으로 밀어 글이 띠를 침범하지 않게(여백은 띠 안쪽에 남음)
+    var _fAll = (framePos==='all'||framePos==='inner');
     el.style.padding = frameOn
-      ? ((pad + (framePos==='top'||framePos==='all' ? fThick : 0))+'px '
-        +(pad + (framePos==='right'||framePos==='all' ? fThick : 0))+'px '
-        +(pad + (framePos==='bottom'||framePos==='all' ? fThick : 0))+'px '
-        +(pad + (framePos==='left'||framePos==='all' ? fThick : 0))+'px')
+      ? ((pad + (framePos==='top'||_fAll ? fThick : 0))+'px '
+        +(pad + (framePos==='right'||_fAll ? fThick : 0))+'px '
+        +(pad + (framePos==='bottom'||_fAll ? fThick : 0))+'px '
+        +(pad + (framePos==='left'||_fAll ? fThick : 0))+'px')
       : (pad+'px');
     (function(){
       [].forEach.call(el.querySelectorAll('.g-frame'), function(f){ f.parentNode.removeChild(f); });
       if(!frameOn) return;
       var isAll = (framePos==='all');
+      var isInner = (framePos==='inner');
+      var isMulti = isAll || isInner;
       var W = el.clientWidth, H = el.clientHeight;
-      var sides = isAll ? ['left','right','top','bottom'] : [framePos];
+      var sides = isMulti ? ['left','right','top','bottom'] : [framePos];
+      var inOff = isInner ? pad : 0;   // inner: 여백만큼 안쪽으로 들여놓기
       sides.forEach(function(sd){
         var f=document.createElement('div'); f.className='g-frame'; f.setAttribute('data-side',sd);
         f.style.setProperty('background-image','url("'+frameData+'")','important');
         if(sd==='left'||sd==='right'){
-          f.style.top='0'; f.style.bottom='0'; f.style.width=fThick+'px'; f.style[sd]='0';
+          f.style.top=inOff+'px'; f.style.bottom=inOff+'px'; f.style.width=fThick+'px'; f.style[sd]=inOff+'px';
         } else {
-          f.style.left='0'; f.style.right='0'; f.style.height=fThick+'px'; f.style[sd]='0';
+          f.style.left=inOff+'px'; f.style.right=inOff+'px'; f.style.height=fThick+'px'; f.style[sd]=inOff+'px';
         }
         // 확대·좌우·위아래 슬라이더 반영 (원본 크기를 알아야 정확 — 모르면 cover/center로 폴백)
         var zoom = (parseFloat($('frame-zoom') ? $('frame-zoom').value : 100)||100)/100;
         var px = (parseFloat($('frame-x') ? $('frame-x').value : 50)||0)/100;
         var py = (parseFloat($('frame-y') ? $('frame-y').value : 50)||0)/100;
-        var boxW = isAll ? W : (sd==='left'||sd==='right' ? fThick : W);
-        var boxH = isAll ? H : (sd==='top'||sd==='bottom' ? fThick : H);
+        var iW = isInner ? (W - inOff*2) : W;   // inner: 여백 뺀 영역
+        var iH = isInner ? (H - inOff*2) : H;
+        var boxW = isMulti ? iW : (sd==='left'||sd==='right' ? fThick : W);
+        var boxH = isMulti ? iH : (sd==='top'||sd==='bottom' ? fThick : H);
         if(frameNatW>0 && frameNatH>0){
-          var sc = Math.max(boxW/frameNatW, boxH/frameNatH) * zoom;   // 최소 '꽉 채움' 보장 → 빈 공간 안 생김
+          var sc = Math.max(boxW/frameNatW, boxH/frameNatH) * zoom;
           var bw = frameNatW*sc, bh = frameNatH*sc;
-          var bx = -(bw-boxW)*px, by = -(bh-boxH)*py;                 // 남는 만큼만 이동(끝에서 더 안 밀림)
-          if(isAll){ bx -= (sd==='right') ? (W-fThick) : 0; by -= (sd==='bottom') ? (H-fThick) : 0; }
+          var bx = -(bw-boxW)*px, by = -(bh-boxH)*py;
+          if(isMulti){ bx -= (sd==='right') ? (iW-fThick) : 0; by -= (sd==='bottom') ? (iH-fThick) : 0; }
           f.style.setProperty('background-size', bw+'px '+bh+'px','important');
           f.style.setProperty('background-position', bx+'px '+by+'px','important');
         } else {
-          f.style.setProperty('background-size', isAll ? (W+'px '+H+'px') : 'cover','important');
-          var ox0 = (isAll && sd==='right') ? -(W-fThick) : 0;
-          var oy0 = (isAll && sd==='bottom') ? -(H-fThick) : 0;
-          f.style.setProperty('background-position', isAll ? (ox0+'px '+oy0+'px') : 'center','important');
+          f.style.setProperty('background-size', isMulti ? (iW+'px '+iH+'px') : 'cover','important');
+          var ox0 = (isMulti && sd==='right') ? -(iW-fThick) : 0;
+          var oy0 = (isMulti && sd==='bottom') ? -(iH-fThick) : 0;
+          f.style.setProperty('background-position', isMulti ? (ox0+'px '+oy0+'px') : 'center','important');
         }
         el.appendChild(f);
       });
@@ -6205,10 +6212,11 @@
       var _mfOn = (framePos!=='none' && !!frameData);
       var _mfPct = _mfOn ? (parseFloat($('frame-size') ? $('frame-size').value : 20)||20) : 0;
       var _mfT = _mfOn ? Math.round(canvas.clientWidth * _mfPct/100) : 0;
-      var mPadT = padSet + (_mfOn && (framePos==='top'||framePos==='all') ? _mfT : 0);
-      var mPadR = padSet + (_mfOn && (framePos==='right'||framePos==='all') ? _mfT : 0);
-      var mPadB = padSet + (_mfOn && (framePos==='bottom'||framePos==='all') ? _mfT : 0);
-      var mPadL = padSet + (_mfOn && (framePos==='left'||framePos==='all') ? _mfT : 0);
+      var _mfAll = (framePos==='all'||framePos==='inner');
+      var mPadT = padSet + (_mfOn && (framePos==='top'||_mfAll) ? _mfT : 0);
+      var mPadR = padSet + (_mfOn && (framePos==='right'||_mfAll) ? _mfT : 0);
+      var mPadB = padSet + (_mfOn && (framePos==='bottom'||_mfAll) ? _mfT : 0);
+      var mPadL = padSet + (_mfOn && (framePos==='left'||_mfAll) ? _mfT : 0);
       canvas.style.padding = mPadT+'px '+mPadR+'px '+mPadB+'px '+mPadL+'px';
       var inner = canvas.querySelector('.g-inner');
       if(inner){
@@ -6241,10 +6249,11 @@
     var _fOn = (framePos!=='none' && !!frameData);
     var _fPct = _fOn ? (parseFloat($('frame-size') ? $('frame-size').value : 20)||20) : 0;
     var _fThick = _fOn ? Math.round(canvas.clientWidth * _fPct/100) : 0;
-    var padT = padSet + (_fOn && (framePos==='top'||framePos==='all') ? _fThick : 0);
-    var padR = padSet + (_fOn && (framePos==='right'||framePos==='all') ? _fThick : 0);
-    var padB = padSet + (_fOn && (framePos==='bottom'||framePos==='all') ? _fThick : 0);
-    var padL = padSet + (_fOn && (framePos==='left'||framePos==='all') ? _fThick : 0);
+    var _fAll = (framePos==='all'||framePos==='inner');
+    var padT = padSet + (_fOn && (framePos==='top'||_fAll) ? _fThick : 0);
+    var padR = padSet + (_fOn && (framePos==='right'||_fAll) ? _fThick : 0);
+    var padB = padSet + (_fOn && (framePos==='bottom'||_fAll) ? _fThick : 0);
+    var padL = padSet + (_fOn && (framePos==='left'||_fAll) ? _fThick : 0);
 
     // 사방 여백을 사용자 설정값 + 꾸밈 두께로 초기화
     canvas.style.padding = padT+'px '+padR+'px '+padB+'px '+padL+'px';
@@ -6287,20 +6296,20 @@
     // 사방 여백을 padStep 단위로 내려가며 잘리지 않는 최대값 탐색
     var maxPad = 0, found = false;
     for(var tryPad = padSet - padStep; tryPad >= minPad; tryPad -= padStep){
-      var tT = tryPad + (_fOn && (framePos==='top'||framePos==='all') ? _fThick : 0);
-      var tR = tryPad + (_fOn && (framePos==='right'||framePos==='all') ? _fThick : 0);
-      var tB = tryPad + (_fOn && (framePos==='bottom'||framePos==='all') ? _fThick : 0);
-      var tL = tryPad + (_fOn && (framePos==='left'||framePos==='all') ? _fThick : 0);
+      var tT = tryPad + (_fOn && (framePos==='top'||_fAll) ? _fThick : 0);
+      var tR = tryPad + (_fOn && (framePos==='right'||_fAll) ? _fThick : 0);
+      var tB = tryPad + (_fOn && (framePos==='bottom'||_fAll) ? _fThick : 0);
+      var tL = tryPad + (_fOn && (framePos==='left'||_fAll) ? _fThick : 0);
       canvas.style.padding = tT+'px '+tR+'px '+tB+'px '+tL+'px';
       if(Math.max(inner.scrollHeight||0, inner.offsetHeight||0) <= ch - tT - tB){
         maxPad = tryPad; found = true; break;
       }
     }
     if(!found) maxPad = minPad;
-    var fT = maxPad + (_fOn && (framePos==='top'||framePos==='all') ? _fThick : 0);
-    var fR = maxPad + (_fOn && (framePos==='right'||framePos==='all') ? _fThick : 0);
-    var fB = maxPad + (_fOn && (framePos==='bottom'||framePos==='all') ? _fThick : 0);
-    var fL = maxPad + (_fOn && (framePos==='left'||framePos==='all') ? _fThick : 0);
+    var fT = maxPad + (_fOn && (framePos==='top'||_fAll) ? _fThick : 0);
+    var fR = maxPad + (_fOn && (framePos==='right'||_fAll) ? _fThick : 0);
+    var fB = maxPad + (_fOn && (framePos==='bottom'||_fAll) ? _fThick : 0);
+    var fL = maxPad + (_fOn && (framePos==='left'||_fAll) ? _fThick : 0);
     canvas.style.padding = fT+'px '+fR+'px '+fB+'px '+fL+'px';
 
     if(warn){
@@ -6539,17 +6548,27 @@
       var W = canvas.clientWidth, H = canvas.clientHeight;
       var fThick = Math.round(W * fp / 100);
       var isAll = (framePos==='all');
+      var isInner = (framePos==='inner');
+      var isMulti = isAll || isInner;
+      var padVal = isInner ? (Math.round(parseFloat($('pad').value)||0)) : 0;
+      var iW = isInner ? (W - padVal*2) : W;
+      var iH = isInner ? (H - padVal*2) : H;
       [].forEach.call(frames, function(f){
         var sd = f.getAttribute('data-side');
         // resize 모드 → 띠 두께도 즉시 반영
-        if(sd==='left'||sd==='right'){ f.style.width=fThick+'px'; }
-        else { f.style.height=fThick+'px'; }
-        var boxW = isAll ? W : (sd==='left'||sd==='right' ? fThick : W);
-        var boxH = isAll ? H : (sd==='top'||sd==='bottom' ? fThick : H);
+        if(sd==='left'||sd==='right'){
+          f.style.width=fThick+'px';
+          if(isInner){ f.style.top=padVal+'px'; f.style.bottom=padVal+'px'; f.style[sd]=padVal+'px'; }
+        } else {
+          f.style.height=fThick+'px';
+          if(isInner){ f.style.left=padVal+'px'; f.style.right=padVal+'px'; f.style[sd]=padVal+'px'; }
+        }
+        var boxW = isMulti ? iW : (sd==='left'||sd==='right' ? fThick : W);
+        var boxH = isMulti ? iH : (sd==='top'||sd==='bottom' ? fThick : H);
         var sc = Math.max(boxW/frameNatW, boxH/frameNatH) * zoom;
         var bw = frameNatW*sc, bh = frameNatH*sc;
         var bx = -(bw-boxW)*px, by = -(bh-boxH)*py;
-        if(isAll){ bx -= (sd==='right') ? (W-fThick) : 0; by -= (sd==='bottom') ? (H-fThick) : 0; }
+        if(isMulti){ bx -= (sd==='right') ? (iW-fThick) : 0; by -= (sd==='bottom') ? (iH-fThick) : 0; }
         f.style.setProperty('background-size', bw+'px '+bh+'px','important');
         f.style.setProperty('background-position', bx+'px '+by+'px','important');
       });
@@ -6620,15 +6639,18 @@
       e.preventDefault();
       e.stopPropagation();
 
-      // 핀치
+      // 핀치 (최소 거리 50px 이상)
       if(e.touches && e.touches.length >= 2){
-        dragMode = 'pinch'; dragTarget = f;
-        startDist = pinchDist(e);
-        startVal = readVals();
-        document.addEventListener('touchmove', onMove, {passive:false});
-        document.addEventListener('touchend', onUp);
-        pushEditcol();
-        return;
+        var _initDist = pinchDist(e);
+        if(_initDist >= 50){
+          dragMode = 'pinch'; dragTarget = f;
+          startDist = _initDist;
+          startVal = readVals();
+          document.addEventListener('touchmove', onMove, {passive:false});
+          document.addEventListener('touchend', onUp);
+          pushEditcol();
+          return;
+        }
       }
 
       var p = ptr(e);
@@ -6655,11 +6677,14 @@
       if(!dragMode) return;
       e.preventDefault();
 
-      // 손가락 2개로 전환 → pinch
+      // 손가락 2개로 전환 → pinch (최소 거리 50px 이상이어야 의도적 핀치로 인정)
       if(e.touches && e.touches.length >= 2 && dragMode !== 'pinch'){
-        dragMode = 'pinch';
-        startDist = pinchDist(e);
-        startVal.zoom = parseFloat($('frame-zoom') ? $('frame-zoom').value : 100);
+        var _pd = pinchDist(e);
+        if(_pd >= 50){
+          dragMode = 'pinch';
+          startDist = _pd;
+          startVal.zoom = parseFloat($('frame-zoom') ? $('frame-zoom').value : 100);
+        }
         return;
       }
 
@@ -6716,8 +6741,10 @@
       document.removeEventListener('touchmove', onMove);
       document.removeEventListener('touchend', onUp);
       // editcol은 복귀하지 않음 — 다른 곳 터치 시 outsideTouchRestore가 처리
-      render();      // 마지막에 한 번만 전체 렌더
+      patchFrames();   // 현재 상태 즉시 확정 (점프 방지)
       saveState();
+      // 전체 렌더는 약간 뒤에 — DOM 재구성이 필요하지만 시각적 점프 방지
+      setTimeout(function(){ render(); }, 200);
     }
 
     // 마우스 휠 → 줌
