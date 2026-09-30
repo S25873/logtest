@@ -758,6 +758,22 @@
   .dot:hover{transform:translateY(-2px);box-shadow:var(--shadow-2);}
   .dot.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink);border-color:transparent;}
 
+  /* 사진 저장소 (꾸밈 테두리) */
+  .frame-lib{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px;}
+  .frame-lib__thumb{
+    position:relative;aspect-ratio:1;border-radius:var(--radius-sm);border:2px solid var(--line);
+    background:var(--surface-2) center/cover no-repeat;cursor:pointer;overflow:hidden;
+    transition:border-color .14s var(--ease),transform .14s;
+  }
+  .frame-lib__thumb:hover{border-color:var(--ink);transform:translateY(-1px);}
+  .frame-lib__thumb.on{border-color:var(--accent,#3b82f6);box-shadow:0 0 0 2px var(--accent-soft,rgba(59,130,246,.25));}
+  .frame-lib__thumb .frame-lib__x{
+    position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;
+    background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:18px;text-align:center;
+    opacity:0;transition:opacity .14s;cursor:pointer;
+  }
+  .frame-lib__thumb:hover .frame-lib__x{opacity:1;}
+
   /* 내 프리셋 */
   .mychips{display:flex;flex-wrap:wrap;gap:8px;}
   .mychips:not(:empty){margin-bottom:10px;}
@@ -811,6 +827,11 @@
   .reorderable.dragging *{cursor:grabbing;}
 
   .hint{font-size:11.5px;color:var(--ink-3);line-height:1.55;margin:12px 0 0;}
+  /* 설명 안의 '자세히' 링크 — 누르면 도움말(?)의 해당 부분으로 */
+  .hint-link{appearance:none;border:none;background:none;padding:0;margin:0;cursor:pointer;
+    font:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px;}
+  .hint-link:hover{color:var(--ink-2);}
+  .hint-link::before{content:"\2794\00a0";}   /* ➔ — 글자처럼 붙어 밑줄도 화살표까지 이어진다 */
 
   /* ============================================================
      로그 에디터
@@ -868,6 +889,8 @@
   #editor .g-img.is-sel{box-shadow:0 0 0 2px var(--accent);}
   #editor .g-img.is-sel::after{content:"\00d7";position:absolute;top:-9px;right:-9px;z-index:2;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;box-shadow:var(--shadow-2);transition:color .14s var(--ease),background .14s,border-color .14s;}
   #editor .g-img.is-sel:hover::after{color:#fff;background:var(--danger);border-color:var(--danger);}
+  /* 문단 들여쓰기가 켜져 있을 때 입력에도 들여쓴 자리를 보여 주는 빈 칸(글에는 들어가지 않는 장식) */
+  #editor .g-ind-vis{display:inline-block !important;width:var(--ed-indent,1em);height:1px;vertical-align:baseline;pointer-events:none;}
   #editor .g-bub-img{display:inline-block;vertical-align:bottom;max-width:100%;height:auto;border-radius:11px;margin:0;}
   #editor .g-bub.img-only{max-width:var(--photo-w,60%);}
   #editor .g-bub.has-img:not(.img-only) .g-bub-img{display:block;width:var(--photo-w-px,60%);max-width:100%;margin:0 0 2px;}
@@ -997,6 +1020,9 @@
   /* 맨 마지막 말풍선(뒤에 실제 내용 없음)은 아래 여백 제거 */
   #canvas .g-msg-group.g-endbub,.canvas-clone .g-msg-group.g-endbub{margin-bottom:0 !important;}
   #canvas .g-bub.g-endbub,.canvas-clone .g-bub.g-endbub{margin-bottom:0 !important;}
+  /* 문단 들여쓰기 — 켜져 있을 때만 캔버스에서 문단을 블록으로 감싸 첫 줄을 민다(1글자 = 본문 1em) */
+  #canvas .g-para,.canvas-clone .g-para{display:block !important;}
+  #canvas .g-para.ind,.canvas-clone .g-para.ind{text-indent:var(--para-indent,1em) !important;}
   #canvas .g-para-gap,.canvas-clone .g-para-gap{display:block !important;width:100% !important;height:var(--para-gap,20px) !important;}
   #canvas .g-msg-group.left,.canvas-clone .g-msg-group.left{flex-direction:row !important;}
   #canvas .g-msg-group.right,.canvas-clone .g-msg-group.right{flex-direction:row-reverse !important;}
@@ -1078,6 +1104,15 @@
   #canvas mark.em,.canvas-clone mark.em{color:var(--em) !important;background:transparent !important;display:inline !important;}
   #canvas mark.ul,.canvas-clone mark.ul{color:inherit !important;background:transparent !important;display:inline !important;
     text-decoration:underline !important;text-decoration-thickness:.05em !important;text-underline-offset:.12em !important;}
+  /* 취소선: 글꼴 기본선은 명조 등에서 너무 얇고, 저장(html2canvas)은 1px 고정이라
+     미리보기 · 저장 모두 같은 식으로 직접 긋는다 — 두께 .05em(밑줄과 같음), 글자 상자 높이의 55% 지점(한글 가운데) */
+  #canvas s,#canvas strike,.canvas-clone s,.canvas-clone strike{text-decoration:none !important;
+    background-image:linear-gradient(currentColor,currentColor) !important;background-repeat:no-repeat !important;
+    background-size:100% var(--st-th,.05em) !important;background-position:0 55% !important;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;}
+  /* 취소선 안의 형광펜은 자기 배경이 선을 덮으니 선을 한 겹 더 얹는다 */
+  #canvas s mark.hl,#canvas strike mark.hl,.canvas-clone s mark.hl,.canvas-clone strike mark.hl{
+    background:linear-gradient(currentColor,currentColor) 0 55%/100% var(--st-th,.05em) no-repeat,var(--hl-solid,#eaeaea) !important;}
   #canvas mark.sub,.canvas-clone mark.sub{color:inherit !important;background:transparent !important;display:inline !important;font-size:var(--sub-fixed,var(--sub-size,.8em)) !important;}
   #canvas mark.sub.psub,.canvas-clone mark.sub.psub{font-size:var(--psub-size,var(--sub-size,.8em)) !important;}
   #canvas mark.gray mark.sub,.canvas-clone mark.gray mark.sub{color:inherit !important;}
@@ -1133,6 +1168,9 @@
   #canvas .g-img.al-left,.canvas-clone .g-img.al-left{text-align:left !important;}
   #canvas .g-img.al-right,.canvas-clone .g-img.al-right{text-align:right !important;}
   #canvas .g-img img,.canvas-clone .g-img img{max-width:var(--logimg-w,100%) !important;height:auto !important;border-radius:var(--logimg-radius,10px) !important;display:inline-block !important;vertical-align:top !important;}
+  /* 하단 여백을 절반만 사용하기: 하단(과 구분선)을 본문에서 떼어 아래 여백 가운데에 둔다 */
+  #canvas .g-foot,.canvas-clone .g-foot{position:absolute !important;z-index:1;transform-origin:left top;}
+  #canvas .g-foot > :first-child,.canvas-clone .g-foot > :first-child{margin-top:0 !important;}
   #canvas .g-name,.canvas-clone .g-name{display:block !important;margin-top:var(--name-gap,1.6em) !important;font-size:var(--name-size,.8em) !important;font-weight:400 !important;font-family:var(--name-font,inherit) !important;color:var(--name-color,#5a5a5a) !important;white-space:pre-wrap !important;overflow-wrap:break-word !important;}
   #canvas .g-name.al-right,.canvas-clone .g-name.al-right{text-align:right !important;}
   #canvas .g-name.al-left,.canvas-clone .g-name.al-left{text-align:left !important;}
@@ -1157,6 +1195,46 @@
   #canvas .g-bub-name.recv,.canvas-clone .g-bub-name.recv{margin-right:auto !important;margin-left:.4em !important;text-align:left !important;color:var(--bub-name-recv,#8a8a8a) !important;}
   #canvas .g-bub-name.send,.canvas-clone .g-bub-name.send{margin-left:auto !important;margin-right:.4em !important;text-align:right !important;color:var(--bub-name-send,#8a8a8a) !important;}
   #canvas .g-bub-name + .g-bub,.canvas-clone .g-bub-name + .g-bub{margin-top:.25em !important;}
+  /* ===== 라인 · 카카오톡 말풍선 (심플 위에 얹음: .bub-soft + .bub-kt) =====
+     꼬리는 말풍선 '위쪽', 프사 쪽 바깥으로 휘어진 뿔 모양.
+     모양 = 가로 .72em × 세로 .62em 사각형에서, 아래 모서리(바깥쪽)를 중심으로 한 타원을 도려낸 것.
+     저장할 땐 같은 식으로 캔버스에 직접 그린다(collectKtTails). */
+  #canvas.bub-kt .g-bub,.canvas-clone.bub-kt .g-bub{border-radius:.78em !important;}
+  #canvas.bub-kt.bub-line .g-bub,.canvas-clone.bub-kt.bub-line .g-bub{border-radius:1.05em !important;}
+  #canvas.bub-kt .g-bub.tail.recv,.canvas-clone.bub-kt .g-bub.tail.recv,#canvas.bub-kt .g-bub.tail.char-bub.left,.canvas-clone.bub-kt .g-bub.tail.char-bub.left{border-top-left-radius:.18em !important;}
+  #canvas.bub-kt .g-bub.tail.send,.canvas-clone.bub-kt .g-bub.tail.send,#canvas.bub-kt .g-bub.tail.char-bub.right,.canvas-clone.bub-kt .g-bub.tail.char-bub.right{border-top-right-radius:.18em !important;}
+  #canvas.bub-kt .g-bub.tail:not(.img-only)::before,.canvas-clone.bub-kt .g-bub.tail:not(.img-only)::before{
+    content:"" !important;position:absolute !important;top:0 !important;width:.72em !important;height:.62em !important;pointer-events:none !important;z-index:0 !important;}
+  #canvas.bub-kt .g-bub.tail.recv:not(.img-only)::before,.canvas-clone.bub-kt .g-bub.tail.recv:not(.img-only)::before,
+  #canvas.bub-kt .g-bub.tail.char-bub.left:not(.img-only)::before,.canvas-clone.bub-kt .g-bub.tail.char-bub.left:not(.img-only)::before{
+    left:-.42em !important;right:auto !important;background:radial-gradient(.72em .62em at 0 100%, transparent 99%, var(--kt-bub,#fff) 100%) !important;}
+  #canvas.bub-kt .g-bub.tail.send:not(.img-only)::before,.canvas-clone.bub-kt .g-bub.tail.send:not(.img-only)::before,
+  #canvas.bub-kt .g-bub.tail.char-bub.right:not(.img-only)::before,.canvas-clone.bub-kt .g-bub.tail.char-bub.right:not(.img-only)::before{
+    right:-.42em !important;left:auto !important;background:radial-gradient(.72em .62em at 100% 100%, transparent 99%, var(--kt-bub,#fee500) 100%) !important;}
+  #canvas.exp-nokt .g-bub::before{display:none !important;}   /* 저장 중엔 CSS 꼬리를 끄고 직접 그린다 */
+  /* 시간 · 읽음 표시 — 말풍선 바깥 아래(받는 쪽은 오른쪽, 보내는 쪽은 왼쪽) */
+  #canvas .g-bub-meta,.canvas-clone .g-bub-meta{position:absolute !important;bottom:0 !important;display:flex !important;flex-direction:column !important;
+    font-size:.6em !important;line-height:1.3 !important;white-space:nowrap !important;font-weight:400 !important;font-style:normal !important;text-decoration:none !important;text-indent:0 !important;}
+  #canvas .g-bub-meta.left,.canvas-clone .g-bub-meta.left{left:100% !important;right:auto !important;margin-left:.6em !important;align-items:flex-start !important;}
+  #canvas .g-bub-meta.right,.canvas-clone .g-bub-meta.right{right:100% !important;left:auto !important;margin-right:.6em !important;align-items:flex-end !important;}
+  #canvas .g-bub-meta .g-meta-read,.canvas-clone .g-bub-meta .g-meta-read{color:var(--read-color,#f2c200) !important;font-weight:700 !important;}
+  #canvas .g-bub-meta .g-meta-time,.canvas-clone .g-bub-meta .g-meta-time{color:var(--time-color,#6b7684) !important;}
+  /* 입력창: 꼬리 · 시간 · 읽음 미리 보기 */
+  #editor.bub-kt .g-bub{border-radius:12px;}
+  #editor.bub-kt.bub-line .g-bub{border-radius:16px;}
+  #editor.bub-kt .g-bub.tail.recv,#editor.bub-kt .g-bub.tail.char-bub.left{border-top-left-radius:3px;}
+  #editor.bub-kt .g-bub.tail.send,#editor.bub-kt .g-bub.tail.char-bub.right{border-top-right-radius:3px;}
+  #editor.bub-kt .g-bub.tail:not(.img-only)::before{content:"";position:absolute;top:0;width:.72em;height:.62em;pointer-events:none;}
+  #editor.bub-kt .g-bub.tail.recv:not(.img-only)::before,#editor.bub-kt .g-bub.tail.char-bub.left:not(.img-only)::before{left:-.42em;background:radial-gradient(.72em .62em at 0 100%, transparent 99%, var(--kt-bub,#fff) 100%);}
+  #editor.bub-kt .g-bub.tail.send:not(.img-only)::before,#editor.bub-kt .g-bub.tail.char-bub.right:not(.img-only)::before{right:-.42em;background:radial-gradient(.72em .62em at 100% 100%, transparent 99%, var(--kt-bub,#fee500) 100%);}
+  #editor.bub-kt .g-bub[data-time]::after,#editor.bub-kt .g-bub[data-read="1"]::after{position:absolute;bottom:0;font-size:.62em;line-height:1.3;white-space:pre;
+    color:var(--time-color,#6b7684);text-align:left;cursor:pointer;}   /* 눌러서 고칠 수 있게(누르면 말풍선이 받음) */
+  #editor.bub-kt .g-bub.char-bub.left::after,#editor.bub-kt .g-bub.recv::after{left:100%;margin-left:.6em;}
+  #editor.bub-kt .g-bub.char-bub.right::after,#editor.bub-kt .g-bub.send::after{right:100%;margin-right:.6em;text-align:right;}
+  #editor.bub-kt .g-bub[data-time]:not([data-read="1"])::after{content:attr(data-time);}
+  #editor.bub-kt .g-bub[data-read="1"]:not([data-read-text])::after{content:var(--read-label,"1") "\A" attr(data-time);}
+  #editor.bub-kt .g-bub[data-read="1"][data-read-text]::after{content:attr(data-read-text) "\A" attr(data-time);}
+
   #canvas .g-bub-name:first-child,.canvas-clone .g-bub-name:first-child{margin-top:0 !important;}
   #canvas .g-bub>svg.g-tail,.canvas-clone .g-bub>svg.g-tail{position:absolute !important;bottom:0 !important;z-index:0 !important;width:1.35em !important;height:.85em !important;display:block !important;overflow:visible !important;pointer-events:none !important;}
   #canvas .g-bub.recv>svg.g-tail,.canvas-clone .g-bub.recv>svg.g-tail{left:-.42em !important;}
@@ -1295,6 +1373,40 @@
     *{animation-duration:.001ms !important;transition-duration:.001ms !important;}
   }
 </style>
+<script>
+/* 글꼴에 없는 문장부호 채우기
+   일부 글꼴에는 휜 따옴표(‘ ’ “ ”)·말줄임표(… ⋯)가 없다. 그대로 두면 미리보기(브라우저)와
+   저장(캔버스)이 각자 다른 기기 글꼴로 대신 채워서 모양이 달라진다.
+   → 빠진 글자만 담은 작은 글꼴을 같은 이름에 덧붙여, 두 곳이 똑같은 모양을 쓰게 한다.
+     명조 계열은 Noto Serif CJK KR, 고딕·손글씨 계열은 Noto Sans CJK KR 에서 여섯 글자만 뽑았다(SIL OFL 1.1).
+     파일 안에 들어 있어 따로 받지 않는다. 글꼴에 원래 있는 글자는 건드리지 않도록, 빠진 글자만 범위로 지정한다. */
+(function(){
+  var SERIF='data:font/woff2;base64,d09GMk9UVE8AAAfQAA8AAAAAEGgAAAd8AAIAgwAAAAAAAAAAAAAAAAAAAAAAAAAAGYFeDYcnGyAcSAZgDggATAE2AiQDGAQGBZF2ByAXJBgOG2APUZQwUgLBzwVD750pcEQiV2U2HuWFT58QPP/8pnUfkqaE1knFmBWzrxFRoXtOZVR11yG1/K8uVQFgyvsFDtMdO4eQSWd/2zLo+0kKryUauwwdxixTh6Wok3W5MkhHIcoeraV2Jxuic4mkDcgXNkrGqPs5eJgQTwhZsY/xBAVEWyHr2NbYrksza5DbHLiJz3KRhRDnts81XhMC+GnPcZ6I0mXLbTbe6khFbLOdwpBttufSY+O9EKKT4PfdmRvJNrkIgIJGJk95yR8HqJeZxHKfj0g4UcsujWgE6+gOrdzR/jPCQVIUS+KU34rHQXwk9jwnIPSPaQoiklSVDLVQCTezUwqSiS9pQp+v/o2X5qVPMjO9DPEyFS9L9ZK1LYVmQXKBpk8xszJg4bD5lvs4xv3DfDfUw3zu/h/HZRFfdKvBP/JPvH6Fn/0GrknCovp4P30hYnjmw+unPkx0QxOMxCl585nNcDH8M0gj0vgqDvPVNDWWtCeBxqPwQFsHO3Vop/eYRbDeiTfZ7WXEjfazPolsNs2UV9U1MibK5UNxzXv3ktM8GvgUhDpO/OWNlJXJnexCc3fojycNdsf/cd5YfXfCtj+uPJkV2lQwuHiTz3unqJlVeMH7VA/F+go3FNW1Eq65XffiIxHFX7S0bPoMRdVfhP6wjLfQXBBd9J631l0ou12/6urDHVp5bxmtfl+0I882pvWa1y9z2IKFo5akgWFV5AXXeBVxoRyrU58+XfrMHpg9MGtDj8GNSxl7j19PXTnGGbY0c/6wQTMHPLCgsPX27uvjBhObt5VunWC+G1qKfDmd5t06vLANXUWa6+1x09xOfX3FqqhN3Qc18dkjxwYNHTwo2r3mauKqJ3lujyYrsbt1jBdr2YZ7P1jdQjSqSGRcimeb7+WFpsd7pc4js0MnxVufbkvocXzJvUnpgW2TfDlGTiBnlmOaOU62GTXZjCsYnPi/lZeAIhIZLGV07tmzc2ags9MzN9dx6k49nc6BwqlbBOplO200NgY23mz0ypwe5ak1aJE3d4HbdJGvMHvS3El7Jq2fFLHJuBTInePNO7Kd9muHZiWGoq0tCagisWnv5ux3UoY7+g8d6lf5NbVXoGPnOj1T5vbU76wJLF+Rs2Lk4l6LswKWiwAG6Yxx5s5wvctoAOEwAGC7S8vfOeSiXJSLclEuLreIBVxbVW/JdHRQJir1YVQ6/y6kKbPyDUxRNA6++XJfK7Dte/zWH2r3MGjDZAyGACiKch2wuYiA2h0GKIAKJHIOARI5zw8wDPwoKHaKnWG/99Yf4TDsZDvddt7d53ef3r17O8gZSsP2n6AwasD0WfHNbq3/51fVZwD3ZUMmDJ7cWZHGu7CNVrvDUFEAENCGlTwA9Rkf80IdjVB6fICs1vbwVdHHknseKDlO1/13w6pjPiCGHaiIFgnUxmxKeIu2Uoimr1Kp6v1iDap06vunfHwiH6kIStdVfgxZqCLlljjKkNHqcBXgJ11TJt/ov6koZa7e826i+cbvJwebWaaZYYkJ88izzAGkOMgIAl7jM4zEKlMcyYOKSXil2xxtJDbFG6i+fYMALUgRXEDGjhKgpKkJefZEOGWWSaYZnLdGQU1NwRqaq7O61ELKxL9cIyWrJi2nCymaQCQgIR+bbIBnv4cZmoHpZc8YF8KlrwsdQhRaLOeNl0sIJ9xRAzjAaJxDMTR5CCDu3y0gxBNBgEWyTUbiazYdISECVFlaiixDHSUpMGFY/WF82qg6A14T4iQOeAkgaDXi3S2X8GlvWAPIUzgp5HE3ioD+0x4XiyGFCuW+hiCNwwHTQxLOOELoG4kINkHPHiRFUgvvLhgqSqkqgGaAn5YtKK83QhIkRlyEobVwcBAbiYh48R5ZmgYJhL6Lfes2njrzaKez4dhZjvbeX59xpJ6E+I7W3gFQl9JUArusA8lXNKA9B1BAwE7ryYGj2hH/8UPBpWcDIB8RoWYYfeFy443XrxzLC+IV7bGNQREEZENTQVRmmJQ0CVg7Co+5ESxGe0MWJqmEwkCZf7qTf8+TUEgA2QyAU2w+wbh4HEggOooyA5qeAIldQj5LOosNk3126Vxqk0pz7FkrrKhAhbT0xNPLFOR+2tpqmizQ7sbvZ51afd/EeXq82SXj9NJZxDAku7ob5QjQsEeQJKAFYLRXkqSm/RUFgrAEKYXI8xayrXLpurex2rVJvBydqnbpMs/nSR/JRKovmqLNV4eCPM7UygY2DsIqQwA084uRjC84dpKQUhb2IUpPSxlQI1oqCZaWkWB8Wp20tXD9gCE555qh2kb2GJ5ADHDj+JSUFsDSbQyk7djB+PE9lraimo526ZjS1JRSZUsOg2uaeuCpOSGLALSZC+RxHQ0yiSwoUpQhIRIpa8yhhCIdAhMVTkwsEaFJn3zWWneU10y/qbEhvZZtIhvJjqmtHWWcFxOZQIwMXQpnqSEACdAyRgEL8RK8TBJ6y0coR8qAPW56J905Rne5yYRmzY5wepINyJEjk6GyZyoCP7DsHACEN/uKg9MlljP/lpigPoMzTcAPEldJNbsmp1MAAAA=';
+  var SANS='data:font/woff2;base64,d09GMk9UVE8AAAdoAA8AAAAAD2QAAAcUAAIBBgAAAAAAAAAAAAAAAAAAAAAAAAAAGYFeDYZZGyAcSAZgDggATAE2AiQDGAQGBZA+ByAXJBgOG1oOEdWkjVH8PIyJLF34Tp0TOb+9IvdCrGnSp9HMTlyCeGBzfw9Yoz3tya/uHDOJJneBUcSRJ5C0v3euj+Q/0OfmEy2hAiosoUvbaTnTl2RJ6FPiLhFt//9a+9XduUTjR6ItEm06Q4qU9OfdLczew/wQs/jF0IwnL0VFQqQREqXyVrXu21zZRGwQscnoeb66IASw05G2aNjKljeXV1nbDBLxVfEOvTG6Kt6xFfeuso5JQLoQtuOurRS/Ko4VAAUND6lJz0KYqgvpBBLKeJISopZeFkIjrO/SqY1rjT0VOEiCEi4bdGYS4UR2cvhkgDBQ0BREJKx6D0ULxmVHN8L0+xdNgH+dYma0GTNF95ixYnoUM041I7SEzLp6OUGPj4jXLJ7MFFq0Qo+LhZT1B9MIMDPr6XzRelozVxB2Eat/myF/N53/+JpfyHtcBvbCHUjN9jQiN4uHjA9AiLvaCpbjk5Ipu6HTEf4PUvYbXuVQXqnJqdTdztDgWgQM86ByTRiaRM0XrH6/aNcPiylJ4b8is2Bg9Fbd/V4pIn753A8P7rvyNupKrx0tXBdVb5TZ171tzardO3qs6BY3avLUKxt2nd4Z2Wu/pXjzVkYxqvK6Dgc9LlHu7ZCHRS9AlNH6wCpSt7X8d/5Vgn7M9+N9o2PBP44Kax4LOfjj9OHcvr3xQ5P2Ws20iS3cCbfNbBZfoDVhd2J9d8hD76h60nlbUs7WbkC/JxLB7Jy+H+5jNWGxgH/CB7Ov1+H1DJDLqWI78/iypHaqX8z+hrNd+3vnNDJNo6SL3pjp1N6GYdvWrtq9o/uKbnGjr4OcCtw7+oCnJVyqgzfmwrSRt3dLiO3U+wCQx8Lr3gj5iVRWvUXM2m4DjH8VtrsOf1QRR1Ckaejpt/gKB5upps4bfMNI6vVu9y0KTn45JcZ1cIr1mvOma8ucdbq+ZX53X35T9aD4oaH/3VtCUERCPO27c9f9333nzo0bBwG7b2wf5/JGeJst7EqYPiXGUn6KdY9zj2vPE13vhF6m8fCF5p5F3rKLrE0br7TddL503Zw3d5L0ct6S4RX6BoeaSe7tIWgiNndMZiO2Y5/D3YYBmz1zp06u0gOX7h+X1yHe7BfPSfPIYmp/BHASgwe5kVeyowGkDABS57KUv9Gl/FJ+Kb+UX8rfXH4myvKqekdmYgFlstIQqHL0I6Q5uaUcKC4Lm29focZkcFXSiEj9Q+2ZArSJYgACoMQpzwADKwJqTwAUQAVCUREgFI2CgBM7CooRacQa6VP/SEmBEWHEAHO9+PTiw4sXz8IQunL3n6CIdevoR81b/C76z66qHwGe7pxuA3j//OBCSqRQx6o9ARUFAAFtYvJLUD9SghLqWISusOJFbSWMEnuu5eUxJUR5ZOftoCZYgQAOUxHNAdQFgAkGdZmCP32ZSlVGO2pEZqEt15mVzJKb2SgrTZkdp6xkDpkrm5lTnGpx5qK4VpHp5NXGMz9lvnZ4K/7ktdVkk3SgICev5HshCsBRQYuDWBB441OUVENW1mmbkcH6esC3jSSy3un4rRUCFhhOAh06AzDMzSHPQYwRCjJyckqaBiYmBppMfMRHwUWE779saumaaOtZQ4IUIBwIoM+LNi6OYykvMkdT59U0JZgIUuu60BnyiHJ3NFWUVeQU9Rma4TMgAaYpwjxEUSHGFKZ2gQFCPLG4q4azDdz4inMXJELAmGZhSLO3YmiBGdGwcbejTWoC3kQYjvkCLCRFEsRFwAsQcGAfVL10yie9awJTzEEMdGWAoQNOAW9MjBLgvoABAaGIebmOCyEQiwVsVm6W5iAUqKBITbihx3nDKCxbuJ17rl5/e2Tt7os3iDrVkC+eEkK+TYC2O/EAXcvYAGTd6YjzoiNSp4djDCKMRZ11X0z8n5FWGRcv1T+KoQSilAU4TVGRUgQ06VKGxlgkV+ldl2bQ4NCAqTLcqZ2pUgIJIdtEn4xg88MVAoLgO158ACFEOvCga3ZkYJGixSc5QkK2lAvpHAdO5+bTEUqLIdzI/NxZy9LSxJwG2m/mxy5tpu5VbJrNoriYM6417zkR6QXbaIleqWlZvEraK5syqAyri7KW/OpK66OYui4QF0+GpyGgKaEEzWAzdbhbUxCA4kOOmhoTmMg05fxNTR7yZTpxaB722g/0oXOkU0SZ5UCpVJiR7ft+0LIAtJIHoA3CiH5NvaFZGppYWXaxlbQQ/pIlTY8BnIcKFBOMdAEHgC9pH1rhLtCoEUEgDQUWoYBcz1ICZQFImC6QaLFggZmC+x6huSOBi5xB2bLEFnDpGSCu4TTGc0RKSQL6DDKF5w8FDCjNqMxJ5FVVGhfki5I1KIIiK+Mp3VblbXOZOGuS7W/NlCJlFE4VyyCCJ2v/L5puAZAyRsFmZgl0/TdZR/3IfkdBFwVJac/Zi6ndAAAA';
+  var ALL='U+2018-2019,U+201C-201D,U+2026,U+22EF', DOTS='U+22EF', ELL='U+2026,U+22EF';
+  // [글꼴 이름, 굵기들, 채울 글꼴, 빠진 글자 범위]
+  var list=[
+    ['ChosunIlboMyungjo', [400], SERIF, ALL],
+    ['DreamHeumul', [400], SANS, ALL],
+    ['BookkMyungjo', [400,700], SERIF, DOTS],
+    ['Ridibatang', [400], SERIF, DOTS],
+    ['OgRenaissanceSecret', [400], SERIF, DOTS],
+    ['MaruBuri', [200,300,400,600,700], SERIF, DOTS],
+    ['Nanum Myeongjo', [400,700,800], SERIF, DOTS],
+    ['Paperozi', [400,700], SANS, DOTS],
+    ['OngleipKonkon', [400], SANS, DOTS],
+    ['OngleipYoonwoo', [400], SANS, ELL]
+  ];
+  var css='';
+  list.forEach(function(f){
+    f[1].forEach(function(w){
+      css+="@font-face{font-family:'"+f[0]+"';font-weight:"+w+";font-display:block;unicode-range:"+f[3]+";src:url("+f[2]+") format('woff2');}\n";
+    });
+  });
+  var st=document.createElement('style'); st.id='punct-fallback'; st.textContent=css;
+  document.head.appendChild(st);   // 원래 글꼴 선언보다 뒤에 둬야 빠진 글자에서 이쪽이 쓰인다
+})();
+</script>
 </head>
 <body>
 <div class="app">
@@ -1305,6 +1417,7 @@
           <button class="tab" role="tab" aria-selected="true" data-tab="content">내용</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="design">디자인</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="bubble">말풍선</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="bars">상하단바</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="layout">레이아웃</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="help">편의성</button>
         </div>
@@ -1368,6 +1481,8 @@
               <button class="fbtn" id="cb-name" type="button" title="이름 넣기/빼기">이름</button>
               <button class="fbtn" id="cb-av" type="button" title="프사 넣기/빼기">프사</button>
               <button class="fbtn" id="cb-tail" type="button" title="꼬리 켜기/끄기">꼬리</button>
+              <button class="fbtn" id="cb-time" type="button" title="시간 켜기/끄기" hidden>시간</button>
+              <button class="fbtn" id="cb-read" type="button" title="읽음 표시 켜기/끄기" hidden>1</button>
               <button class="fbtn fbtn--del" id="cb-del" type="button" title="말풍선 해제(내용은 남김)">삭제</button>
             </div>
             <div class="subtools" id="logimg-tools" hidden style="grid-template-columns:repeat(4,1fr)">
@@ -1389,6 +1504,7 @@
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
+              <p class="section__head">자동화 도구</p>
               <div class="cgrid cgrid--2">
                 <div class="cchip"><label>*색*</label><div class="cchip__box"><input id="c-star" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-star-txt" type="text" value="#8a8a8a"></div></div>
                 <div class="cchip"><label>(색)</label><div class="cchip__box"><input id="c-paren" type="color" value="#8a8a8a"><input class="cchip__hex" id="c-paren-txt" type="text" value="#8a8a8a"></div></div>
@@ -1527,7 +1643,26 @@
                 </span>
                 <input id="size-helper" type="checkbox" style="margin-left:auto">
               </label>
-              <p class="hint" style="margin-top:8px">크기 변경: 제목 · 소제목 · 하단 · (크기) · 인용선 두께<br>간격 변경: 문단 · 제목 · 하단 (말풍선 관련 간격 X)<br>버튼을 킨 상태에서 다른 크기를 직접 수정해도 돼요. 단, 본문 글자 크기를 바꾸면 다른 크기까지 영향을 받아 수정한 값까지 다시 정해져요.<br>버튼을 끄면 모든 게 켜기 전 값으로 돌아가요. 킨 상태에서 직접 수정한 값도 복구할 수 없어요. 중요한 값은 미리 메모하거나 프리셋에 저장해 주세요. 프리셋 저장 시 크기 도우미를 사용했다는 사실은 남지 않고 값만 저장돼요.</p>
+              <p class="hint" style="margin-top:8px"><button type="button" class="hint-link" data-help-jump="help-sizehelper">자세한 설명 (크기 도우미 사용 시 필독)</button></p>
+              <label class="switch" style="margin-top:16px">
+                <span class="switch__text" style="flex:1">
+                  <span class="switch__title">문단 들여쓰기 (소설 모드 추천)</span>
+                  <span class="switch__sub">문단 첫 줄을 들여써요 (인용선 · 말풍선의 내용X)</span>
+                </span>
+                <input id="para-indent" type="checkbox" style="margin-left:auto">
+              </label>
+              <div class="field" id="para-indent-row" style="margin-top:12px;display:none">
+                <span class="label">들여쓰기 크기</span>
+                <div class="seg" id="para-indent-seg">
+                  <button type="button" data-ind="0.5" aria-pressed="false">0.5글자</button>
+                  <button type="button" data-ind="1" aria-pressed="true">1글자</button>
+                  <button type="button" data-ind="1.5" aria-pressed="false">1.5글자</button>
+                  <button type="button" data-ind="2" aria-pressed="false">2글자</button>
+                  <span class="seg__thumb"></span>
+                </div>
+                <input id="indent-size" type="hidden" value="1">
+                <p class="hint" style="margin-top:10px">들여쓰기를 빼고 싶은 경우 입력의 해당 문단 앞에서 백스페이스를 누르면 돼요.</p>
+              </div>
 
             </div>
           </details>
@@ -1739,6 +1874,13 @@
                 </div>
                 <p class="hint" style="margin-top:10px">구분선 색깔은 디자인-글자 · 보조 탭에 있어요.</p>
               </div>
+              <label class="switch" style="margin-top:16px">
+                <span class="switch__text" style="flex:1">
+                  <span class="switch__title">하단 여백 절반만 사용 (소설 모드 추천)</span>
+                  <span class="switch__sub">소설은 위보다 아래 여백이 좁으니 페이지 표기용으로 마련했어요</span>
+                </span>
+                <input id="name-in-margin" type="checkbox" style="margin-left:auto">
+              </label>
           </details>
         </div>
 
@@ -1988,15 +2130,31 @@
             </summary>
             <div class="fold__body">
               <div class="field">
-                <span class="label">말풍선 모양 (오른쪽 위 ? 도움말 참고!)</span>
-                <div class="seg" id="bub-shape-seg" style="height:auto">
-                  <button type="button" data-shape="imessage" aria-pressed="true" style="padding:7px 2px;line-height:1.35">메시지</button>
-                  <button type="button" data-shape="soft" aria-pressed="false" style="padding:7px 2px;line-height:1.35">심플</button>
-                  <button type="button" data-shape="simple" aria-pressed="false" style="padding:7px 2px;line-height:1.35">네모</button>
-                  <button type="button" data-shape="plain" aria-pressed="false" style="padding:7px 2px;line-height:1.35">로그</button>
-                  <button type="button" data-shape="script" aria-pressed="false" style="padding:7px 2px;line-height:1.35">대본</button>
+                <span class="label">말풍선 모양</span>
+                <div class="seg seg--wrap" id="bub-shape-seg">
+                  <button type="button" data-shape="imessage" aria-pressed="true" style="height:32px">아이메시지</button>
+                  <button type="button" data-shape="line" aria-pressed="false" style="height:32px">라인</button>
+                  <button type="button" data-shape="kakao" aria-pressed="false" style="height:32px">카카오톡</button>
+                  <span class="seg__divider"></span>
+                  <button type="button" data-shape="soft" aria-pressed="false" style="height:32px">심플</button>
+                  <button type="button" data-shape="simple" aria-pressed="false" style="height:32px">네모</button>
+                  <button type="button" data-shape="plain" aria-pressed="false" style="height:32px">로그</button>
+                  <button type="button" data-shape="script" aria-pressed="false" style="height:32px">대본</button>
                   <span class="seg__thumb"></span>
                 </div>
+                <p class="hint" style="margin-top:8px"><button type="button" class="hint-link" data-help-jump="help-bubble">자세한 설명 (모양별 차이)</button></p>
+              </div>
+
+              <div id="kt-options" style="margin-top:16px;display:none">
+                <div class="field">
+                  <span class="label">읽음 표시 글자</span>
+                  <input class="txt-input" id="read-text" type="text" value="1" maxlength="12" placeholder="예: 1, 읽음, Read">
+                </div>
+                <div class="cgrid cgrid--2" style="margin-top:12px">
+                  <div class="cchip"><label>시간</label><div class="cchip__box"><input id="c-time" type="color" value="#6b7684"><input class="cchip__hex" id="c-time-txt" type="text" value="#6b7684"></div></div>
+                  <div class="cchip"><label>읽음 표시</label><div class="cchip__box"><input id="c-read" type="color" value="#f2c200"><input class="cchip__hex" id="c-read-txt" type="text" value="#f2c200"></div></div>
+                </div>
+                <p class="hint" style="margin-top:10px">말풍선을 누르면 뜨는 도구에서 시간 · 읽음 표시를 켜고 끌 수 있어요.<br>시간은 바로 위 말풍선의 시간을 따라가고, 입력에서 시간 · 읽음 글자를 누르면 그 말풍선만 고칠 수 있어요.</p>
               </div>
 
               <div id="script-options" style="margin-top:16px;display:none">
@@ -2068,6 +2226,19 @@
             </div>
           </details>
 
+          <div id="legacy-bub" hidden aria-hidden="true">
+            <input id="c-brecv" type="color" value="#ececec"><input id="c-brecv-txt" type="text" value="#ececec">
+            <input id="c-bsend" type="color" value="#248bf5"><input id="c-bsend-txt" type="text" value="#248bf5">
+            <input id="c-brecv-ink" type="color" value="#1a1a1a"><input id="c-brecv-ink-txt" type="text" value="#1a1a1a">
+            <input id="c-bsend-ink" type="color" value="#ffffff"><input id="c-bsend-ink-txt" type="text" value="#ffffff">
+            <input id="c-brecv-name" type="color" value="#8a8a8a"><input id="c-brecv-name-txt" type="text" value="#8a8a8a">
+            <input id="c-bsend-name" type="color" value="#8a8a8a"><input id="c-bsend-name-txt" type="text" value="#8a8a8a">
+            <div id="bub-presets"></div>
+          </div>
+        </div>
+
+        <!-- ========== 상하단바 ========== -->
+        <div class="panel" data-panel="bars" role="tabpanel">
           <details class="fold" id="fold-imsgbar">
             <summary>
               아이메시지 상하단바
@@ -2128,22 +2299,33 @@
             </div>
           </details>
 
-          <div id="legacy-bub" hidden aria-hidden="true">
-            <input id="c-brecv" type="color" value="#ececec"><input id="c-brecv-txt" type="text" value="#ececec">
-            <input id="c-bsend" type="color" value="#248bf5"><input id="c-bsend-txt" type="text" value="#248bf5">
-            <input id="c-brecv-ink" type="color" value="#1a1a1a"><input id="c-brecv-ink-txt" type="text" value="#1a1a1a">
-            <input id="c-bsend-ink" type="color" value="#ffffff"><input id="c-bsend-ink-txt" type="text" value="#ffffff">
-            <input id="c-brecv-name" type="color" value="#8a8a8a"><input id="c-brecv-name-txt" type="text" value="#8a8a8a">
-            <input id="c-bsend-name" type="color" value="#8a8a8a"><input id="c-bsend-name-txt" type="text" value="#8a8a8a">
-            <div id="bub-presets"></div>
-          </div>
+          <details class="fold" id="fold-linebar">
+            <summary>
+              라인 상하단바
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <p class="hint" style="margin:0">라인 상하단바는 준비 중이에요.</p>
+            </div>
+          </details>
+
+          <details class="fold" id="fold-kakaobar">
+            <summary>
+              카카오톡 상하단바
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <p class="hint" style="margin:0">카카오톡 상하단바는 준비 중이에요.</p>
+            </div>
+          </details>
+
         </div>
 
         <!-- ========== 레이아웃 ========== -->
         <div class="panel" data-panel="layout" role="tabpanel">
           <details class="fold" id="fold-bg">
             <summary>
-              배경 · 꾸밈
+              배경
               <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fold__body">
@@ -2193,10 +2375,18 @@
                   </div>
                 </div>
               </div>
-              <p class="section__head" style="margin-top:22px">꾸밈</p>
-              <p class="hint" style="margin:-10px 0 12px">가장자리에 사진 띠를 둘러요. 글 영역은 그만큼 좁아져요.<br>고정 비율에서도 적용할 수 있어요.</p>
+            </div>
+          </details>
+
+          <details class="fold" id="fold-frame">
+            <summary>
+              꾸밈 테두리
+              <svg class="fold__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fold__body">
+              <p class="hint" style="margin:-4px 0 12px">가장자리에 사진 띠를 둘러요. 글 영역은 그만큼 좁아져요.<br>간혹 창을 너무 오래 띄우면 사진 편집이 안 되는 경우가 있어요.<br>꾸밈 위치(왼쪽 등)을 다른 것으로 설정했다가 복귀하면 고쳐져요.</p>
               <div class="field">
-                <span class="label">위치</span>
+                <span class="label">꾸밈 위치</span>
                 <div class="seg" id="frame-pos-seg">
                   <button type="button" data-fpos="none" aria-pressed="true">없음</button>
                   <button type="button" data-fpos="left" aria-pressed="false">왼쪽</button>
@@ -2204,16 +2394,26 @@
                   <button type="button" data-fpos="top" aria-pressed="false">위</button>
                   <button type="button" data-fpos="bottom" aria-pressed="false">아래</button>
                   <button type="button" data-fpos="all" aria-pressed="false">사방</button>
-                  <button type="button" data-fpos="inner" aria-pressed="false">안쪽</button>
                   <span class="seg__thumb"></span>
                 </div>
               </div>
               <div id="frame-opts" hidden>
                 <input id="frame-file" type="file" accept="image/*" hidden>
+                <input id="frame-lib-file" type="file" accept="image/*" hidden>
                 <div class="mini-row" style="justify-content:flex-start;margin-top:12px">
                   <button class="mini" id="frame-pick" type="button">🖼 사진 선택</button>
                 </div>
-                <p class="hint" style="margin:10px 0 0">사진을 직접 드래그하여 위치를, 가장자리를 드래그하여 두께를 조절해요.<br>마우스 휠 또는 두 손가락 핀치로 확대할 수 있어요.</p>
+                <span class="label" style="display:block;margin-top:14px">꾸밈 사진 저장소</span>
+                <p class="hint" style="margin:0 0 6px">자주 쓰는 사진을 저장해 두고 원터치로 불러와요. (최대 10장)</p>
+                <div class="frame-lib" id="frame-lib"></div>
+                <button class="btn btn--ghost" id="frame-lib-add" type="button" style="height:34px;font-size:12px;width:100%;margin-top:6px">＋ 사진 추가</button>
+                <label class="switch" style="margin-top:14px">
+                  <span class="switch__text" style="flex:1">
+                    <span class="switch__title">여백 맞추기</span>
+                    <span class="switch__sub">사진의 두께를 크기 · 비율의 여백 값과 통일해요</span>
+                  </span>
+                  <input id="frame-pad-sync" type="checkbox" style="margin-left:auto">
+                </label>
                 <!-- 상태 저장용 hidden inputs -->
                 <input id="frame-size" type="hidden" value="20">
                 <input id="frame-zoom" type="hidden" value="100">
@@ -2298,7 +2498,7 @@
 
           <div class="section" style="margin-top:20px">
             <p class="section__head">내 프리셋</p>
-            <p class="hint" style="margin:0 0 12px">지금의 설정을 저장해 두고 언제든 다시 불러올 수 있어요.<br>단, 사진 배경은 프리셋에 저장되지 않아요.</p>
+            <p class="hint" style="margin:0 0 12px">지금의 설정을 저장해 두고 언제든 다시 불러올 수 있어요.<br>사진 배경과 꾸밈 사진은 프리셋에 저장되지 않아요.<br>인물은 모든 프리셋이 공유하되, 프리셋마다 자물쇠 상태가 따로 저장돼요.</p>
             <div class="mychips" id="my-presets"></div>
             <button class="btn btn--ghost" id="preset-save" type="button" style="height:40px;font-size:12.5px;width:100%">＋ 현재 설정 저장</button>
             <div class="grid-2" style="margin-top:8px">
@@ -2317,6 +2517,7 @@
               <button class="btn btn--ghost" id="reset-replace" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">텍스트 대치 초기화</button>
               <button class="btn btn--ghost" id="reset-snapshot" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">이어서 편집하기 초기화</button>
               <button class="btn btn--ghost" id="reset-mypreset" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">내 프리셋 초기화</button>
+              <button class="btn btn--ghost" id="reset-framelib" type="button" style="height:40px;font-size:12px;color:var(--danger,#d9534f)">꾸밈 사진 저장소 초기화</button>
             </div>
           </div>
         </div>
@@ -2362,31 +2563,37 @@
 <div class="sheet-overlay" id="notice-overlay" hidden>
   <div class="sheet help-sheet" role="dialog" aria-modal="true" aria-label="업데이트 안내">
     <div class="sheet__grip"></div>
-    <div class="sheet__title">업데이트 안내</div>
+    <div class="sheet__title">업데이트!</div>
     <div class="help-body">
-      <p class="help-cat">UI 개선 예정</p>
-      <p class="hint">· 기능을 추가하느라 UI가 많이 더러워요.<br>· 곧 개선할 테니 양해 부탁드려요...</p>
+      <p class="help-cat">소설 모드</p>
+      <p class="hint">· 고정 비율일 때 <b>소설 모드</b> 버튼이 나타나요. 긴 본문을 소설 형식처럼 내용이 잘리지 않는 선에서 최대 4페이지로 배분해요.<br>· 사용 시 시작점 맞추기도 함께 켜지며, 모드를 끄면 모든 페이지가 다시 한 페이지로 합쳐져요. 모드를 끌 경우 2페이지 이후 따로 작성한 제목 · 하단은 지워져요.</p>
 
-      <p class="help-cat">멀티페이지</p>
-      <p class="hint">· <b>페이지</b> 기능이 추가됐어요. 프리뷰 바에서 ＋를 눌러 최대 4개까지 만들 수 있어요.<br>· 제목 · 소제목 · 하단은 기본적으로 모든 페이지가 공유해요. 편집하는 순간 해당 페이지만 분리되고, 뱃지를 눌러 되돌릴 수 있어요.<br>· 페이지 삭제는 탭을 길게 누르면 돼요.</p>
+      <p class="help-cat">문단 들여쓰기</p>
+      <p class="hint">· 내용-본문에 <b>문단 들여쓰기</b>가 추가됐어요. 0.5 · 1 · 1.5 · 2글자 중에서 고를 수 있어요.<br>· 입력에서도 들여쓴 자리가 보이며, 들여쓰기를 빼고 싶은 경우 입력의 해당 문단 앞에서 백스페이스를 누르면 돼요.</p>
 
-      <p class="help-cat">열 나누기</p>
-      <p class="hint">· 페이지 2개 이상일 때 <b>열 나누기</b> 버튼이 나타나요.<br>· 누를 때마다 단일 → 2열 → 3열 → 4열로 순환해요.<br>· 제목과 하단은 전체 너비로 한 번만, 본문만 열로 나뉘어요.<br>· 2열 + 4페이지 = 자동으로 2×2 배치.</p>
+      <p class="help-cat">하단 여백 절반만 사용</p>
+      <p class="hint">· 내용-하단에 <b>하단 여백 절반만 사용</b>이 추가됐어요. 켜면 레이아웃-크기 · 비율에서 지정한 여백의 절반 값만 하단에 사용해요.<br>· 소설 내지 특성상 위 여백보다 아래 여백이 좁은 점을 고려하여 마련했어요.</p>
 
       <p class="help-cat">시작점 맞추기</p>
-      <p class="hint">· 고정 비율 + 단일 모드에서 <b>시작점 맞추기</b> 버튼이 나타나요.<br>· 켜면 가장 긴 페이지 기준으로 모든 페이지의 콘텐츠 시작 위치가 통일돼요.</p>
+      <p class="hint">· 시작점 맞추기를 켜면 <b>하단</b>도 모든 페이지에서 같은 높이에 맞춰져요.</p>
 
-      <p class="help-cat">전체 내보내기</p>
-      <p class="hint">· 단일 모드에서 페이지가 2개 이상이면 저장 시 전체 / 현재 페이지를 선택할 수 있어요.<br>· 전체 저장 시 로그_1.png, 로그_2.png 식으로 순차 다운로드돼요.</p>
+      <p class="help-cat">글꼴</p>
+      <p class="hint">· 조선일보명조체 · 드림흐물체처럼 휜 따옴표(‘ ’ “ ”)나 말줄임표(… ⋯)가 없는 글꼴에서 미리보기와 저장한 이미지의 모양이 다르게 나오던 문제를 고쳤어요.</p>
 
-      <p class="help-cat">구분선</p>
-      <p class="hint">· 본문 구분선과 제목 · 하단 구분선의 <b>두께</b>를 각각 조절할 수 있어요.<br>· 내용 탭 → 자동화 도구 · 인용선 · 구분선 · 사진에서 설정해요.</p>
+      <p class="help-cat">꾸밈 테두리</p>
+      <p class="hint">· 프리뷰에서 직접 사진의 <b>위치 · 확대 · 두께</b>를 조절할 수 있도록 바뀌었어요.<br>· 꾸밈 사진 저장소의 사진들은 각각 확대 · 위치를 따로 지녀요. 예를 들어 사진1에서 사진2로 넘어가 조정하더라도, 다시 사진1을 클릭하면 사진2의 값이 아니라 마지막으로 조정한 사진1의 값으로 떠요.<br>· <b>여백 맞추기</b> 토글이 추가됐어요. 켜면 사진 두께가 크기 · 비율의 여백 값과 자동으로 통일돼요.</p>
 
-      <p class="help-cat">대본 이름 균등 배분</p>
-      <p class="hint">· 대본 모드에서 간격 맞추기를 켜면 <b>이름 균등 배분</b> 옵션이 나타나요.<br>· 짧은 이름의 글자를 가장 긴 이름 너비에 맞춰 양쪽 끝으로 벌려요.</p>
+      <p class="help-cat">프리셋</p>
+      <p class="hint">· 프리셋마다 인물의 <b>자물쇠 상태</b>가 따로 저장돼요.</p>
 
-      <p class="help-cat">고정 비율</p>
-      <p class="hint">· 비율 선택이 세로형 · 가로형 <b>두 줄</b>로 나뉘었어요.<br>· 가로형에 2:1 · 5:4 · 4:3 · 3:2가 새로 추가됐어요.</p>
+      <p class="help-cat">따옴표 넣기</p>
+      <p class="hint">· "넣" 도구가 이제 휜 따옴표(“ ”)를 넣어요. 휜 따옴표는 양 끝의 모양이 다르고, 곧은 따옴표는 전부 같아서 곧은 따옴표 → 휜 따옴표를 대치하는 게 어려워 내린 판단이에요. 휜 따옴표 → 곧은 따옴표는 편의성의 대치 기능을 이용해 주세요.</p>
+
+      <p class="help-cat">도움말</p>
+      <p class="hint">· 인용선 여백 · 말풍선 여백 다이어그램이 더 알아보기 쉽게 개선됐어요.<br>· 꾸밈 테두리 조작법이 도움말에 추가됐어요.<br>· 버튼 아래 긴 설명들을 도움말로 옮겼어요. 크기 도우미 · 말풍선 모양 아래의 <b>➔ 자세한 설명</b>을 누르면 도움말의 해당 부분으로 바로 넘어가요.<br>· 소설 모드 · 문단 들여쓰기 설명이 추가됐어요.</p>
+
+      <p class="help-cat">기타</p>
+      <p class="hint">· 오류 제보 · 기능 추가 · 개선 문의 등은 언제나 환영이에요!<br>· 부탁 받은 사항은 늦더라도 전부 반영해드려요.</p>
     </div>
     <div class="notice-btns">
       <button class="sheet__cancel" id="notice-never" type="button">다시 보지 않기</button>
@@ -2403,7 +2610,7 @@
       <p class="help-cat">자동화 도구</p>
       <p class="hint">· <b>*색*</b>: *영역*을 *색*의 색깔로 변경해요.<br><br>· <b>(색)</b>: (영역)을 (색)의 색깔로 변경해요. 말풍선 안의 (영역)은 각 인물별로 지정된 (색)을 사용해요.<br>· <b>(휨)</b>: (영역)을 이탤릭으로 변경해요.<br>· <b>(크기)</b>: (영역)의 글자 크기를 변환해요. 어떤 크기로 변환할지는 내용-자동화 도구에서 설정하며, 값을 바꾸면 이미 적용한 것도 함께 반영돼요.<br><br>· <b>&quot;넣&quot;</b>: 문단 앞뒤에 &quot; &quot;를 넣어요. 문단이 별표·괄호·따옴표로 시작하거나 끝나면 건너뛰어요.<br>· <b>&quot;색&quot;</b>: &quot;영역&quot;을 강조색으로 변경해요. 강조색 1~6 중에서 고를 수 있으며, 적용 후에는 일반적인 강조색과 똑같이 조정돼요.<br>· <b>&quot;인&quot;</b>: &quot;영역&quot;을 인용선으로 변경해요. 바로 아래 줄에 (영역)·*(영역)*이 있으면 하나의 인용선에 같이 들어가요. 인용선 1~6 중에서 고를 수 있으며, 적용 후에는 일반적인 인용선과 똑같이 조정돼요.<br>· <b>&quot;말&quot;</b>: &quot;영역&quot;을 말풍선으로 변경해요. 바로 아래 줄에 (영역)·*(영역)*이 있으면 하나의 말풍선에 같이 들어가요.<br><br><b>TIP!</b><br>· *색*과 (색)에 사용되는 색깔은 내용-자동화 도구에서 설정해요.<br>· 말풍선 안의 (색)에 사용되는 색깔은 말풍선-인물에서 인물별로 변경돼요.<br>· 프리셋-텍스트 대치에서 특정 글자를 다른 글자로 변환 · 삭제할 수 있어요.</p>
       <p class="help-cat">서식</p>
-      <p class="hint">· <b>서식 종류</b>: 볼드, 이탤릭, 밑줄, 취소선, 형광펜, 강조색, 개별 크기, 삽입.<br><br>· <b>형광펜 · 강조색 · 인용선</b>: 적용된 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br><br>· <b>개별 크기</b>: 드래그한 부분만 크기를 따로 적용해요. 본문보다 작게도, 크게도 만들 수 있어요. 나중에 값을 변경해도 이전 것은 적용 당시 크기를 그대로 유지해요. 이전 것까지 바꾸고 싶다면 해당 영역을 다시 적용해 주세요.<br>· <b>글자 크기 불러오기</b>: 입력이나 미리보기의 글자를 누르면 해당 글자의 크기를 그대로 가져와요. 일반 본문 · 제목 · 하단을 눌러도 돼요.<br><br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br><br><b>TIP!</b><br>· 강조색 · 형광펜 · 인용선을 삭제하거나 슬롯(색)을 변경하고 싶을 경우, 칠해진 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· 개별 글자를 되돌리거나 값을 변경하고 싶을 경우, 해당 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.<br>· 인용선 여백은 인용선의 위아래를 항상 감싸는 여백이에요.<br>
+      <p class="hint">· <b>서식 종류</b>: 볼드, 이탤릭, 밑줄, 취소선, 형광펜, 강조색, 개별 크기, 삽입.<br><br>· <b>형광펜 · 강조색 · 인용선</b>: 적용된 뒤에도 각각 고유한 값을 가져요. 형광펜 1을 칠했다면, 나중에 형광펜 1의 색을 변경해도 이전 것이 반영돼요.<br><br>· <b>개별 크기</b>: 드래그한 부분만 크기를 따로 적용해요. 본문보다 작게도, 크게도 만들 수 있어요. 나중에 값을 변경해도 이전 것은 적용 당시 크기를 그대로 유지해요. 이전 것까지 바꾸고 싶다면 해당 영역을 다시 적용해 주세요.<br>· <b>글자 크기 불러오기</b>: 입력이나 미리보기의 글자를 누르면 해당 글자의 크기를 그대로 가져와요. 일반 본문 · 제목 · 하단을 눌러도 돼요.<br><br>· <b>구분선 삭제</b>: 백스페이스 또는 입력에서 직접 클릭 후 삭제할 수 있어요.<br>· <b>사진 정렬</b>: 삽입 후에도 사진을 클릭해서 조정할 수 있어요.<br>· <b>문단 들여쓰기</b>: 내용-본문에서 켜요. 인용선 · 말풍선 안을 뺀 모든 문단의 첫 줄을 0.5~2글자만큼 들여써요. 빼고 싶은 문단은 입력에서 문단 맨 앞에 커서를 두고 백스페이스를 누르면 빠지고, 버튼을 껐다 켜면 모두 다시 들여써요. 입력에서도 들여쓴 자리가 보여요.<br><br><b>TIP!</b><br>· 강조색 · 형광펜 · 인용선을 삭제하거나 슬롯(색)을 변경하고 싶을 경우, 칠해진 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· 개별 글자를 되돌리거나 값을 변경하고 싶을 경우, 해당 영역을 드래그하는 대신 커서만 둬도 전체에 반영돼요.<br>· ＋로 넣는 사진은 본문에 바로 들어가는 사진이에요. 말풍선처럼 사진을 넣고 싶다면 말풍선 삽입의 인물을 클릭하여 사진을 선택해 주세요.<br>· 인용선 여백은 인용선의 위아래를 항상 감싸는 여백이에요.<br>
 <svg viewBox="0 0 360 100" width="100%" style="display:block;margin:8px auto 2px;max-width:500px" fill="none" xmlns="http://www.w3.org/2000/svg">
 <text x="55" y="10" font-size="8" fill="#888" text-anchor="middle">여백 0 설정</text>
 <text x="155" y="10" font-size="8" fill="#888" text-anchor="middle">여백 있음</text>
@@ -2413,34 +2620,37 @@
 <rect x="29" y="29" width="61" height="20" rx="2" fill="#f7f7f7"/><text x="59" y="42" font-size="7" fill="#555" text-anchor="middle">인용 내용</text>
 <rect x="20" y="49" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="55" y="58" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
 <rect x="120" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
-<line x1="120" y1="33" x2="190" y2="33" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="120" y="29" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="194" y="36" font-size="5" fill="#e06050">인용선 여백</text>
 <rect x="124" y="37" width="2" height="20" rx="1" fill="#999"/>
 <rect x="129" y="37" width="61" height="20" rx="2" fill="#f7f7f7"/><text x="159" y="50" font-size="7" fill="#555" text-anchor="middle">인용 내용</text>
-<line x1="120" y1="61" x2="190" y2="61" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="120" y="57" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="194" y="64" font-size="5" fill="#e06050">인용선 여백</text>
 <rect x="120" y="65" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="74" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
 <rect x="232" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
-<line x1="232" y1="33" x2="302" y2="33" stroke="#5090d0" stroke-dasharray="2 2"/>
+<rect x="232" y="29" width="70" height="8" rx="1" fill="#5090d0" opacity="0.2"/>
 <text x="306" y="36" font-size="5" fill="#5090d0">문단 간격</text>
-<line x1="232" y1="41" x2="302" y2="41" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="232" y="37" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="306" y="44" font-size="5" fill="#e06050">인용선 여백</text>
 <rect x="236" y="45" width="2" height="20" rx="1" fill="#999"/>
 <rect x="241" y="45" width="61" height="20" rx="2" fill="#f7f7f7"/><text x="271" y="58" font-size="7" fill="#555" text-anchor="middle">인용 내용</text>
-<line x1="232" y1="69" x2="302" y2="69" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="232" y="65" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="306" y="72" font-size="5" fill="#e06050">인용선 여백</text>
-<line x1="232" y1="77" x2="302" y2="77" stroke="#5090d0" stroke-dasharray="2 2"/>
+<rect x="232" y="73" width="70" height="11" rx="1" fill="#5090d0" opacity="0.2"/>
 <text x="306" y="80" font-size="5" fill="#5090d0">문단 간격</text>
 <rect x="232" y="84" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="93" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
 </svg>
 </p>
-      <p class="help-cat">말풍선</p>
+      <p class="help-cat" id="help-sizehelper">크기 도우미</p>
+      <p class="hint">· <b>크기 변경</b>: 제목 · 소제목 · 하단 · (크기) · 인용선 두께<br>· <b>간격 변경</b>: 문단 · 제목 · 하단 (말풍선 관련 간격 X)<br>· 버튼을 킨 상태에서 다른 크기를 직접 수정해도 돼요. 단, 본문 글자 크기를 바꾸면 다른 크기까지 영향을 받아 수정한 값까지 다시 정해져요.<br>· 버튼을 끄면 모든 게 켜기 전 값으로 돌아가요. 킨 상태에서 직접 수정한 값도 복구할 수 없어요. 중요한 값은 미리 메모하거나 프리셋에 저장해 주세요.<br>· 프리셋 저장 시 크기 도우미를 사용했다는 사실은 남지 않고 값만 저장돼요.</p>
+      <p class="help-cat" id="help-bubble">말풍선</p>
       <table class="help-tbl">
-        <tr><th></th><th>메시지</th><th>심플</th><th>네모</th><th>로그</th><th>대본</th></tr>
-        <tr><td>꼬리</td><td>O</td><td>O</td><td>X</td><td>X</td><td>X</td></tr>
-        <tr><td>프사</td><td>O</td><td>O</td><td>O</td><td>O</td><td>X</td></tr>
-        <tr><td>배경</td><td>O</td><td>O</td><td>O</td><td>X</td><td>X</td></tr>
-        <tr><td>이름</td><td>위</td><td>위</td><td>위</td><td>위</td><td>옆</td></tr>
+        <tr><th></th><th>아이<br>메시지</th><th>라인</th><th>카카오톡</th><th>심플</th><th>네모</th><th>로그</th><th>대본</th></tr>
+        <tr><td>꼬리</td><td>O</td><td>O</td><td>O</td><td>O</td><td>X</td><td>X</td><td>X</td></tr>
+        <tr><td>프사</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>X</td></tr>
+        <tr><td>배경</td><td>O</td><td>O</td><td>O</td><td>O</td><td>O</td><td>X</td><td>X</td></tr>
+        <tr><td>이름</td><td>위</td><td>위</td><td>위</td><td>위</td><td>위</td><td>위</td><td>옆</td></tr>
+        <tr><td>시간 · 읽음</td><td>X</td><td>O</td><td>O</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
       </table>
       <p class="hint" style="margin-top:18px">· <b>말풍선 삭제</b>: 백스페이스 또는 클릭 시 나타나는 버튼으로 삭제할 수 있어요. 삭제 버튼을 사용할 경우 말풍선 안 내용은 그대로 유지돼요.<br>· <b>말풍선 이름</b>: 말풍선 이름은 입력에서 조정 가능한 텍스트가 아니에요. 이름을 바꾸고 싶다면 말풍선-인물에서 변경해 주세요.<br>· <b>말풍선 내 줄바꿈</b>: 맨 앞·맨 뒤에서 이루어지는 엔터는 말풍선 밖으로 이동해요. 맨 뒤에서 줄바꿈을 하고 싶다면 Shift+Enter를 사용해 주세요. 모바일은 호환이 되지 않아 모든 글을 입력한 후 앞으로 이동하여 엔터를 눌러주세요.<br><br>· <b>말풍선 ↔ 말풍선 간격</b>: 서로 다른 말풍선끼리의 간격이에요. 빈 문단은 본문으로 인식되어서, 말풍선과 말풍선 사이에 빈 문단이 있다면 각 말풍선 기준 말풍선 여백이 적용돼요.<br>· <b>연속 말풍선 간격</b>: 같은 인물, 같은 방향, 중간에 빈 문단이 없는 말풍선들을 연속 말풍선으로 처리해요. 이때 연속 말풍선끼리의 간격이에요.<br><br><b>TIP!</b><br>· 말풍선 여백은 말풍선의 위아래를 감싸는 여백이에요. 말풍선 앞뒤로 빈 문단 · 일반 글이 있을 때 적용돼요.<br>
 <svg viewBox="0 0 360 100" width="100%" style="display:block;margin:8px auto 2px;max-width:500px" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -2451,26 +2661,28 @@
 <rect x="20" y="29" width="52" height="18" rx="8" fill="#e5e5ea"/><text x="46" y="41" font-size="7" fill="#555" text-anchor="middle">말풍선</text>
 <rect x="20" y="47" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="55" y="56" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
 <rect x="120" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
-<line x1="120" y1="33" x2="190" y2="33" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="120" y="29" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="194" y="36" font-size="5" fill="#e06050">말풍선 여백</text>
 <rect x="120" y="37" width="52" height="18" rx="8" fill="#e5e5ea"/><text x="146" y="49" font-size="7" fill="#555" text-anchor="middle">말풍선</text>
-<line x1="120" y1="59" x2="190" y2="59" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="120" y="55" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="194" y="62" font-size="5" fill="#e06050">말풍선 여백</text>
 <rect x="120" y="63" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="155" y="72" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
 <rect x="232" y="16" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="25" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
-<line x1="232" y1="33" x2="302" y2="33" stroke="#5090d0" stroke-dasharray="2 2"/>
+<rect x="232" y="29" width="70" height="8" rx="1" fill="#5090d0" opacity="0.2"/>
 <text x="306" y="36" font-size="5" fill="#5090d0">문단 간격</text>
-<line x1="232" y1="41" x2="302" y2="41" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="232" y="37" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="306" y="44" font-size="5" fill="#e06050">말풍선 여백</text>
 <rect x="232" y="45" width="52" height="18" rx="8" fill="#e5e5ea"/><text x="258" y="57" font-size="7" fill="#555" text-anchor="middle">말풍선</text>
-<line x1="232" y1="67" x2="302" y2="67" stroke="#e06050" stroke-dasharray="2 2"/>
+<rect x="232" y="63" width="70" height="8" rx="1" fill="#e06050" opacity="0.2"/>
 <text x="306" y="70" font-size="5" fill="#e06050">말풍선 여백</text>
-<line x1="232" y1="75" x2="302" y2="75" stroke="#5090d0" stroke-dasharray="2 2"/>
+<rect x="232" y="71" width="70" height="11" rx="1" fill="#5090d0" opacity="0.2"/>
 <text x="306" y="78" font-size="5" fill="#5090d0">문단 간격</text>
 <rect x="232" y="82" width="70" height="13" rx="2" fill="#f0f0f0"/><text x="267" y="91" font-size="7" fill="#555" text-anchor="middle">본문 텍스트</text>
 </svg>
+      <p class="help-cat">꾸밈 테두리</p>
+      <p class="hint">· <b>PC:</b> 프리뷰 속 사진을 드래그하면 위치를, 테두리를 드래그하면 두께를, 마우스 휠로 확대를 조절할 수 있어요.<br>· <b>모바일:</b> 프리뷰 속 사진을 터치하면 조정 모드로 전환되며, 사진 밖을 터치하면 편집창이 돌아와요. 드래그로 위치를, 테두리 드래그로 두께를, 두 손가락 핀치로 확대를 조절할 수 있어요.</p>
       <p class="help-cat">멀티페이지</p>
-      <p class="hint">· <b>＋</b>를 눌러 최대 4개까지 페이지를 만들 수 있어요.<br>· 페이지는 후술될 기능을 사용하거나 각각 편집하여 따로 저장할 수 있어요.<br>· 제목 · 소제목 · 하단의 내용은 첫 번째 페이지를 기준으로 공유돼요. 페이지별 내용을 따로 편집하는 순간 해당 페이지만 분리되고, 뱃지(이 페이지만)를 눌러 다시 페이지들에 공유할 수 있어요.<br>· 페이지 삭제는 탭을 길게 누르면 돼요.<br><br>· <b>열 나누기</b>: 페이지가 2개 이상일 때 <b>열 나누기</b> 버튼이 나타나요. 누를 때마다 열 나누기(1열) → 2열 → 3열 → 4열로 순환해요. 최대 열은 페이지 수에 비례해요.<br>· <b>시작점 맞추기</b>: 고정 비율 + 열 나누기(1열)일 때 <b>시작점 맞추기</b> 버튼이 나타나요. 내용이 가장 긴 페이지 기준으로 모든 페이지의 시작 위치가 통일돼요.<br>
+      <p class="hint">· <b>＋</b>를 눌러 최대 4개까지 페이지를 만들 수 있어요.<br>· 페이지는 후술될 기능을 사용하거나 각각 편집하여 따로 저장할 수 있어요.<br>· 제목 · 소제목 · 하단의 내용은 첫 번째 페이지를 기준으로 공유돼요. 페이지별 내용을 따로 편집하는 순간 해당 페이지만 분리되고, 뱃지(이 페이지만)를 눌러 다시 페이지들에 공유할 수 있어요.<br>· 페이지 삭제는 탭을 길게 누르면 돼요.<br><br>· <b>열 나누기</b>: 페이지가 2개 이상일 때 <b>열 나누기</b> 버튼이 나타나요. 누를 때마다 열 나누기(1열) → 2열 → 3열 → 4열로 순환해요. 최대 열은 페이지 수에 비례해요.<br>· <b>시작점 맞추기</b>: 고정 비율 + 열 나누기(1열)일 때 <b>시작점 맞추기</b> 버튼이 나타나요. 내용이 가장 긴 페이지 기준으로 모든 페이지의 시작 위치가 통일돼요. 하단도 모든 페이지에서 같은 높이에 맞춰져요.<br>· <b>소설 모드</b>: 고정 비율일 때 나타나요. 긴 본문을 소설 형식처럼 내용이 잘리지 않는 선에서 다른 페이지로 배분해요. 사용 시 시작점 맞추기도 함께 켜지며, 모드를 끄면 모든 페이지가 다시 한 페이지로 합쳐져요.<br>
 <svg viewBox="0 0 360 105" width="100%" style="display:block;margin:8px auto 2px;max-width:500px" fill="none" xmlns="http://www.w3.org/2000/svg">
 <text x="90" y="10" font-size="8" fill="#888" text-anchor="middle">시작점 맞추기 OFF</text>
 <text x="270" y="10" font-size="8" fill="#888" text-anchor="middle">시작점 맞추기 ON</text>
@@ -2563,6 +2775,8 @@
   var sharedName = '';
   var gridCols = 0; // 0=단일(현재 페이지만), 2=2열, 3=3열, 4=4열
   var alignPages = false; // 고정 비율에서 페이지 간 시작점 맞추기
+  var novelMode = false;  // 소설 모드: 본문을 잘리지 않게 여러 페이지로 흘려 나눈 상태
+  var _measuring = false; // 페이지 측정 중(측정용 렌더에서 여백 보정·하단 밀기가 끼어들지 않게)
 
   /* 형광펜·강조색: 슬롯 1/2/3 (슬롯1은 기존 c-hl / c-em 을 그대로 사용) */
   var hlSlot = 1, emSlot = 1, quoteSlot = 1;
@@ -2863,9 +3077,14 @@
       render();
     });
   });
+  function isKtShape(){ return bubbleShape==='line' || bubbleShape==='kakao'; }
   function applyBubbleShape(){
     var simple = bubbleShape==='simple';
-    var soft = bubbleShape==='soft';
+    var kt = isKtShape();
+    var soft = bubbleShape==='soft' || kt;   // 라인 · 카카오톡은 심플(둥근 말풍선) 위에 꼬리 · 시간을 얹은 모양
+    editor.classList.toggle('bub-kt', kt); canvas.classList.toggle('bub-kt', kt);
+    editor.classList.toggle('bub-line', bubbleShape==='line'); canvas.classList.toggle('bub-line', bubbleShape==='line');
+    editor.classList.toggle('bub-kakao', bubbleShape==='kakao'); canvas.classList.toggle('bub-kakao', bubbleShape==='kakao');
     var plain = bubbleShape==='plain';
     var script = bubbleShape==='script';
     editor.classList.toggle('bub-simple', simple);
@@ -2884,12 +3103,18 @@
     });
     moveThumb($('bub-shape-seg'));
   }
-  function setBubbleShape(shape){ bubbleShape=shape; applyBubbleShape(); syncShapeSeg(); updateScriptOptions(); render(); updateFormatButtons(); }
+  function setBubbleShape(shape){
+    bubbleShape=shape;
+    // 읽음 표시 글자: 손대지 않은 기본값이면 모양에 맞게 바꿔 준다(카카오톡 1 / 라인 읽음)
+    var rt=$('read-text');
+    if(rt){ var v=rt.value.trim(); if(shape==='line' && (v==='' || v==='1')) rt.value='읽음'; else if(shape==='kakao' && (v==='' || v==='읽음')) rt.value='1'; }
+    applyBubbleShape(); syncShapeSeg(); updateScriptOptions(); render(); updateFormatButtons();
+  }
   /* ── 멀티페이지: 탭 렌더·전환·추가·삭제 ── */
   function flushPage(){
     // 현재 에디터 내용을 pages 배열에 저장
     if(!pages[pageIdx]) return;
-    pages[pageIdx].body = editor.innerHTML;
+    pages[pageIdx].body = stripIndVis(editor.innerHTML);
     // 제목·소제목·하단: 분리 상태면 현재 에디터 값 저장
     if(pages[pageIdx].title != null) pages[pageIdx].title = $('title-ed') ? $('title-ed').innerHTML : '';
     if(pages[pageIdx].subtitle != null) pages[pageIdx].subtitle = $('subtitle-ed') ? $('subtitle-ed').innerHTML : '';
@@ -2899,7 +3124,7 @@
   function renderPageTabs(){
     var bar = $('page-bar');
     if(!bar) return;
-    var state = pages.length + '|' + pageIdx + '|' + gridCols + '|' + alignPages + '|' + sizeMode;
+    var state = pages.length + '|' + pageIdx + '|' + gridCols + '|' + alignPages + '|' + sizeMode + '|' + novelMode;
     if(state === _lastTabState) return;
     _lastTabState = state;
     bar.innerHTML = '';
@@ -2953,8 +3178,16 @@
       });
       bar.appendChild(gt);
 
-      // 시작점 맞추기 토글 (단일 모드 + 고정 비율일 때)
-      if(gridCols === 0 && sizeMode === 'ratio'){
+    }
+    // 고정 비율 + 열 나누기 아닐 때: 시작점 맞추기 · 소설 모드
+    if(sizeMode === 'ratio' && gridCols === 0){
+      if(pages.length <= 1){
+        var sep2 = document.createElement('span');
+        sep2.style.cssText = 'width:1px;height:14px;background:var(--line);margin:0 4px;flex:none;';
+        bar.appendChild(sep2);
+      }
+      // 시작점 맞추기 — 페이지가 여럿일 때만(한 페이지면 맞출 대상이 없음)
+      if(pages.length > 1){
         var al = document.createElement('button');
         al.className = 'page-tab' + (alignPages ? ' active' : '');
         al.type = 'button';
@@ -2962,12 +3195,20 @@
         al.title = '페이지 시작점 맞추기';
         al.addEventListener('click', function(){
           alignPages = !alignPages;
-          if(alignPages) measureAllPages();
-          else pages.forEach(function(p){ delete p._contentH; });
+          if(alignPages){ syncSharedFromEds(); measureAllPages(); }
+          else pages.forEach(function(p){ delete p._contentH; delete p._nameTop; });
           renderPageTabs(); render(); scheduleSave();
         });
         bar.appendChild(al);
       }
+      // 소설 모드 — 긴 본문을 잘리지 않게 최대 4페이지로 나눈다
+      var nv = document.createElement('button');
+      nv.className = 'page-tab' + (novelMode ? ' active' : '');
+      nv.type = 'button';
+      nv.textContent = '소설 모드';
+      nv.title = novelMode ? '끄면 모든 페이지를 한 페이지로 합쳐요' : '본문을 잘리지 않게 최대 4페이지로 나눠요';
+      nv.addEventListener('click', function(){ toggleNovelMode(); });
+      bar.appendChild(nv);
     }
   }
   function switchPage(newIdx){
@@ -3081,6 +3322,7 @@
   /* 대본 모드 전용 옵션 표시/숨김 */
   function updateScriptOptions(){
     var opt=$('script-options'); if(opt) opt.style.display = (bubbleShape==='script')?'':'none';
+    var kto=$('kt-options'); if(kto) kto.style.display = isKtShape()?'':'none';
   }
   /* 간격 맞추기: 가장 긴 이름의 너비를 측정해 CSS 변수로 세팅 */
   function applyScriptAlign(){
@@ -3178,6 +3420,9 @@
   linkColor('c-bar-avatar','c-bar-avatar-txt',false,false);
   linkColor('c-bar-plus','c-bar-plus-txt',false,false);
   linkColor('c-bar-arrow','c-bar-arrow-txt',false,false);
+  linkColor('c-time','c-time-txt',false,false);
+  linkColor('c-read','c-read-txt',false,false);
+  if($('read-text')) $('read-text').addEventListener('input', function(){ render(); });
 
   /* ============================================================
      하단 정보 HTML화 (br만 허용)
@@ -4929,6 +5174,17 @@
     function closeHelp(){ hOv.classList.remove('is-open'); hT=setTimeout(function(){ hOv.hidden=true; hT=null; }, 260); }
     (typeof bindTap==='function'?bindTap:function(b,f){b.addEventListener('click',f);})(hBtn, function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } openHelp(); });
     if(hClose){ hClose.addEventListener('click', closeHelp); }
+    // 설명 속 '자세한 설명' 링크 → 도움말을 열고 해당 항목으로 스크롤
+    document.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('[data-help-jump]') : null;
+      if(!a) return;
+      e.preventDefault(); e.stopPropagation();
+      openHelp();
+      var t = document.getElementById(a.getAttribute('data-help-jump'));
+      var body = hOv.querySelector('.help-body');
+      function go(){ if(t && body){ body.scrollTop += t.getBoundingClientRect().top - body.getBoundingClientRect().top - 2; } }
+      requestAnimationFrame(go); setTimeout(go, 260);   // 열리는 애니메이션이 끝난 뒤 한 번 더 맞춤
+    });
     hOv.addEventListener('click', function(e){ if(e.target===hOv){ closeHelp(); } });
     document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !hOv.hidden){ closeHelp(); } });
   })();
@@ -4938,9 +5194,9 @@
      (기존 사용자는 저장된 값이 없으므로 이번에 한 번 보게 된다)
      ============================================================ */
   (function(){
-    var NOTICE_ID   = '2026-09-18a';                 // ★공지를 새로 띄우려면 이 값을 바꾼다
-    var NOTICE_FROM = '2026-09-18T00:00:00';         // 이 기간에는 볼 때마다 뜬다
-    var NOTICE_TO   = '2026-09-20T00:00:00';         // (끝나는 날 자정 = 19일까지)
+    var NOTICE_ID   = '2026-09-27a';                 // ★공지를 새로 띄우려면 이 값을 바꾼다
+    var NOTICE_FROM = '2026-09-26T00:00:00';         // 이 기간에는 볼 때마다 뜬다
+    var NOTICE_TO   = '2026-09-29T00:00:00';         // (끝나는 날 자정 = 28일까지)
     var NOTICE_KEY  = 'logmaker-notice-v2';
     var ov=$('notice-overlay'), okBtn=$('notice-close'), neverBtn=$('notice-never'), t=null;
     if(!ov) return;
@@ -5064,6 +5320,52 @@
   bindCharBubTool($('cb-name'), cbToggleName);
   bindCharBubTool($('cb-av'), cbToggleAvatar);
   bindCharBubTool($('cb-del'), cbDelete);
+  /* ===== 라인 · 카카오톡: 시간 · 읽음 표시 =====
+     말풍선 속성으로 들고 다닌다(data-time="오후 3:12", data-read="1", data-read-text="이 말풍선만 다른 글자").
+     그래서 저장 · 페이지 · 스냅샷 · 되돌리기에 그대로 따라간다. */
+  function timeAbove(b){
+    var all=[].slice.call(editor.querySelectorAll('.g-bub')), i=all.indexOf(b);
+    for(var k=i-1; k>=0; k--){ var t=all[k].getAttribute('data-time'); if(t) return t; }
+    return '';
+  }
+  function cbToggleTime(b){
+    if(b.hasAttribute('data-time')){ b.removeAttribute('data-time'); return; }
+    var t = timeAbove(b);                                   // 바로 위 시간 따라가기
+    if(!t){ t = prompt('시간을 적어 주세요. (예: 오후 3:12)', ''); if(t==null) return; t = t.trim(); if(!t) return; }
+    b.setAttribute('data-time', t);
+  }
+  function cbToggleRead(b){
+    if(b.getAttribute('data-read')==='1'){ b.removeAttribute('data-read'); b.removeAttribute('data-read-text'); }
+    else b.setAttribute('data-read','1');
+  }
+  bindCharBubTool($('cb-time'), cbToggleTime);
+  bindCharBubTool($('cb-read'), cbToggleRead);
+  // 입력창에서 말풍선 옆 시간 · 읽음 글자를 누르면 그 말풍선만 고친다(말풍선 상자 바깥쪽을 누른 것으로 판단)
+  editor.addEventListener('click', function(e){
+    if(!isKtShape()) return;
+    var b = e.target && e.target.closest ? e.target.closest('.g-bub') : null;
+    if(!b || !(b.hasAttribute('data-time') || b.getAttribute('data-read')==='1')) return;
+    var r = b.getBoundingClientRect(), right = b.classList.contains('right') || b.classList.contains('send');
+    var outside = right ? (e.clientX < r.left) : (e.clientX > r.right);
+    if(!outside) return;
+    e.preventDefault(); e.stopPropagation();
+    var hasTime = b.hasAttribute('data-time'), hasRead = b.getAttribute('data-read')==='1';
+    var lh = (parseFloat(getComputedStyle(b).fontSize)||15) * 0.62 * 1.3;
+    var onTime = hasTime && (!hasRead || e.clientY > r.bottom - lh);
+    if(onTime){
+      var t = prompt('시간 (비우면 시간이 사라져요)', b.getAttribute('data-time')||'');
+      if(t==null) return; t=t.trim();
+      if(t) b.setAttribute('data-time', t); else b.removeAttribute('data-time');
+    } else {
+      var cur = b.getAttribute('data-read-text') || readLabel();
+      var v = prompt('읽음 표시 글자 · 이 말풍선만 (비우면 읽음 표시가 사라져요)', cur);
+      if(v==null) return; v=v.trim();
+      if(!v){ b.removeAttribute('data-read'); b.removeAttribute('data-read-text'); }
+      else if(v===readLabel()) b.removeAttribute('data-read-text');
+      else b.setAttribute('data-read-text', v);
+    }
+    render(); updateFormatButtons();
+  }, true);
   if($('cb-char')){
     bindTap($('cb-char'), function(e){
       if(e){ e.preventDefault(); e.stopPropagation(); }
@@ -5153,7 +5455,10 @@
     var cbTail = $('cb-tail'); if(cbTail){ cbTail.hidden = hideTail; }
     var cbName = $('cb-name'); if(cbName){ cbName.hidden = isScript; }
     var cbAv = $('cb-av'); if(cbAv){ cbAv.hidden = isScript; }
-    var visCount = 6 - (hideTail?1:0) - (isScript?2:0);
+    var kt = isKtShape();
+    var cbTime = $('cb-time'); if(cbTime){ cbTime.hidden = !kt; cbTime.classList.toggle('is-on', !!(kt && cbub && cbub.hasAttribute('data-time'))); }
+    var cbRead = $('cb-read'); if(cbRead){ cbRead.hidden = !kt; cbRead.textContent = (bubbleShape==='line') ? '읽음' : '1'; cbRead.classList.toggle('is-on', !!(kt && cbub && cbub.getAttribute('data-read')==='1')); }
+    var visCount = 6 - (hideTail?1:0) - (isScript?2:0) + (kt?2:0);
     if(cbTools){ cbTools.style.gridTemplateColumns = 'repeat('+visCount+',1fr)'; }
   }
   editor.addEventListener('keyup', updateFormatButtons);
@@ -5272,6 +5577,7 @@
     saveSel(); render();
   }
   function doLineBreak(forceBreak){
+    applyFirstInd();   // 빈 입력에서 타이핑한 첫 문단에도 들여쓰기 빈칸(커서 위치는 그대로 유지)
     var inBub = caretInBubble();
     var sel=window.getSelection(); if(!sel || sel.rangeCount===0) return false;
     var range=sel.getRangeAt(0);
@@ -5283,7 +5589,15 @@
     var br=document.createElement('br'); range.insertNode(br);
     // br 바로 뒤 위치는 브라우저가 이전 텍스트로 병합시켜 줄바꿈이 씹히므로,
     // 커서가 안착할 텍스트 노드를 br 뒤에 명시적으로 만든다.
-    var anchor = document.createTextNode('\u200b');
+    // 문단 들여쓰기가 켜져 있으면 새 문단 앞에 들여쓰기 빈칸도 붙인다
+    var anchor = document.createTextNode('\u200b' + newParaPrefix(br));
+    (function(){   // 방금 끝난 줄이 들여쓰기 빈칸뿐이면(빈 줄) 빈칸을 뗀다 — 빈 줄은 문단 간격으로 보여야 하니까
+      var n=br.previousSibling, nodes=[];
+      while(n && n.nodeType===3){ nodes.push(n); n=n.previousSibling; }
+      if(n && !(n.nodeType===1 && (n.tagName==='BR' || !isInlineNode(n)))) return;
+      if(!nodes.length || !nodes.every(function(x){ return /^[\u200b\u2002]*$/.test(x.nodeValue); })) return;
+      nodes.forEach(function(x){ x.nodeValue = x.nodeValue.replace(/\u2002/g,''); });
+    })();
     if(br.nextSibling){ br.parentNode.insertBefore(anchor, br.nextSibling); }
     else { br.parentNode.appendChild(anchor); }
     // 안전장치: 줄바꿈이 말풍선 '안쪽 끝'에 들어갔고 바로 뒤가 또 다른 말풍선이면,
@@ -5350,11 +5664,19 @@
     editor.focus();
     var sel = window.getSelection();
     if(!sel.rangeCount){ editor.appendChild(document.createTextNode(text)); return; }
+    var wasEmpty = (editor.textContent||'').replace(/[\s\u200b]/g,'')==='' && !editor.querySelector('img');
     sel.deleteFromDocument();
     var range = sel.getRangeAt(0);
     var lines = text.replace(/\r\n/g,'\n').split('\n');
     var frag = document.createDocumentFragment();
-    lines.forEach(function(line, i){ if(i>0) frag.appendChild(document.createElement('br')); frag.appendChild(document.createTextNode(line)); });
+    // 문단 들여쓰기가 켜져 있으면 붙여넣은 새 문단들 앞에도 빈칸(빈 줄은 제외, 본문 최상위에서만)
+    var sc = range.startContainer, top = (sc===editor) || (sc.parentNode===editor);
+    var pre = (paraIndentOn() && top && !(pageIdx>0 && isNovelCont(pageIdx) && wasEmpty)) ? IND_CH : '';
+    lines.forEach(function(line, i){
+      if(i>0) frag.appendChild(document.createElement('br'));
+      var add = pre && line.replace(/\s/g,'')!=='' && line.charAt(0)!==IND_CH && (i>0 || wasEmpty);
+      frag.appendChild(document.createTextNode(add ? IND_CH+line : line));
+    });
     range.insertNode(frag); sel.collapseToEnd();
   }
 
@@ -5464,7 +5786,9 @@
   var _foldSize=$('fold-size');
   if(_foldSize){ _foldSize.addEventListener('toggle', function(){ if(_foldSize.open){ requestAnimationFrame(moveAllThumbs); } }); }
   var _foldBg=$('fold-bg');
-  if(_foldBg){ _foldBg.addEventListener('toggle', function(){ updateFrameInteractive(); if(_foldBg.open){ requestAnimationFrame(function(){ moveAllThumbs(); moveThumb($('frame-pos-seg')); }); } }); }
+  if(_foldBg){ _foldBg.addEventListener('toggle', function(){ if(_foldBg.open){ requestAnimationFrame(moveAllThumbs); } }); }
+  var _foldFrame=$('fold-frame');
+  if(_foldFrame){ _foldFrame.addEventListener('toggle', function(){ updateFrameInteractive(); if(_foldFrame.open){ requestAnimationFrame(function(){ moveAllThumbs(); moveThumb($('frame-pos-seg')); }); } }); }
   var _foldBubDesign=$('fold-bubdesign');
   if(_foldBubDesign){ _foldBubDesign.addEventListener('toggle', function(){ if(_foldBubDesign.open){ requestAnimationFrame(moveAllThumbs); } }); }
   var _foldImsgBar=$('fold-imsgbar');
@@ -5607,6 +5931,9 @@
     var psubsz=$('parensub-size'); if(psubsz){ var _ps=parseFloat(psubsz.value); if(isNaN(_ps)) _ps=26; el.style.setProperty('--psub-size', _ps+'px'); }
     var psz=$('photo-size'); if(psz){ var _pp=parseFloat(psz.value); el.style.setProperty('--photo-w', _pp+'%'); el.style.setProperty('--photo-w-px', Math.round(w*_pp/100)+'px'); }
     var lisz=$('logimg-size'); if(lisz){ el.style.setProperty('--logimg-w', parseFloat(lisz.value)+'%'); }
+    var indz=$('indent-size'); el.style.setProperty('--para-indent', ((indz && parseFloat(indz.value))||1)+'em');
+    el.style.setProperty('--read-color', ($('c-read')||{}).value || '#f2c200');
+    el.style.setProperty('--time-color', ($('c-time')||{}).value || '#6b7684');
     var lirad=$('logimg-radius'); if(lirad){ el.style.setProperty('--logimg-radius', parseFloat(lirad.value)+'px'); }
     var tf=$('title-font'), nf=$('name-font');
     el.style.setProperty('--title-font', (tf && tf.value) ? tf.value : $('font').value);
@@ -5625,6 +5952,7 @@
     el.style.letterSpacing = ls+'px';
     el.style.lineHeight = String((parseFloat($('line-height').value)/10).toFixed(2));
     // ── 테두리 꾸밈(가장자리 사진 띠)
+    if(typeof syncFrameToPad==='function') syncFrameToPad();
     var frameOn = (framePos!=='none' && !!frameData);
     var fThick = 0;
     if(frameOn){
@@ -5632,50 +5960,44 @@
       fThick = Math.round(el.clientWidth * fp/100);   // 두께는 '전체 폭' 기준
     }
     // 띠가 차지하는 만큼 안쪽으로 밀어 글이 띠를 침범하지 않게(여백은 띠 안쪽에 남음)
-    var _fAll = (framePos==='all'||framePos==='inner');
     el.style.padding = frameOn
-      ? ((pad + (framePos==='top'||_fAll ? fThick : 0))+'px '
-        +(pad + (framePos==='right'||_fAll ? fThick : 0))+'px '
-        +(pad + (framePos==='bottom'||_fAll ? fThick : 0))+'px '
-        +(pad + (framePos==='left'||_fAll ? fThick : 0))+'px')
+      ? ((pad + (framePos==='top'||framePos==='all' ? fThick : 0))+'px '
+        +(pad + (framePos==='right'||framePos==='all' ? fThick : 0))+'px '
+        +(pad + (framePos==='bottom'||framePos==='all' ? fThick : 0))+'px '
+        +(pad + (framePos==='left'||framePos==='all' ? fThick : 0))+'px')
       : (pad+'px');
     (function(){
       [].forEach.call(el.querySelectorAll('.g-frame'), function(f){ f.parentNode.removeChild(f); });
       if(!frameOn) return;
       var isAll = (framePos==='all');
-      var isInner = (framePos==='inner');
-      var isMulti = isAll || isInner;
       var W = el.clientWidth, H = el.clientHeight;
-      var sides = isMulti ? ['left','right','top','bottom'] : [framePos];
-      var inOff = isInner ? pad : 0;   // inner: 여백만큼 안쪽으로 들여놓기
+      el._frameW = W; el._frameH = H;          // patchFrames 에서 재사용
+      var sides = isAll ? ['left','right','top','bottom'] : [framePos];
       sides.forEach(function(sd){
         var f=document.createElement('div'); f.className='g-frame'; f.setAttribute('data-side',sd);
         f.style.setProperty('background-image','url("'+frameData+'")','important');
         if(sd==='left'||sd==='right'){
-          f.style.top=inOff+'px'; f.style.bottom=inOff+'px'; f.style.width=fThick+'px'; f.style[sd]=inOff+'px';
+          f.style.top='0'; f.style.bottom='0'; f.style.width=fThick+'px'; f.style[sd]='0';
         } else {
-          f.style.left=inOff+'px'; f.style.right=inOff+'px'; f.style.height=fThick+'px'; f.style[sd]=inOff+'px';
+          f.style.left='0'; f.style.right='0'; f.style.height=fThick+'px'; f.style[sd]='0';
         }
-        // 확대·좌우·위아래 슬라이더 반영 (원본 크기를 알아야 정확 — 모르면 cover/center로 폴백)
         var zoom = (parseFloat($('frame-zoom') ? $('frame-zoom').value : 100)||100)/100;
         var px = (parseFloat($('frame-x') ? $('frame-x').value : 50)||0)/100;
         var py = (parseFloat($('frame-y') ? $('frame-y').value : 50)||0)/100;
-        var iW = isInner ? (W - inOff*2) : W;   // inner: 여백 뺀 영역
-        var iH = isInner ? (H - inOff*2) : H;
-        var boxW = isMulti ? iW : (sd==='left'||sd==='right' ? fThick : W);
-        var boxH = isMulti ? iH : (sd==='top'||sd==='bottom' ? fThick : H);
+        var boxW = isAll ? W : (sd==='left'||sd==='right' ? fThick : W);
+        var boxH = isAll ? H : (sd==='top'||sd==='bottom' ? fThick : H);
         if(frameNatW>0 && frameNatH>0){
           var sc = Math.max(boxW/frameNatW, boxH/frameNatH) * zoom;
           var bw = frameNatW*sc, bh = frameNatH*sc;
           var bx = -(bw-boxW)*px, by = -(bh-boxH)*py;
-          if(isMulti){ bx -= (sd==='right') ? (iW-fThick) : 0; by -= (sd==='bottom') ? (iH-fThick) : 0; }
+          if(isAll){ bx -= (sd==='right') ? (W-fThick) : 0; by -= (sd==='bottom') ? (H-fThick) : 0; }
           f.style.setProperty('background-size', bw+'px '+bh+'px','important');
           f.style.setProperty('background-position', bx+'px '+by+'px','important');
         } else {
-          f.style.setProperty('background-size', isMulti ? (iW+'px '+iH+'px') : 'cover','important');
-          var ox0 = (isMulti && sd==='right') ? -(iW-fThick) : 0;
-          var oy0 = (isMulti && sd==='bottom') ? -(iH-fThick) : 0;
-          f.style.setProperty('background-position', isMulti ? (ox0+'px '+oy0+'px') : 'center','important');
+          f.style.setProperty('background-size', isAll ? (W+'px '+H+'px') : 'cover','important');
+          var ox0 = (isAll && sd==='right') ? -(W-fThick) : 0;
+          var oy0 = (isAll && sd==='bottom') ? -(H-fThick) : 0;
+          f.style.setProperty('background-position', isAll ? (ox0+'px '+oy0+'px') : 'center','important');
         }
         el.appendChild(f);
       });
@@ -5736,7 +6058,7 @@
       /* ★위에서 el.style.padding 을 통째로 다시 지정하므로 줄여 둔 위아래 여백이 날아간다.
          저장 직전에도 styleCanvas 가 한 번 더 불리는데 그때 되살아나서
          '미리보기는 줄어든 여백, 저장은 원래 여백'으로 갈렸다 → 여기서 곧바로 다시 맞춘다 */
-      if(el===canvas && typeof centerRatioInner==='function') centerRatioInner();
+      if(el===canvas && !_measuring && typeof centerRatioInner==='function') centerRatioInner();
     } else {
       el.style.height=''; el.style.display=''; el.style.justifyContent='';
       if(inner){ inner.style.marginTop=''; inner.style.marginBottom=''; }
@@ -5820,6 +6142,7 @@
           var savedCharId = (isCharBub||isCharName) ? (ch.getAttribute('data-char')||'') : '';
           var savedAv = isCharBub ? (ch.getAttribute('data-av')||'') : '';
           var bubTail = isBub ? !ch.classList.contains('cont') : false;
+          var bubMeta = isBub ? ['data-time','data-read','data-read-text'].map(function(a){ return [a, ch.getAttribute(a)]; }) : null;   // 시간 · 읽음 보존
           var hlColor = isHl ? ch.style.getPropertyValue('--hl') : '';
           var emColor = isEm ? ch.style.getPropertyValue('--em') : '';
           var subFixed = isSub ? ch.style.getPropertyValue('--sub-fixed') : '';
@@ -5827,6 +6150,7 @@
           for(var i=ch.attributes.length-1;i>=0;i--){ ch.removeAttribute(ch.attributes[i].name); }
           if(isCharBub){ ch.className='g-bub char-bub '+charSide+' '+(bubTail?'tail':'cont'); if(savedCharId) ch.setAttribute('data-char', savedCharId); if(savedAv) ch.setAttribute('data-av', savedAv); }
           else if(isBub){ ch.className='g-bub '+bubKind+' '+(bubTail?'tail':'cont'); }
+          if(bubMeta) bubMeta.forEach(function(p){ if(p[1]!=null) ch.setAttribute(p[0], p[1]); });
           else if(isCharName){ ch.className='g-bub-name char-name '+charSide; if(savedCharId) ch.setAttribute('data-char', savedCharId); }
           else if(isBubName){ ch.className='g-bub-name '+nameKind; }
           else if(isHl){
@@ -5847,6 +6171,20 @@
   function processBodyRaw(rawHtml){
     var tmp = document.createElement('div');
     tmp.innerHTML = (typeof rawHtml === 'string') ? rawHtml : '';
+    // 들여쓰기 빈칸만 있는 줄은 빈 줄로 취급(문단 간격으로 보이게)
+    if(/\u2002/.test(tmp.innerHTML)){
+      var _w=document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT, null, false), _t, _ts=[];
+      while((_t=_w.nextNode())) _ts.push(_t);
+      _ts.forEach(function(t){
+        if(!/^[\u200b\u2002]+$/.test(t.nodeValue) || t.nodeValue.indexOf('\u2002')===-1) return;
+        var a=t.previousSibling, b=t.nextSibling;
+        while(a && a.nodeType===3 && /^\u200b*$/.test(a.nodeValue)) a=a.previousSibling;
+        while(b && b.nodeType===3 && /^\u200b*$/.test(b.nodeValue)) b=b.nextSibling;
+        var edgeA = !a ? t.parentNode===tmp : (a.nodeType===1 && a.tagName==='BR');
+        var edgeB = !b ? true : (b.nodeType===1 && (b.tagName==='BR' || /\bg-(quote|bub|hr|img)\b/.test(b.className||'')));
+        if(edgeA && edgeB) t.nodeValue = t.nodeValue.replace(/\u2002/g,'');
+      });
+    }
     sanitize(tmp);
     var tw = document.createTreeWalker(tmp, NodeFilter.SHOW_TEXT, null, false), zs=[];
     while(tw.nextNode()){ if(tw.currentNode.nodeValue.indexOf('\u200b')!==-1){ zs.push(tw.currentNode); } }
@@ -6102,17 +6440,41 @@
       if(!ok && nm.parentNode) nm.parentNode.removeChild(nm);
     });
   }
+  function readLabel(){
+    var v = ($('read-text') && $('read-text').value.trim()) || '';
+    return v || (bubbleShape==='line' ? '읽음' : '1');
+  }
+  // 라인 · 카카오톡: 꼬리 색(말풍선 실제 배경색)을 변수로 넘기고, 미리보기엔 시간 · 읽음 글자를 붙인다
+  function ktDecorate(root){
+    if(!isKtShape()) return;
+    [].forEach.call(root.querySelectorAll('.g-bub'), function(b){
+      var bg = getComputedStyle(b).backgroundColor;
+      if(bg) b.style.setProperty('--kt-bub', bg);
+      if(root===editor) return;
+      var t = b.getAttribute('data-time'), rd = b.getAttribute('data-read')==='1';
+      if(!t && !rd) return;
+      var right = b.classList.contains('right') || b.classList.contains('send');
+      var m = document.createElement('span'); m.className = 'g-bub-meta ' + (right ? 'right' : 'left');
+      if(rd){ var r = document.createElement('span'); r.className='g-meta-read'; r.textContent = b.getAttribute('data-read-text') || readLabel(); m.appendChild(r); }
+      if(t){ var tm = document.createElement('span'); tm.className='g-meta-time'; tm.textContent = t; m.appendChild(tm); }
+      b.appendChild(m);
+    });
+  }
   function render(){
     bgValue = effectiveBg();
     var _psz=$('photo-size'); if(_psz){ var _pp2=parseFloat(_psz.value); editor.style.setProperty('--photo-w', _pp2+'%'); editor.style.setProperty('--photo-w-px', Math.round((editor.clientWidth||360)*_pp2/100)+'px'); }
     var _lisz=$('logimg-size'); if(_lisz) editor.style.setProperty('--logimg-w', parseFloat(_lisz.value)+'%');
     var _lirad=$('logimg-radius'); if(_lirad) editor.style.setProperty('--logimg-radius', parseFloat(_lirad.value)+'px');
     cleanOrphanNames();
+    syncEditorIndent();
     updateEmptyBubbles();
     styleCharBubbles(editor);
+    editor.style.setProperty('--read-label', JSON.stringify(readLabel()));
+    editor.style.setProperty('--time-color', ($('c-time')||{}).value || '#6b7684');
+    ktDecorate(editor);
     syncSubFixedEm();
     canvas.innerHTML = '<div class="g-inner">' + (gridCols > 0 && pages.length > 1 ? buildGridHtml() : buildHtml()) + '</div>';
-    renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); neutralizeStretch(canvas); wrapParaGaps(canvas); tagMsgGroupNeighbors(canvas); stripLastGap(canvas); trimImgMargins(canvas); applyScriptFont(canvas); fitStage();
+    renderChrome(canvas); extractFooter(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas); groupAvatars(canvas); neutralizeStretch(canvas); wrapParaGaps(canvas); tagMsgGroupNeighbors(canvas); stripLastGap(canvas); trimImgMargins(canvas); applyParaIndent(canvas, isNovelCont(pageIdx)); novelJustifyLastLine(canvas); ktDecorate(canvas); applyScriptFont(canvas); fitStage();
     setVal('font-size', $('font-size').value+'px');
     if($('subtext-size')) setVal('subtext-size', $('subtext-size').value+'px');
     if($('parensub-size')) setVal('parensub-size', $('parensub-size').value+'px');
@@ -6184,61 +6546,538 @@
   /* 고정 비율에서 본문이 '여백 안쪽'보다 길면 사방 여백을 잘리지 않는 최대값으로 내린다.
      ★좌우까지 함께 줄여야 '여백 10 차이로 숫자가 크게 바뀌는' 혼란이 없어진다.
      슬라이더는 사용자 의도(padSet)를 보존하고, 캔버스에만 보정값(maxPad)을 적용한다. */
+  /* 하단 블록의 맨 윗 요소(구분선이 있으면 구분선, 없으면 하단 글자) */
+  function nameStartEl(inner){
+    if(!inner) return null;
+    try{ return inner.querySelector(':scope > .g-name-rule, :scope > .g-name'); }catch(e){ return null; }
+  }
+  /* 시작점 맞추기에서 하단을 밀어 내리려고 붙였던 여백을 뗀다(측정 전에 원래 높이로) */
+  function clearNameAlign(inner){
+    var el = nameStartEl(inner);
+    if(el) el.style.removeProperty('margin-top');
+    return el;
+  }
+  /* 하단 윗단이 target(px, .g-inner 기준)에 오도록 위 여백을 늘린다.
+     앞 요소의 아래 여백과 겹침(마진 상쇄)이 있으면 늘린 만큼 그대로 안 내려가서, 재 보고 한 번 더 보정한다 */
+  function pushNameTo(el, target){
+    if(!el) return;
+    var extra = target - el.offsetTop;
+    for(var i=0; i<3 && Math.abs(target - el.offsetTop) > 0.5; i++){
+      if(extra < 0) extra = 0;
+      el.style.setProperty('margin-top', 'calc(var(--name-gap,1.6em) + '+extra+'px)', 'important');
+      extra += target - el.offsetTop;
+    }
+  }
   /* 모든 페이지의 콘텐츠 높이를 한 번에 측정 (시작점 맞추기 켤 때 호출) */
-  function measureAllPages(){
-    if(sizeMode !== 'ratio' || !ratio || pages.length <= 1) return;
-    var origIdx = pageIdx;
-    var origBody = editor.innerHTML;
-    var origTitle = $('title-ed') ? $('title-ed').innerHTML : '';
-    var origSub = $('subtitle-ed') ? $('subtitle-ed').innerHTML : '';
-    var origName = nameEd ? nameEd.innerHTML : '';
-    _switching = true;
-    pages.forEach(function(p, i){
-      // 에디터에 해당 페이지 내용 세팅
-      editor.innerHTML = p.body || '';
-      if($('title-ed')) $('title-ed').innerHTML = (p.title != null ? p.title : sharedTitle) || '';
-      if($('subtitle-ed')) $('subtitle-ed').innerHTML = (p.subtitle != null ? p.subtitle : sharedSubtitle) || '';
-      if(nameEd) nameEd.innerHTML = (p.name != null ? p.name : sharedName) || '';
-      syncTails(editor);
-      // 캔버스에 렌더
-      pageIdx = i;
-      canvas.innerHTML = '<div class="g-inner">' + buildHtml() + '</div>';
-      renderChrome(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas);
+  function syncSharedFromEds(){
+    flushPage();
+    var p = pages[pageIdx]; if(!p) return;
+    if(p.title == null && $('title-ed')) sharedTitle = $('title-ed').innerHTML;
+    if(p.subtitle == null && $('subtitle-ed')) sharedSubtitle = $('subtitle-ed').innerHTML;
+    if(p.name == null && nameEd) sharedName = nameEd.innerHTML;
+  }
+  /* 다른 페이지 측정값이 낡지 않게 — 설정·제목·하단을 바꾼 뒤 모든 페이지를 다시 잰다.
+     (입력창을 건드리지 않고 재므로 커서가 튀지 않는다) */
+  var _alignRefreshT = 0;
+  function refreshAlignSoon(){
+    if(!alignPages) return;
+    clearTimeout(_alignRefreshT);
+    _alignRefreshT = setTimeout(function(){
+      if(!alignPages || gridCols !== 0 || pages.length <= 1 || sizeMode !== 'ratio' || _busy) return;
+      measureAllPages(); render();
+    }, 400);
+  }
+  function tmpEl(html){ var d=document.createElement('div'); d.innerHTML=html||''; return d; }
+  /* 한 페이지를 (입력창은 건드리지 않고) 캔버스에만 그려 잰다.
+     사용자 여백 그대로 두고 잰다(넘칠 때 여백을 줄이는 보정은 측정에 끼지 않게 _measuring 으로 막음).
+     반환: ih = 내용 높이, avail = 여백 안쪽에 쓸 수 있는 높이, nameTop = 하단 시작 높이 */
+  function layoutTestPage(body, tH, sH, nH, wantAvail, cont){
+    _measuring = true;
+    try{
+      var html = buildTitleBlock(edToHtml(tmpEl(tH)), edToHtml(tmpEl(sH)))
+        + processBodyRaw(body)
+        + buildNameBlock(edToHtml(tmpEl(nH)));
+      canvas.innerHTML = '<div class="g-inner">' + html + '</div>';
+      renderChrome(canvas); extractFooter(canvas); styleCanvas(canvas); applyHlSolid(canvas); styleCharBubbles(canvas);
       groupAvatars(canvas); neutralizeStretch(canvas); wrapParaGaps(canvas);
       tagMsgGroupNeighbors(canvas); stripLastGap(canvas); trimImgMargins(canvas);
+      applyParaIndent(canvas, !!cont);
       applyScriptFont(canvas);
-      // 높이 측정 (꾸밈 두께 반영)
       var padSet = Math.round(parseFloat($('pad').value)||0);
       var _mfOn = (framePos!=='none' && !!frameData);
       var _mfPct = _mfOn ? (parseFloat($('frame-size') ? $('frame-size').value : 20)||20) : 0;
       var _mfT = _mfOn ? Math.round(canvas.clientWidth * _mfPct/100) : 0;
-      var _mfAll = (framePos==='all'||framePos==='inner');
-      var mPadT = padSet + (_mfOn && (framePos==='top'||_mfAll) ? _mfT : 0);
-      var mPadR = padSet + (_mfOn && (framePos==='right'||_mfAll) ? _mfT : 0);
-      var mPadB = padSet + (_mfOn && (framePos==='bottom'||_mfAll) ? _mfT : 0);
-      var mPadL = padSet + (_mfOn && (framePos==='left'||_mfAll) ? _mfT : 0);
+      var mPadT = padSet + (_mfOn && (framePos==='top'||framePos==='all') ? _mfT : 0);
+      var mPadR = padSet + (_mfOn && (framePos==='right'||framePos==='all') ? _mfT : 0);
+      var mPadB = padSet + (_mfOn && (framePos==='bottom'||framePos==='all') ? _mfT : 0);
+      var mPadL = padSet + (_mfOn && (framePos==='left'||framePos==='all') ? _mfT : 0);
       canvas.style.padding = mPadT+'px '+mPadR+'px '+mPadB+'px '+mPadL+'px';
       var inner = canvas.querySelector('.g-inner');
-      if(inner){
+      if(!inner) return { ih:0, avail:0, nameTop:null };
+      inner.style.marginTop = 'auto'; inner.style.marginBottom = 'auto';
+      var ih = Math.max(inner.scrollHeight||0, inner.offsetHeight||0);
+      var nm = nameStartEl(inner);
+      var out = { ih:ih, nameTop: nm ? nm.offsetTop : null, avail:0 };
+      if(wantAvail){
+        // 여백 안쪽 높이: 내용칸을 남는 자리만큼 늘려 재면 상하단바까지 빼고 정확히 나온다
+        inner.style.marginTop = '0'; inner.style.marginBottom = '0';
+        inner.style.flex = '1 1 0'; inner.style.minHeight = '0';
+        out.avail = inner.clientHeight;
+        inner.style.flex = ''; inner.style.minHeight = '';
         inner.style.marginTop = 'auto'; inner.style.marginBottom = 'auto';
-        p._contentH = Math.max(inner.scrollHeight||0, inner.offsetHeight||0);
       }
+      return out;
+    } finally { _measuring = false; }
+  }
+  function pageMetaHtml(p, shT, shS, shN){
+    return { t: (p && p.title != null) ? p.title : shT,
+             s: (p && p.subtitle != null) ? p.subtitle : shS,
+             n: (p && p.name != null) ? p.name : shN };
+  }
+  function measureAllPages(){
+    if(sizeMode !== 'ratio' || !ratio || pages.length <= 1) return;
+    /* 입력창은 건드리지 않고(커서 유지) 각 페이지 내용을 임시 요소로 조립해 캔버스에서만 잰다 */
+    var cur = pages[pageIdx] || {};
+    var liveTitle = $('title-ed') ? $('title-ed').innerHTML : '';
+    var liveSub = $('subtitle-ed') ? $('subtitle-ed').innerHTML : '';
+    var liveName = nameEd ? nameEd.innerHTML : '';
+    // 지금 페이지가 공유 중이면 입력창 값이 곧 최신 공유 값
+    var shT = (cur.title == null) ? liveTitle : sharedTitle;
+    var shS = (cur.subtitle == null) ? liveSub : sharedSubtitle;
+    var shN = (cur.name == null) ? liveName : sharedName;
+    pages.forEach(function(p, i){
+      var isCur = (i === pageIdx);
+      var m = pageMetaHtml(p, shT, shS, shN);
+      var r = layoutTestPage(isCur ? editor.innerHTML : (p.body || ''),
+                             isCur ? liveTitle : m.t, isCur ? liveSub : m.s, isCur ? liveName : m.n, false, isNovelCont(i));
+      p._contentH = r.ih;
+      p._nameTop = r.nameTop;   // 하단이 시작하는 높이(없으면 null)
     });
-    // 원래 페이지 복원
-    pageIdx = origIdx;
-    editor.innerHTML = origBody;
-    if($('title-ed')) $('title-ed').innerHTML = origTitle;
-    if($('subtitle-ed')) $('subtitle-ed').innerHTML = origSub;
-    if(nameEd) nameEd.innerHTML = origName;
-    syncTails(editor); clearHrSel();
-    _switching = false;
   }
 
-  function centerRatioInner(){
+  /* ============================================================
+     소설 모드 — 고정 비율에서 긴 본문을 잘리지 않는 만큼씩 최대 4페이지에 흘려 담는다.
+     · 페이지 끝 줄은 끝까지 채운다(글자 단위로 끊음: '오리'에서 '오'까지만 들어가면 '리'는 다음 페이지)
+     · 끄면 모든 페이지를 원래 한 덩어리로 합친다 → 고친 뒤 다시 켜면 새로 계산
+     · 끊긴 자리에서 지운 줄바꿈·공백은 페이지마다 novelJoin 에 적어 두었다가 합칠 때 되돌린다
+     ============================================================ */
+  var NOVEL_INLINE = {MARK:1,B:1,I:1,S:1,U:1,STRONG:1,EM:1,STRIKE:1};
+  function novelAtomic(el){
+    if(el.tagName==='IMG' || el.tagName==='BR' || (el.nodeName && el.nodeName.toLowerCase()==='svg')) return true;
+    var c = el.classList; if(!c) return false;
+    return c.contains('g-img') || c.contains('g-hr') || c.contains('g-bub') || c.contains('g-bub-name') || c.contains('g-title-blk');
+  }
+  // 끊을 수 있는 자리 목록: 글자 하나하나 뒤, 그리고 통째로 옮길 덩어리(사진·구분선·말풍선) 뒤
+  function novelCuts(root){
+    var cuts = [];
+    (function walk(n){
+      for(var i=0;i<n.childNodes.length;i++){
+        var ch = n.childNodes[i];
+        if(ch.nodeType===3){
+          var v = ch.nodeValue;
+          for(var k=1;k<=v.length;k++){
+            var cc = v.charCodeAt(k-1);
+            if(cc>=0xD800 && cc<=0xDBFF && k<v.length) continue;   // 이모지 등 두 칸짜리 글자는 가르지 않음
+            cuts.push({ n:ch, o:k });
+          }
+        } else if(ch.nodeType===1){
+          if(ch.classList && ch.classList.contains('g-bub-name')) continue;   // 이름표와 말풍선 사이는 끊지 않음
+          if(novelAtomic(ch)) cuts.push({ after:ch });
+          else walk(ch);
+        }
+      }
+    })(root);
+    return cuts;
+  }
+  function novelSlice(root, cut, head){
+    var r = document.createRange();
+    if(head){
+      r.setStart(root, 0);
+      if(cut.n) r.setEnd(cut.n, cut.o); else r.setEndAfter(cut.after);
+    } else {
+      if(cut.n) r.setStart(cut.n, cut.o); else r.setStartAfter(cut.after);
+      r.setEnd(root, root.childNodes.length);
+    }
+    var d = document.createElement('div'); d.appendChild(r.cloneContents());
+    return d;
+  }
+  function novelIsEmptyEl(el){
+    if(novelAtomic(el)) return false;
+    if(el.querySelector('img,br,svg,.g-hr,.g-img')) return false;
+    return (el.textContent||'').replace(/\u200b/g,'')==='';
+  }
+  function novelLeaf(d, fromEnd){
+    var n = fromEnd ? d.lastChild : d.firstChild;
+    while(n && n.nodeType===1 && !novelAtomic(n) && (fromEnd ? n.lastChild : n.firstChild)){ n = fromEnd ? n.lastChild : n.firstChild; }
+    return n;
+  }
+  // 앞 조각 끝의 줄바꿈·공백을 떼어 내고, 뗀 것을 문자열로 돌려준다
+  function novelTrimEnd(d){
+    var removed = '';
+    for(var g=0; g<500; g++){
+      var n = novelLeaf(d, true); if(!n || n===d) break;
+      if(n.nodeType===3){
+        var v=n.nodeValue, t=v.replace(/[\s\u200b]+$/,'');
+        if(t===v) break;
+        removed = v.slice(t.length).replace(/\u200b/g,'') + removed;
+        if(t===''){ n.parentNode.removeChild(n); continue; }
+        n.nodeValue=t; break;
+      }
+      if(n.nodeType===1 && n.tagName==='BR'){ n.parentNode.removeChild(n); removed = '<br>' + removed; continue; }
+      if(n.nodeType===1 && novelIsEmptyEl(n)){ n.parentNode.removeChild(n); continue; }
+      break;
+    }
+    return removed;
+  }
+  // 뒤 조각 앞의 줄바꿈을 떼어 낸다. 문단 한가운데서 끊겼으면(줄바꿈이 없으면) 줄 앞 공백도 뗀다
+  function novelTrimStart(d, sawBr){
+    var removed = '';
+    for(var g=0; g<500; g++){
+      var n = novelLeaf(d, false); if(!n || n===d) break;
+      if(n.nodeType===3){
+        var v=n.nodeValue;
+        var re = sawBr ? /^\u200b+/ : /^[\s\u200b]+/;
+        var t=v.replace(re,'');
+        if(t===v) break;
+        removed += v.slice(0, v.length-t.length).replace(/\u200b/g,'');
+        if(t===''){ n.parentNode.removeChild(n); continue; }
+        n.nodeValue=t; break;
+      }
+      if(n.nodeType===1 && n.tagName==='BR'){ n.parentNode.removeChild(n); removed += '<br>'; sawBr=true; continue; }
+      if(n.nodeType===1 && novelIsEmptyEl(n)){ n.parentNode.removeChild(n); continue; }
+      break;
+    }
+    return removed;
+  }
+  function novelIsBlank(html){
+    var d=tmpEl(html);
+    if(d.querySelector('img,.g-hr,.g-img')) return false;
+    return (d.textContent||'').replace(/[\s\u200b]/g,'')==='';
+  }
+  // 지금 페이지들을 한 덩어리로 합친다(소설 모드로 나눈 자리는 원래 모양 그대로, 직접 만든 페이지 사이는 줄바꿈)
+  function novelMergedBody(){
+    var out = '';
+    pages.forEach(function(p, i){
+      var b = p.body || '';
+      if(i===0){ out = b; return; }
+      if(novelIsBlank(b)) return;
+      var j = (typeof p.novelJoin === 'string') ? p.novelJoin : '<br>';
+      out = novelIsBlank(out) ? b : (out + j + b);
+    });
+    return out;
+  }
+  function loadPageIntoEditors(){
+    _switching = true;
+    var p = pages[pageIdx];
+    editor.innerHTML = p.body || '';
+    if($('title-ed')) $('title-ed').innerHTML = (p.title != null ? p.title : sharedTitle) || '';
+    if($('subtitle-ed')) $('subtitle-ed').innerHTML = (p.subtitle != null ? p.subtitle : sharedSubtitle) || '';
+    if(nameEd) nameEd.innerHTML = (p.name != null ? p.name : sharedName) || '';
+    syncTails(editor); clearHrSel();
+    [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode);
+    _switching = false;
+  }
+  function novelSplit(){
+    syncSharedFromEds();
+    // 지금 있는 페이지에서 따로 쓰던 제목·하단은 같은 순서의 페이지에 그대로 둔다(새로 생기는 페이지는 1페이지 것을 같이 씀)
+    var metas = pages.map(function(p){ return { title:p.title, subtitle:p.subtitle, name:p.name, id:p.id }; });
+    var rest = novelMergedBody();
+    var out = [], joins = [], overflow = false, availPx = 0;
+    for(var i=0; i<PAGE_LIMIT; i++){
+      var meta = metas[i] || { title:null, subtitle:null, name:null };
+      var m = pageMetaHtml(meta, sharedTitle, sharedSubtitle, sharedName);
+      var cont = i > 0 && typeof joins[i] === 'string' && joins[i].indexOf('<br') === -1;
+      var whole = layoutTestPage(rest, m.t, m.s, m.n, true, cont);
+      availPx = whole.avail;
+      var page = { id: meta.id || ('p' + (_nextPageId++)), body:'', title:meta.title==null?null:meta.title,
+                   subtitle:meta.subtitle==null?null:meta.subtitle, name:meta.name==null?null:meta.name };
+      if(whole.ih <= availPx + 0.5 || i === PAGE_LIMIT-1){
+        if(whole.ih > availPx + 0.5) overflow = true;
+        page.body = rest; out.push(page); rest = ''; break;
+      }
+      // 들어가는 만큼(글자 단위) 이분 탐색
+      var root = tmpEl(rest), cuts = novelCuts(root);
+      var lo = 0, hi = cuts.length - 1, best = -1;
+      while(lo <= hi){
+        var mid = (lo + hi) >> 1;
+        var r = layoutTestPage(novelSlice(root, cuts[mid], true).innerHTML, m.t, m.s, m.n, false, cont);
+        if(r.ih <= availPx + 0.5){ best = mid; lo = mid + 1; } else { hi = mid - 1; }
+      }
+      if(best < 0) best = 0;   // 첫 덩어리조차 안 들어가면(아주 큰 사진 등) 그것만이라도 싣고 넘어간다
+      var headD = novelSlice(root, cuts[best], true), tailD = novelSlice(root, cuts[best], false);
+      var j1 = novelTrimEnd(headD);
+      // 새 문단 첫머리의 들여쓰기 빈칸이 앞 페이지 끝에 딸려 잘렸으면 다음 페이지 문단 앞으로 돌려준다
+      if(j1.indexOf('<br')!==-1 && /\u2002\u200b*$/.test(j1)){
+        j1 = j1.replace(/\u2002(\u200b*)$/, '$1');
+        tailD.insertBefore(document.createTextNode(IND_CH), tailD.firstChild);
+      }
+      var j2 = novelTrimStart(tailD, j1.indexOf('<br')!==-1);
+      page.body = headD.innerHTML;
+      out.push(page);
+      rest = tailD.innerHTML;
+      if(novelIsBlank(rest)){ rest=''; break; }
+      // 다음 페이지가 이 페이지와 어떻게 이어지는지 적어 둔다(끄면 이걸로 되붙임)
+      joins[i+1] = j1 + j2;
+    }
+    out.forEach(function(p, k){ if(k>0) p.novelJoin = (typeof joins[k]==='string') ? joins[k] : '<br>'; });
+    pages = out; pageIdx = 0;
+    return overflow;
+  }
+  function novelMerge(){
+    syncSharedFromEds();
+    var merged = novelMergedBody();
+    // 2페이지 이후에 따로 쓴 제목·하단은 버린다(숨겨 뒀다가 나중에 다른 글에서 불쑥 나타나지 않게)
+    var first = pages[0];
+    pages = [{ id:first.id, body:merged, title:first.title, subtitle:first.subtitle, name:first.name }];
+    pageIdx = 0;
+  }
+  function toggleNovelMode(){
+    if(sizeMode !== 'ratio'){ alert('소설 모드는 고정 비율에서만 쓸 수 있어요.'); return; }
+    var go = function(){
+      var overflow = false;
+      if(!novelMode){
+        overflow = novelSplit();
+        novelMode = true;
+        alignPages = true;   // 짧은 마지막 페이지도 위에서부터 시작하고, 하단 위치가 페이지끼리 맞도록
+      } else {
+        var lost = pages.slice(1).some(function(p){ return p.title != null || p.subtitle != null || p.name != null; });
+        if(lost && !confirm('2페이지 이후에 따로 쓴 제목 · 하단은 지워져요.\n소설 모드를 끌까요?')) return;
+        novelMerge();
+        novelMode = false;
+      }
+      _lastTabState = '';
+      loadPageIntoEditors();
+      renderPageTabs(); updateShareBadges();
+      if(alignPages) measureAllPages();
+      render(); _histClear(); scheduleSave();
+      if(overflow) alert('내용이 4페이지를 넘어요. 남은 내용은 4페이지에 모두 넣었지만 잘릴 수 있어요.\n글자 크기·여백을 줄이거나 내용을 나눠 주세요.');
+    };
+    // 웹폰트가 다 붙은 뒤 재야 줄바꿈 위치가 맞는다
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+  /* ============================================================
+     문단 들여쓰기
+     · 들여쓴 문단은 입력에서 맨 앞에 좁은 빈칸 문자(U+2002, en space) 하나를 가진다.
+       미리보기 · 저장에선 그 문자를 떼고 첫 줄을 설정 크기(0.5~2글자)만큼 민다.
+     · 문단 앞 빈칸을 백스페이스로 지우면 그 문단만 빠진다 — 키 입력을 가로채지 않아
+       아이폰 한글 키보드에서도 평범한 글자 지우기와 똑같이 동작한다.
+     · 켜면 모든 문단 앞에 빈칸을 넣고, 끄면 모두 뗀다. 엔터 · 붙여넣기로 생긴 새 문단에도 자동으로 붙는다.
+     · 인용선 · 말풍선 안의 글은 건드리지 않는다
+     ============================================================ */
+  var IND_CH = '\u2002';
+  var IND_MARK = '\u2060';   // 예전 방식의 '뺀 문단' 표식(옮겨 올 때만 씀)
+  function paraIndentOn(){ var c=$('para-indent'); return !!(c && c.checked); }
+  function isNovelCont(i){
+    var p = pages[i];
+    return !!(novelMode && i > 0 && p && typeof p.novelJoin === 'string' && p.novelJoin.indexOf('<br') === -1);
+  }
+  function isIndVis(n){ return n && n.nodeType===1 && n.classList && n.classList.contains('g-ind-vis'); }
+  function isInlineNode(n){
+    if(n.nodeType===3) return true;
+    if(isIndVis(n)) return true;
+    return n.nodeType===1 && (NOVEL_INLINE[n.tagName] || (n.tagName==='SPAN' && !/\bg-/.test(n.className||'')));
+  }
+  function stripIndVis(html){ return String(html||'').replace(/<span class="g-ind-vis"[^>]*><\/span>/g,''); }
+  // 최상위 문단(줄바꿈 · 블록으로 나뉜 인라인 덩어리) 목록
+  function paraRuns(host){
+    var runs=[], run=[];
+    [].slice.call(host.childNodes).forEach(function(n){
+      if(n.nodeType===1 && n.tagName==='BR'){ runs.push(run); run=[]; return; }
+      if(isInlineNode(n)){ run.push(n); return; }
+      runs.push(run); run=[];
+    });
+    runs.push(run);
+    return runs.filter(function(r){ return r.length; });
+  }
+  // 문단의 첫 글자가 든 텍스트 노드(보이지 않는 \u200b 는 건너뜀)
+  function runFirstText(run){
+    for(var i=0;i<run.length;i++){
+      var n=run[i];
+      if(n.nodeType===3){ if(n.nodeValue.replace(/\u200b/g,'')!=='') return n; continue; }
+      if(n.nodeType!==1 || isIndVis(n)) continue;
+      var w=document.createTreeWalker(n, NodeFilter.SHOW_TEXT, null, false), t;
+      while((t=w.nextNode())){ if(t.nodeValue.replace(/\u200b/g,'')!=='') return t; }
+      if(n.tagName==='IMG' || (n.querySelector && n.querySelector('img'))) return null;
+    }
+    return null;
+  }
+  function leadIndex(t){ var m=/^\u200b*/.exec(t.nodeValue); return m ? m[0].length : 0; }
+  function runHasInd(run){ var t=runFirstText(run); return !!(t && t.nodeValue.charAt(leadIndex(t))===IND_CH); }
+  function runStripInd(run){
+    var t=runFirstText(run); if(!t) return false;
+    var i=leadIndex(t);
+    if(t.nodeValue.charAt(i)!==IND_CH) return false;
+    t.nodeValue = t.nodeValue.slice(0,i) + t.nodeValue.slice(i+1);
+    return true;
+  }
+  /* 본문 HTML 의 모든 문단에 들여쓰기 빈칸을 넣거나(on) 뗀다(off).
+     skipFirst: 소설 모드에서 앞 페이지와 이어진 첫 문단(들여쓰지 않음)
+     legacy: 예전 방식 표식(\u2060)이 붙은 문단은 '뺀 문단'이므로 빈칸 없이 둔다 */
+  function markParasHtml(html, on, skipFirst, legacy){
+    var d=tmpEl(stripIndVis(html));
+    paraRuns(d).forEach(function(run, k){
+      var t=runFirstText(run);
+      if(!t) return;
+      var i=leadIndex(t), v=t.nodeValue;
+      if(!on){ if(v.charAt(i)===IND_CH) t.nodeValue=v.slice(0,i)+v.slice(i+1); return; }
+      if(legacy && v.charAt(i)===IND_MARK) return;
+      if(k===0 && skipFirst) return;
+      if(v.charAt(i)!==IND_CH) t.nodeValue=v.slice(0,i)+IND_CH+v.slice(i);
+    });
+    var out=d.innerHTML;
+    if(!on || legacy) out=out.replace(/\u2060/g,'');
+    return out;
+  }
+  // 모든 페이지에 적용(버튼 켜기/끄기 · 프리셋 · 예전 데이터 옮기기)
+  function applyIndentMarkers(on, legacy){
+    if(typeof flushPage==='function') flushPage();
+    pages.forEach(function(p, i){ if(typeof p.body==='string') p.body = markParasHtml(p.body, on, isNovelCont(i), legacy); });
+    _switching = true;
+    editor.innerHTML = (pages[pageIdx] && pages[pageIdx].body) || '';
+    syncTails(editor); clearHrSel();
+    [].forEach.call(editor.querySelectorAll('img'), reRenderOnDecode);
+    _switching = false;
+  }
+  // 미리보기 · 저장: 빈칸이 있는 문단만 블록으로 감싸 첫 줄을 민다(빈칸 문자는 떼어 냄)
+  function indentIn(host){
+    paraRuns(host).forEach(function(run){
+      if(!runHasInd(run)) return;
+      var hasImg=run.some(function(x){ return x.nodeType===1 && (x.tagName==='IMG' || (x.querySelector && x.querySelector('img'))); });
+      var txt=run.map(function(x){ return x.textContent||''; }).join('').replace(/[\s\u200b]/g,'');
+      if(!txt && !hasImg){ runStripInd(run); return; }   // 빈칸만 있는 빈 줄: 빈칸만 떼고 빈 줄 그대로
+      var d=document.createElement('div'); d.className='g-para ind';
+      run[0].parentNode.insertBefore(d, run[0]);
+      run.forEach(function(x){ d.appendChild(x); });
+      runStripInd([d]);
+      // 블록이 된 문단 뒤의 줄바꿈은 필요 없음(있으면 빈 줄이 하나 더 생김)
+      var nx=d.nextSibling; if(nx && nx.nodeType===1 && nx.tagName==='BR') nx.parentNode.removeChild(nx);
+    });
+  }
+  function applyParaIndent(root){
+    if(!paraIndentOn()) return;
+    var inner=root.querySelector('.g-inner'); if(!inner) return;
+    var cols=inner.querySelectorAll('.g-grid-col');
+    if(cols.length){ [].forEach.call(cols, function(c){ indentIn(c); }); }
+    else indentIn(inner);
+  }
+  // 엔터 · 붙여넣기로 새 문단이 생길 때 앞에 붙일 문자(최상위 본문에서, 켜져 있을 때만)
+  function newParaPrefix(node){
+    if(!paraIndentOn()) return '';
+    var p=node && node.parentNode;
+    return (p===editor) ? IND_CH : '';
+  }
+  /* 빈 입력에서 첫 문단을 직접 타이핑하기 시작하면, 그 문단에도 들여쓰기 빈칸을 붙인다.
+     한글 조합을 깨지 않도록 타이핑 중엔 건드리지 않고, 엔터를 누를 때 · 입력칸을 떠날 때 붙인다 */
+  var _indFirstPending=false, _edEmptyPrev=null;
+  function editorIsEmpty(){ return (editor.textContent||'').replace(/[\s\u200b]/g,'')==='' && !editor.querySelector('img'); }
+  editor.addEventListener('focus', function(){ _edEmptyPrev = editorIsEmpty(); });
+  editor.addEventListener('input', function(){
+    var e2 = editorIsEmpty();
+    if(_edEmptyPrev && !e2) _indFirstPending = true;
+    if(e2) _indFirstPending = false;
+    _edEmptyPrev = e2;
+  });
+  function applyFirstInd(){
+    if(!_indFirstPending) return;
+    _indFirstPending = false;
+    if(!paraIndentOn() || isNovelCont(pageIdx)) return;
+    var run = paraRuns(editor)[0]; if(!run || runHasInd(run)) return;
+    var t = runFirstText(run); if(!t) return;
+    t.insertData(leadIndex(t), IND_CH);   // insertData 는 커서 · 범위 위치를 알아서 밀어 준다
+  }
+  editor.addEventListener('blur', function(){ if(_indFirstPending){ applyFirstInd(); if(typeof renderSoon==='function') renderSoon(); } });
+  function syncEditorIndent(){ /* 예전 방식(입력 속 표시 칸)은 쓰지 않는다 — 남아 있으면 치운다 */
+    [].forEach.call(editor.querySelectorAll('.g-ind-vis'), function(x){ x.parentNode.removeChild(x); });
+  }
+  function syncIndentUI(){
+    var on=paraIndentOn(), row=$('para-indent-row'); if(row) row.style.display = on ? '' : 'none';
+    var v=String(parseFloat(($('indent-size')||{}).value)||1);
+    var seg=$('para-indent-seg');
+    if(seg){
+      [].forEach.call(seg.querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-ind')===v ? 'true':'false'); });
+      if(on) requestAnimationFrame(function(){ moveThumb(seg); });
+    }
+  }
+  if($('name-in-margin')){
+    $('name-in-margin').addEventListener('change', function(){ render(); scheduleSave(); });
+  }
+  if($('para-indent')){
+    $('para-indent').addEventListener('change', function(){
+      if(!_restoring){
+        if(typeof _histCommit==='function'){ clearTimeout(_histTimer); _histCommit(); }
+        applyIndentMarkers(paraIndentOn(), false);
+      }
+      syncIndentUI(); render(); scheduleSave();
+      if(!_restoring && typeof _histCommit==='function') _histCommit();   // 켜기/끄기도 되돌리기 한 단계
+    });
+  }
+  if($('para-indent-seg')){
+    [].forEach.call($('para-indent-seg').querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){ $('indent-size').value=b.getAttribute('data-ind'); syncIndentUI(); render(); scheduleSave(); });
+    });
+  }
+
+  /* 다음 페이지로 문단 한가운데가 이어지면, 이 페이지 마지막 줄도 양쪽 끝까지 맞춘다
+     (문단의 끝 줄로 취급되어 왼쪽에 붙는 걸 막음) */
+  function novelJustifyLastLine(root){
+    if(!novelMode || gridCols !== 0 || currentAlign !== 'justify') return;
+    var nx = pages[pageIdx+1];
+    if(!nx || typeof nx.novelJoin !== 'string' || nx.novelJoin.indexOf('<br') !== -1) return;
+    var inner = root.querySelector('.g-inner'); if(!inner) return;
+    var end = nameStartEl(inner);
+    var lp = end ? end.previousSibling : inner.lastChild;
+    while(lp && lp.nodeType===3 && lp.nodeValue.replace(/[\s\u200b]/g,'')==='') lp = lp.previousSibling;
+    if(lp && lp.nodeType===1 && lp.classList && lp.classList.contains('g-para')){ lp.style.setProperty('text-align-last','justify','important'); return; }
+    var n = end ? end.previousSibling : inner.lastChild, run = [];
+    while(n){
+      if(n.nodeType===3){ run.unshift(n); n = n.previousSibling; continue; }
+      if(n.nodeType===1 && (NOVEL_INLINE[n.tagName] || (n.tagName==='SPAN' && !(n.className||'').match(/\bg-/)))){ run.unshift(n); n = n.previousSibling; continue; }
+      break;
+    }
+    if(n && n.nodeType===1 && n.classList && n.classList.contains('g-quote') && !run.length){ n.style.textAlignLast = 'justify'; return; }
+    if(!run.length) return;
+    var w = document.createElement('div'); w.className = 'g-novel-last';
+    w.style.setProperty('text-align-last', 'justify', 'important');
+    run[0].parentNode.insertBefore(w, run[0]);
+    run.forEach(function(x){ w.appendChild(x); });
+  }
+
+  function footerHalfOn(){ var c=$('name-in-margin'); return !!(c && c.checked) && !chrome.inputbar; }
+  // 하단 블록(구분선 + 하단)을 본문 밖으로 꺼낸다 — 본문 높이 · 페이지 나누기 계산에서 빠지게
+  function extractFooter(root){
+    if(!footerHalfOn()) return;
+    var inner=root.querySelector('.g-inner'); if(!inner) return;
+    var first=nameStartEl(inner); if(!first) return;
+    var foot=document.createElement('div'); foot.className='g-foot';
+    var n=first;
+    while(n){ var nx=n.nextSibling; foot.appendChild(n); n=nx; }
+    root.appendChild(foot);
+  }
+  // 하단 아래에 지정한 여백의 절반만 남긴다(꾸밈 테두리 두께 제외). 장평도 본문과 똑같이 적용
+  function positionFooter(){
+    var f=canvas.querySelector('.g-foot'); if(!f) return;
+    var cs=getComputedStyle(canvas);
+    var pl=parseFloat(cs.paddingLeft)||0, pr=parseFloat(cs.paddingRight)||0, pb=parseFloat(cs.paddingBottom)||0;
+    var fB=0;
+    if(framePos!=='none' && frameData && (framePos==='bottom' || framePos==='all')){
+      var fp=parseFloat($('frame-size') ? $('frame-size').value : 20); if(isNaN(fp)) fp=20;
+      fB=Math.round(canvas.clientWidth * fp/100);
+    }
+    var st=parseFloat($('stretch') ? $('stretch').value : 100); if(isNaN(st)) st=100; var sc=st/100;
+    var cw=canvas.clientWidth - pl - pr;
+    f.style.left=pl+'px'; f.style.right='auto';
+    f.style.width=(cw/sc)+'px';
+    f.style.transform = (sc===1) ? '' : 'scaleX('+sc+')';
+    var margin=Math.max(0, pb - fB);
+    f.style.bottom = (fB + margin/2) + 'px';   // 하단 아래에 남는 여백 = 지정한 여백의 절반
+  }
+  function centerRatioInner(){ _centerRatioInnerCore(); positionFooter(); }
+  function _centerRatioInnerCore(){
     var inner = canvas.querySelector('.g-inner');
     if(!inner) return;
     var warn = $('ratio-warn');
     inner.style.marginTop=''; inner.style.marginBottom='';
+    var nameEl = clearNameAlign(inner);   // 이전에 밀어 둔 하단 여백은 떼고 원래 높이로 잰다
     if(!(sizeMode==='ratio' && ratio)){ if(warn) warn.hidden = true; return; }
 
     var padSet = Math.round(parseFloat($('pad').value)||0);
@@ -6249,11 +7088,10 @@
     var _fOn = (framePos!=='none' && !!frameData);
     var _fPct = _fOn ? (parseFloat($('frame-size') ? $('frame-size').value : 20)||20) : 0;
     var _fThick = _fOn ? Math.round(canvas.clientWidth * _fPct/100) : 0;
-    var _fAll = (framePos==='all'||framePos==='inner');
-    var padT = padSet + (_fOn && (framePos==='top'||_fAll) ? _fThick : 0);
-    var padR = padSet + (_fOn && (framePos==='right'||_fAll) ? _fThick : 0);
-    var padB = padSet + (_fOn && (framePos==='bottom'||_fAll) ? _fThick : 0);
-    var padL = padSet + (_fOn && (framePos==='left'||_fAll) ? _fThick : 0);
+    var padT = padSet + (_fOn && (framePos==='top'||framePos==='all') ? _fThick : 0);
+    var padR = padSet + (_fOn && (framePos==='right'||framePos==='all') ? _fThick : 0);
+    var padB = padSet + (_fOn && (framePos==='bottom'||framePos==='all') ? _fThick : 0);
+    var padL = padSet + (_fOn && (framePos==='left'||framePos==='all') ? _fThick : 0);
 
     // 사방 여백을 사용자 설정값 + 꾸밈 두께로 초기화
     canvas.style.padding = padT+'px '+padR+'px '+padB+'px '+padL+'px';
@@ -6266,21 +7104,31 @@
       return;
     }
 
-    // ── 멀티페이지 시작점 맞추기: 현재 페이지 높이 기록 ──
-    if(pages[pageIdx]) pages[pageIdx]._contentH = ih;
+    // ── 멀티페이지 시작점 맞추기: 현재 페이지 높이·하단 위치 기록 ──
+    if(pages[pageIdx]){
+      pages[pageIdx]._contentH = ih;
+      pages[pageIdx]._nameTop = nameEl ? nameEl.offsetTop : null;
+    }
 
     // 열 나누기가 아니고 페이지 2개 이상이고 시작점 맞추기가 켜져 있으면, 가장 긴 페이지 기준으로 맞춤
-    var alignH = ih;
+    // 하단도 모든 페이지에서 같은 높이에 오도록, 본문이 짧은 페이지는 하단을 아래로 밀어 둔다
     if(alignPages && gridCols === 0 && pages.length > 1){
-      var allMeasured = true;
+      var allMeasured = true, maxNameTop = -1;
       pages.forEach(function(p){
-        if(p._contentH > 0 && p._contentH > alignH) alignH = p._contentH;
         if(!p._contentH) allMeasured = false;
+        if(p._nameTop != null && p._nameTop > maxNameTop) maxNameTop = p._nameTop;
       });
-      // 모든 페이지가 측정됐으면 가장 긴 높이 기준으로 margin-top 고정
+      // 하단을 맞춘 뒤의 페이지 높이 중 가장 큰 값 기준으로 margin-top 고정
+      var alignH = 0;
+      pages.forEach(function(p){
+        var h = p._contentH || 0;
+        if(maxNameTop >= 0 && p._nameTop != null) h += maxNameTop - p._nameTop;
+        if(h > alignH) alignH = h;
+      });
       if(allMeasured){
         var availH = ch - padT - padB;
         if(alignH <= availH){
+          if(nameEl && maxNameTop >= 0) pushNameTo(nameEl, maxNameTop);
           var alignedTop = (availH - alignH) / 2;
           inner.style.marginTop = alignedTop + 'px';
           inner.style.marginBottom = '0';
@@ -6296,20 +7144,20 @@
     // 사방 여백을 padStep 단위로 내려가며 잘리지 않는 최대값 탐색
     var maxPad = 0, found = false;
     for(var tryPad = padSet - padStep; tryPad >= minPad; tryPad -= padStep){
-      var tT = tryPad + (_fOn && (framePos==='top'||_fAll) ? _fThick : 0);
-      var tR = tryPad + (_fOn && (framePos==='right'||_fAll) ? _fThick : 0);
-      var tB = tryPad + (_fOn && (framePos==='bottom'||_fAll) ? _fThick : 0);
-      var tL = tryPad + (_fOn && (framePos==='left'||_fAll) ? _fThick : 0);
+      var tT = tryPad + (_fOn && (framePos==='top'||framePos==='all') ? _fThick : 0);
+      var tR = tryPad + (_fOn && (framePos==='right'||framePos==='all') ? _fThick : 0);
+      var tB = tryPad + (_fOn && (framePos==='bottom'||framePos==='all') ? _fThick : 0);
+      var tL = tryPad + (_fOn && (framePos==='left'||framePos==='all') ? _fThick : 0);
       canvas.style.padding = tT+'px '+tR+'px '+tB+'px '+tL+'px';
       if(Math.max(inner.scrollHeight||0, inner.offsetHeight||0) <= ch - tT - tB){
         maxPad = tryPad; found = true; break;
       }
     }
     if(!found) maxPad = minPad;
-    var fT = maxPad + (_fOn && (framePos==='top'||_fAll) ? _fThick : 0);
-    var fR = maxPad + (_fOn && (framePos==='right'||_fAll) ? _fThick : 0);
-    var fB = maxPad + (_fOn && (framePos==='bottom'||_fAll) ? _fThick : 0);
-    var fL = maxPad + (_fOn && (framePos==='left'||_fAll) ? _fThick : 0);
+    var fT = maxPad + (_fOn && (framePos==='top'||framePos==='all') ? _fThick : 0);
+    var fR = maxPad + (_fOn && (framePos==='right'||framePos==='all') ? _fThick : 0);
+    var fB = maxPad + (_fOn && (framePos==='bottom'||framePos==='all') ? _fThick : 0);
+    var fL = maxPad + (_fOn && (framePos==='left'||framePos==='all') ? _fThick : 0);
     canvas.style.padding = fT+'px '+fR+'px '+fB+'px '+fL+'px';
 
     if(warn){
@@ -6330,10 +7178,11 @@
 
   var _renderRAF=0;
   function renderSoon(){ if(_renderRAF) return; _renderRAF=requestAnimationFrame(function(){ _renderRAF=0; render(); }); }
-  var _fr, _lastFitW=0;
+  var _fr, _lastFitW=0, _suppressFitResize=false;
   function fitStage(fromObserver){
     if(_fr) cancelAnimationFrame(_fr);
     _fr = requestAnimationFrame(function(){
+      if(fromObserver && _suppressFitResize) return;
       var stage=$('stage'), inner=$('stage-in'); if(!stage || !inner) return;
       var avail=stage.clientWidth; if(!avail) return;
       // ResizeObserver가 스크롤바 등장/소멸(폭 ±스크롤바)로 반복 발화하면 배율이 진동(떨림)함.
@@ -6476,7 +7325,7 @@
   }
   // ── 테두리 꾸밈 UI
   function updateFrameInteractive(){
-    var on = !!($('fold-bg') && $('fold-bg').open && framePos!=='none' && frameData);
+    var on = !!( ($('fold-frame') ? $('fold-frame').open : ($('fold-bg') && $('fold-bg').open)) && framePos!=='none' && frameData);
     canvas.classList.toggle('frame-interactive', on);
   }
   function updateFrameUI(){
@@ -6499,12 +7348,140 @@
     $('frame-file').addEventListener('change', function(e){
       var file=e.target.files && e.target.files[0]; if(!file) return;
       var rd=new FileReader();
-      rd.onload=function(ev){ frameData=ev.target.result; loadFrameNat(render); updateFrameUI(); render(); saveState(); };
+      rd.onload=function(ev){ frameData=ev.target.result; _activeLibId=null; loadFrameNat(render); updateFrameUI(); renderFrameLib(); render(); saveState(); };
       rd.readAsDataURL(file); e.target.value='';
     });
   }
-  // fold-frame 삭제됨 → fold-bg에서 꾸밈 seg thumb 업데이트
-  // (fold-bg toggle은 아래 _foldBg 핸들러에서 처리)
+
+  // ── 사진 저장소 (IndexedDB) ──
+  var FRAMELIB_MAX = 10;
+  var _flDB = null;
+  var _activeLibId = null;   // 현재 저장소에서 불러온 항목 id (위치 자동 갱신용)
+  function openFrameLibDB(cb){
+    if(_flDB){ cb(_flDB); return; }
+    var req = indexedDB.open('logmaker-frame-lib', 1);
+    req.onupgradeneeded = function(e){ e.target.result.createObjectStore('images', {keyPath:'id', autoIncrement:true}); };
+    req.onsuccess = function(e){ _flDB = e.target.result; cb(_flDB); };
+    req.onerror = function(){ cb(null); };
+  }
+  function loadFrameLib(cb){
+    openFrameLibDB(function(db){
+      if(!db){ cb([]); return; }
+      var tx = db.transaction('images','readonly');
+      var store = tx.objectStore('images');
+      var req = store.getAll();
+      req.onsuccess = function(){ cb(req.result || []); };
+      req.onerror = function(){ cb([]); };
+    });
+  }
+  function addFrameLibItem(dataUrl, zoom, px, py, cb){
+    openFrameLibDB(function(db){
+      if(!db){ if(cb) cb(); return; }
+      var tx = db.transaction('images','readwrite');
+      tx.objectStore('images').add({src:dataUrl, zoom:zoom, px:px, py:py});
+      tx.oncomplete = function(){ if(cb) cb(); };
+      tx.onerror = function(){ alert('저장에 실패했어요.'); if(cb) cb(); };
+    });
+  }
+  function deleteFrameLibItem(id, cb){
+    openFrameLibDB(function(db){
+      if(!db){ if(cb) cb(); return; }
+      var tx = db.transaction('images','readwrite');
+      tx.objectStore('images').delete(id);
+      tx.oncomplete = function(){ if(cb) cb(); };
+    });
+  }
+  function updateFrameLibItem(id, zoom, px, py){
+    openFrameLibDB(function(db){
+      if(!db) return;
+      var tx = db.transaction('images','readwrite');
+      var store = tx.objectStore('images');
+      var req = store.get(id);
+      req.onsuccess = function(){
+        var item = req.result; if(!item) return;
+        item.zoom = zoom; item.px = px; item.py = py;
+        store.put(item);
+      };
+    });
+  }
+  function clearFrameLib(cb){
+    openFrameLibDB(function(db){
+      if(!db){ if(cb) cb(); return; }
+      var tx = db.transaction('images','readwrite');
+      tx.objectStore('images').clear();
+      tx.oncomplete = function(){ if(cb) cb(); };
+    });
+  }
+  function renderFrameLib(){
+    var wrap=$('frame-lib'); if(!wrap) return;
+    loadFrameLib(function(list){
+      wrap.innerHTML='';
+      list.forEach(function(item){
+        var th=document.createElement('div'); th.className='frame-lib__thumb';
+        th.style.backgroundImage='url("'+item.src+'")';
+        if(frameData===item.src) th.classList.add('on');
+        th.addEventListener('click', function(){
+          frameData=item.src;
+          _activeLibId = item.id;
+          if(item.zoom!=null && $('frame-zoom')) $('frame-zoom').value = item.zoom;
+          if(item.px!=null && $('frame-x')) $('frame-x').value = item.px;
+          if(item.py!=null && $('frame-y')) $('frame-y').value = item.py;
+          loadFrameNat(render); updateFrameUI(); renderFrameLib(); render(); saveState();
+        });
+        var x=document.createElement('span'); x.className='frame-lib__x'; x.textContent='×';
+        x.addEventListener('click', function(e){
+          e.stopPropagation();
+          if(_activeLibId===item.id) _activeLibId=null;
+          deleteFrameLibItem(item.id, renderFrameLib);
+        });
+        th.appendChild(x); wrap.appendChild(th);
+      });
+      var addBtn=$('frame-lib-add');
+      if(addBtn) addBtn.style.display = list.length>=FRAMELIB_MAX ? 'none' : '';
+    });
+  }
+  if($('frame-lib-add')){
+    $('frame-lib-add').addEventListener('click', function(){ $('frame-lib-file').click(); });
+    $('frame-lib-file').addEventListener('change', function(e){
+      var file=e.target.files && e.target.files[0]; if(!file) return;
+      var rd=new FileReader();
+      rd.onload=function(ev){
+        loadFrameLib(function(list){
+          if(list.length>=FRAMELIB_MAX){ alert('최대 '+FRAMELIB_MAX+'장까지 저장할 수 있어요.'); return; }
+          var _z = $('frame-zoom') ? parseFloat($('frame-zoom').value)||100 : 100;
+          var _px = $('frame-x') ? parseFloat($('frame-x').value)||50 : 50;
+          var _py = $('frame-y') ? parseFloat($('frame-y').value)||50 : 50;
+          addFrameLibItem(ev.target.result, _z, _px, _py, renderFrameLib);
+        });
+      };
+      rd.readAsDataURL(file); e.target.value='';
+    });
+  }
+  renderFrameLib();
+
+  // ── 여백 맞추기 ──
+  var _framePadSync = false;
+  function syncFrameToPad(){
+    if(!_framePadSync) return;
+    var pad = parseFloat($('pad') ? $('pad').value : 120)||120;
+    var w = baseW();
+    if(w>0 && $('frame-size')) $('frame-size').value = Math.max(5, Math.min(50, pad / w * 100));
+  }
+  if($('frame-pad-sync')){
+    $('frame-pad-sync').addEventListener('change', function(){
+      _framePadSync = this.checked;
+      if(_framePadSync){ syncFrameToPad(); render(); }
+      saveState();
+    });
+  }
+  // pad 슬라이더 움직일 때도 동기화
+  (function(){
+    var padEl=$('pad'); if(!padEl) return;
+    padEl.addEventListener('input', syncFrameToPad);
+    padEl.addEventListener('change', syncFrameToPad);
+  })();
+
+  // 꾸밈 테두리는 fold-frame으로 분리됨
 
   // ── 꾸밈 프레임 드래그 인터랙션 ──
   // render() 없이 .g-frame CSS만 직접 갱신 → 60fps 부드러운 드래그
@@ -6545,30 +7522,21 @@
       var px = (parseFloat($('frame-x') ? $('frame-x').value : 50)||0)/100;
       var py = (parseFloat($('frame-y') ? $('frame-y').value : 50)||0)/100;
       var fp = parseFloat($('frame-size') ? $('frame-size').value : 20); if(isNaN(fp)) fp=20;
-      var W = canvas.clientWidth, H = canvas.clientHeight;
+      // render() 가 캐시한 W·H 를 사용 — reflow 로 높이가 달라지는 문제 방지
+      var W = canvas._frameW || canvas.clientWidth;
+      var H = canvas._frameH || canvas.clientHeight;
       var fThick = Math.round(W * fp / 100);
       var isAll = (framePos==='all');
-      var isInner = (framePos==='inner');
-      var isMulti = isAll || isInner;
-      var padVal = isInner ? (Math.round(parseFloat($('pad').value)||0)) : 0;
-      var iW = isInner ? (W - padVal*2) : W;
-      var iH = isInner ? (H - padVal*2) : H;
       [].forEach.call(frames, function(f){
         var sd = f.getAttribute('data-side');
-        // resize 모드 → 띠 두께도 즉시 반영
-        if(sd==='left'||sd==='right'){
-          f.style.width=fThick+'px';
-          if(isInner){ f.style.top=padVal+'px'; f.style.bottom=padVal+'px'; f.style[sd]=padVal+'px'; }
-        } else {
-          f.style.height=fThick+'px';
-          if(isInner){ f.style.left=padVal+'px'; f.style.right=padVal+'px'; f.style[sd]=padVal+'px'; }
-        }
-        var boxW = isMulti ? iW : (sd==='left'||sd==='right' ? fThick : W);
-        var boxH = isMulti ? iH : (sd==='top'||sd==='bottom' ? fThick : H);
+        if(sd==='left'||sd==='right'){ f.style.width=fThick+'px'; }
+        else { f.style.height=fThick+'px'; }
+        var boxW = isAll ? W : (sd==='left'||sd==='right' ? fThick : W);
+        var boxH = isAll ? H : (sd==='top'||sd==='bottom' ? fThick : H);
         var sc = Math.max(boxW/frameNatW, boxH/frameNatH) * zoom;
         var bw = frameNatW*sc, bh = frameNatH*sc;
         var bx = -(bw-boxW)*px, by = -(bh-boxH)*py;
-        if(isMulti){ bx -= (sd==='right') ? (iW-fThick) : 0; by -= (sd==='bottom') ? (iH-fThick) : 0; }
+        if(isAll){ bx -= (sd==='right') ? (W-fThick) : 0; by -= (sd==='bottom') ? (H-fThick) : 0; }
         f.style.setProperty('background-size', bw+'px '+bh+'px','important');
         f.style.setProperty('background-position', bx+'px '+by+'px','important');
       });
@@ -6586,7 +7554,18 @@
       var ws = document.querySelector('.workspace');
       if(!ws) return;
       editcolPushed = true;
+      // 레이아웃 변경 중 fitStage 억제 + 스크롤 위치 보존 → 첫 터치 점프 방지
+      _suppressFitResize = true;
+      var scr = document.querySelector('.preview__scroll');
+      var st = scr ? scr.scrollTop : 0;
       ws.classList.add('frame-fullpreview');
+      if(scr) scr.scrollTop = st;
+      requestAnimationFrame(function(){
+        if(scr) scr.scrollTop = st;
+        requestAnimationFrame(function(){
+          _suppressFitResize = false;
+        });
+      });
       // 다른 곳 터치하면 복귀하는 리스너 등록
       setTimeout(function(){
         document.addEventListener('touchstart', outsideTouchRestore, {passive:true});
@@ -6601,8 +7580,20 @@
     function restoreEditcol(){
       if(!editcolPushed) return;
       editcolPushed = false;
+      // 레이아웃 복귀 중 fitStage 억제 + 스크롤 위치 보존
+      _suppressFitResize = true;
+      var scr = document.querySelector('.preview__scroll');
+      var st = scr ? scr.scrollTop : 0;
       var ws = document.querySelector('.workspace');
       if(ws) ws.classList.remove('frame-fullpreview');
+      if(scr) scr.scrollTop = st;
+      requestAnimationFrame(function(){
+        if(scr) scr.scrollTop = st;
+        requestAnimationFrame(function(){
+          _suppressFitResize = false;
+          fitStage();
+        });
+      });
       document.removeEventListener('touchstart', outsideTouchRestore);
       document.removeEventListener('mousedown', outsideTouchRestore);
     }
@@ -6616,7 +7607,7 @@
         el.classList.remove('frame-resize-h','frame-resize-v');
       });
       if(!f) return;
-      if(isInnerEdge(e, f)){
+      if(isInnerEdge(e, f) && !_framePadSync){
         f.classList.add(getResizeAxis(f)==='h' ? 'frame-resize-h' : 'frame-resize-v');
       }
     });
@@ -6656,7 +7647,7 @@
       startVal = readVals();
       dragTarget = f;
 
-      if(isInnerEdge(e, f)){
+      if(isInnerEdge(e, f) && !_framePadSync){
         dragMode = 'resize';
         f.classList.add(getResizeAxis(f)==='h' ? 'frame-resize-h' : 'frame-resize-v');
       } else {
@@ -6865,6 +7856,33 @@
     });
     return out;
   }
+  /* 라인 · 카카오톡 꼬리: 미리보기 CSS(.72em × .62em 사각형에서 바깥 아래 모서리 중심 타원을 도려냄)와 같은 식 */
+  function collectKtTails(canvasRect, scale){
+    var out=[];
+    if(!canvas.classList.contains('bub-kt')) return out;
+    [].forEach.call(canvas.querySelectorAll('.g-bub.tail:not(.img-only)'), function(bub){
+      var r=bub.getBoundingClientRect(); if(r.width<=0||r.height<=0) return;
+      var cs=getComputedStyle(bub), fs=parseFloat(cs.fontSize)||16;
+      var right = bub.classList.contains('right') || bub.classList.contains('send');
+      var W=0.72*fs, H=0.62*fs, off=0.42*fs;
+      var x0 = right ? (r.right - (W-off)) : (r.left - off);   // 사각형 왼쪽
+      out.push({ x0:(x0-canvasRect.left)*scale, y0:(r.top-canvasRect.top)*scale, W:W*scale, H:H*scale, right:right, color:cs.backgroundColor });
+    });
+    return out;
+  }
+  function paintKtTail(ctx, d){
+    ctx.save(); ctx.fillStyle=d.color; ctx.beginPath();
+    if(!d.right){
+      // 뾰족한 끝 = 왼쪽 위. 타원 중심 = 왼쪽 아래
+      ctx.moveTo(d.x0, d.y0); ctx.lineTo(d.x0+d.W, d.y0); ctx.lineTo(d.x0+d.W, d.y0+d.H);
+      ctx.ellipse(d.x0, d.y0+d.H, d.W, d.H, 0, 0, -Math.PI/2, true);
+    } else {
+      // 뾰족한 끝 = 오른쪽 위. 타원 중심 = 오른쪽 아래
+      ctx.moveTo(d.x0+d.W, d.y0); ctx.lineTo(d.x0, d.y0); ctx.lineTo(d.x0, d.y0+d.H);
+      ctx.ellipse(d.x0+d.W, d.y0+d.H, d.W, d.H, 0, Math.PI, Math.PI*1.5, false);
+    }
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
   function paintPseudoTail(mainCtx, d){
     var b=d.b, a=d.a;
     var originX=Math.floor(Math.min(b[0],a[0])-2), originY=Math.floor(Math.min(b[1],a[1])-2);
@@ -6991,6 +8009,7 @@
       if(choice){ doSaveAll(type); return; }
     }
     _busy=true; mode=mode||'save';
+    if(alignPages && gridCols === 0 && pages.length > 1 && sizeMode === 'ratio'){ syncSharedFromEds(); measureAllPages(); }
     var allBtns = document.querySelectorAll('#save-png,#save-jpg,#copy-img');
     [].forEach.call(allBtns, function(b){ b.disabled=true; });
     var actBtn = (mode==='copy') ? $('copy-img') : (type==='image/jpeg' ? $('save-jpg') : $('save-png'));
@@ -7021,6 +8040,8 @@
     var blobs = [];
     var idx = 0;
     _collectBlobs = [];
+    syncSharedFromEds();
+    if(alignPages && gridCols === 0) measureAllPages();   // 저장 직전 모든 페이지 높이·하단 위치를 새로 잰다
 
     function finishAll(){
       _busy = false;
@@ -7170,6 +8191,22 @@
         ulBackup.push([mk, mk.getAttribute('style')]);
         mk.style.setProperty('text-decoration','none','important');
       });
+      // 취소선(s/strike): 미리보기와 같은 식(두께 .05em, 상자 높이 55% 지점)으로 모아 직접 그린다
+      var stRects=[], stEls=canvas.querySelectorAll('s,strike');
+      [].forEach.call(stEls, function(el){
+        var cs=window.getComputedStyle(el);
+        var color=cs.color || '#000';
+        var th=Math.max((parseFloat(cs.fontSize)||16)*0.05, 0.5);   // 밑줄과 같은 두께
+        var rects=el.getClientRects();
+        for(var i=0;i<rects.length;i++){
+          var r=rects[i]; if(r.width<=0||r.height<=0) continue;
+          stRects.push({ x:r.left-canvasRect.left, y:(r.top-canvasRect.top)+(r.height-th)*0.55, w:r.width, h:th, color:color });
+        }
+      });
+      [].forEach.call(stEls, function(el){
+        ulBackup.push([el, el.getAttribute('style')]);
+        el.style.setProperty('background-image','none','important');   // 저장 중엔 CSS 선을 끄고 위에서 직접 그림
+      });
       function restoreUl(){ ulBackup.forEach(function(pair){ if(pair[1]===null) pair[0].removeAttribute('style'); else pair[0].setAttribute('style', pair[1]); }); }
       var markBackup=[];
       [].forEach.call(marks, function(mk){
@@ -7181,6 +8218,8 @@
       var pseudoTails=collectPseudoTails(canvasRect, 2);
       var tailRects=pseudoTails.length ? [] : collectTailRects(canvas);
       if(pseudoTails.length) canvas.classList.add('exp-notail');
+      var ktTails=collectKtTails(canvasRect, 2);
+      if(ktTails.length) canvas.classList.add('exp-nokt');
       var restoreTails=hideTails(canvas);
       // 아바타 사진: html2canvas가 저해상도로 굽는 문제가 있어, 위치를 모아 두고 저장 중엔 숨긴 뒤 최종 캔버스에 원본으로 직접 고품질 렌더
       var avBakes=[], avHidden=[];
@@ -7202,7 +8241,21 @@
       });
       var hrBackup=[];
       [].forEach.call(canvas.querySelectorAll('.g-hr.line, .g-hr.short'), function(hr){ hrBackup.push([hr, hr.style.visibility]); hr.style.visibility='hidden'; });
-      function restoreHrs(){ hrBackup.forEach(function(p){ if(p[1]) p[0].style.visibility=p[1]; else p[0].style.removeProperty('visibility'); }); }
+      // 제목 · 하단 구분선: 저장 배율(2배)에서 소수점 위치에 걸치면 선이 한 줄 더 번져 두꺼워 보인다
+      // → 저장하는 동안만 선을 가장 가까운 아래쪽 정수 픽셀로 살짝(1px 미만) 내려 두 선의 굵기를 똑같이 맞춘다
+      var ruleSnap=[];
+      [].forEach.call(canvas.querySelectorAll('.g-title-rule, .g-name-rule'), function(el){
+        var r=el.getBoundingClientRect(); if(r.width<=0) return;
+        var top=r.top-canvasRect.top, d=Math.ceil(top-0.001)-top;
+        if(d<0.01) return;
+        ruleSnap.push([el, el.getAttribute('style')]);
+        el.style.setProperty('position','relative','important');
+        el.style.setProperty('top', d+'px','important');
+      });
+      function restoreHrs(){
+        hrBackup.forEach(function(p){ if(p[1]) p[0].style.visibility=p[1]; else p[0].style.removeProperty('visibility'); });
+        ruleSnap.forEach(function(p){ if(p[1]===null) p[0].removeAttribute('style'); else p[0].setAttribute('style', p[1]); });
+      }
       function restoreMarks(){ markBackup.forEach(function(pair){ if(pair[1]===null) pair[0].removeAttribute('style'); else pair[0].setAttribute('style', pair[1]); }); }
 
       var prevBg=canvas.style.background, prevBgColor=canvas.style.backgroundColor;
@@ -7211,7 +8264,7 @@
       var hlLayer=canvas.querySelector('.g-bg-layer'), prevLayerDisplay=null;
       if(hlLayer){ prevLayerDisplay=hlLayer.style.display; hlLayer.style.display='none'; }
       function restoreCanvasBg(){
-        canvas.classList.remove('exp-notail');
+        canvas.classList.remove('exp-notail'); canvas.classList.remove('exp-nokt');
         if(prevBg) canvas.style.background=prevBg; else canvas.style.removeProperty('background');
         if(prevBgColor) canvas.style.backgroundColor=prevBgColor; else canvas.style.removeProperty('background-color');
         styleCanvas(canvas); applyHlSolid(canvas);
@@ -7221,7 +8274,7 @@
       // bold 웨이트가 없는 폰트의 b/strong에 text-stroke 보정 (html2canvas faux bold 미지원 대응)
       var BOLD_FONTS = ['pretendard','paperozi','paperlogy','presentation','freesentation','bookkmyungjo','maruburi','kopubdotum','kopubbatang','nanum myeongjo','nanummyeongjo'];
       var boldStrokeBackup=[];
-      [].forEach.call(canvas.querySelectorAll('b,strong,.g-script-name'), function(el){
+      [].forEach.call(canvas.querySelectorAll('b,strong,.g-script-name,.g-meta-read'), function(el){
         var ff = window.getComputedStyle(el).fontFamily.toLowerCase();
         var hasBold = BOLD_FONTS.some(function(f){ return ff.indexOf(f)!==-1; });
         if(!hasBold){
@@ -7256,12 +8309,15 @@
           if(photoOn && photoData && bakedPhotoImg){ ctx.drawImage(bakedPhotoImg, 0, 0, outW, outH); }
           else { paintBackground(ctx, outW, outH, bgValue, type); }
           hlRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(rc.x*2, rc.y*2, rc.w*2, rc.h*2); });
-          hrRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(rc.x*2, rc.y*2, rc.w*2, rc.h*2); });
+          // 본문 구분선도 정수 픽셀에 맞춰 그린다(위치에 따라 굵기가 달라 보이지 않게)
+          hrRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(Math.round(rc.x*2), Math.round(rc.y*2), Math.round(rc.w*2), Math.max(1, Math.round(rc.h*2))); });
           tailRects.forEach(function(t){ ctx.save(); ctx.fillStyle=t.color; traceTailPath(ctx, t.x*2, t.y*2, t.w*2, t.h*2, t.flip); ctx.fill(); ctx.restore(); });
           pseudoTails.forEach(function(d){ paintPseudoTail(ctx, d); });
+          ktTails.forEach(function(d){ paintKtTail(ctx, d); });
           ctx.drawImage(textCanvas, 0, 0, outW, outH);
           // 밑줄을 텍스트 위에 직접 그린다 (html2canvas text-decoration 렌더링 불일치 보정)
           ulRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(rc.x*2, rc.y*2, rc.w*2, rc.h*2); });
+          stRects.forEach(function(rc){ ctx.fillStyle=rc.color; ctx.fillRect(rc.x*2, rc.y*2, rc.w*2, rc.h*2); });
           drawBakedAvatars(ctx, avBakes, function(){ deliverImage(out, type, cleanup, mode); });
         });
       }).catch(function(){ restoreMarks(); restoreUl(); restoreTails(); restoreHrs(); restoreAvatars(); restoreCanvasBg(); restoreBoldStroke(); removeResolveStyle(); cleanup(); });
@@ -7560,13 +8616,16 @@
   function _wrapSeg(parent, seg){
     if(!seg.length) return;
     var txt=''; seg.forEach(function(n){ txt += (n.textContent||''); });
-    txt = txt.replace(/\u200b/g,'').trim();
+    txt = txt.replace(/[\u200b\u2060]/g,'').trim();
     if(!txt) return;
     if(_EDGE_SKIP.indexOf(txt.charAt(0))>-1) return;                // 앞이 * ( )
     if(_EDGE_SKIP.indexOf(txt.charAt(txt.length-1))>-1) return;     // 뒤가 * ( )
-    parent.insertBefore(document.createTextNode('"'), seg[0]);      // 서식 '바깥'에 붙음
+    var f0=seg[0];
+    if(f0.nodeType===3 && /^\u200b*[\u2060\u2002]/.test(f0.nodeValue)){      // 들여쓰기 빈칸은 문단 맨 앞에 남긴다
+      f0.nodeValue = f0.nodeValue.replace(/^(\u200b*[\u2060\u2002])/, '$1“');
+    } else parent.insertBefore(document.createTextNode('“'), seg[0]);      // 서식 '바깥'에 붙음 — 휜 여는 따옴표
     var last=seg[seg.length-1];
-    parent.insertBefore(document.createTextNode('"'), last.nextSibling);
+    parent.insertBefore(document.createTextNode('”'), last.nextSibling);   // 휜 닫는 따옴표
     _wrapCount++;
   }
   function wrapPlainLines(host){
@@ -7794,7 +8853,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-thick','quote-gap','hr-thick','title-hr-thick','grid-gap','script-font','font-size','subtext-size','parensub-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['read-text','c-time','c-time-txt','c-read','c-read-txt','indent-size','name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-thick','quote-gap','hr-thick','title-hr-thick','grid-gap','script-font','font-size','subtext-size','parensub-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-hl5','c-hl5-txt','c-hl6','c-hl6-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-em5','c-em5-txt','c-em6','c-em6-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-quote2','c-quote2-txt','c-quote3','c-quote3-txt','c-quote4','c-quote4-txt','c-quote5','c-quote5-txt','c-quote6','c-quote6-txt','c-hr','c-hr-txt','c-title-hr','c-title-hr-txt',
@@ -7804,6 +8863,20 @@
   function saveState(){
     if(_restoring) return;
     try{
+      var data = buildStateData();
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+      catch(e){ try{ data.photoData=null; localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e2){} }
+      // 사진 저장소: 활성 항목의 zoom/x/y 자동 갱신
+      if(_activeLibId!=null){
+        var _lz = $('frame-zoom') ? parseFloat($('frame-zoom').value) : null;
+        var _lx = $('frame-x') ? parseFloat($('frame-x').value) : null;
+        var _ly = $('frame-y') ? parseFloat($('frame-y').value) : null;
+        if(_lz!=null) updateFrameLibItem(_activeLibId, _lz, _lx, _ly);
+      }
+    }catch(e){}
+  }
+  // 지금 편집 상태 전체를 하나의 객체로 만든다(자동 저장 · 스냅샷 공용)
+  function buildStateData(){
       flushPage(); // 현재 에디터 내용을 pages에 반영
       // 공유 상태인 에디터 값을 shared에 반영
       if(pages[pageIdx] && pages[pageIdx].title == null && $('title-ed')) sharedTitle = $('title-ed').innerHTML;
@@ -7812,13 +8885,11 @@
       var vals={}; TEXT_IDS.forEach(function(id){ var e=$(id); if(e) vals[id]=e.value; });
       var data={ vals:vals, editorHtml:pages[0].body||'', nameHtml:sharedName,
         titleHtml:sharedTitle, subtitleHtml:sharedSubtitle,
-        bgValue:bgValue, align:currentAlign, titleAlign:titleAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, scriptAlign:(!!($('script-align')&&$('script-align').checked)), scriptJustify:(!!($('script-justify')&&$('script-justify').checked)), titleRule:(!!($('title-rule')&&$('title-rule').checked)), titleRuleStyle:titleRuleStyle, nameRule:(!!($('name-rule')&&$('name-rule').checked)), nameRuleStyle:nameRuleStyle, photoOn:photoOn, photoData:photoData, framePos:framePos, frameData:frameData, chrome:chrome,
-        sizeHelper: sizeHelperOn() ? { on:1, snap:_sizeSnap } : null,
-        multiPage: { pages:pages, pageIdx:pageIdx, nextId:_nextPageId, sharedTitle:sharedTitle, sharedSubtitle:sharedSubtitle, sharedName:sharedName, gridCols:gridCols, alignPages:alignPages }
+        bgValue:bgValue, align:currentAlign, titleAlign:titleAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, scriptAlign:(!!($('script-align')&&$('script-align').checked)), scriptJustify:(!!($('script-justify')&&$('script-justify').checked)), titleRule:(!!($('title-rule')&&$('title-rule').checked)), titleRuleStyle:titleRuleStyle, nameRule:(!!($('name-rule')&&$('name-rule').checked)), nameRuleStyle:nameRuleStyle, paraIndent:paraIndentOn(), nameInMargin:(!!($('name-in-margin')&&$('name-in-margin').checked)), photoOn:photoOn, photoData:photoData, framePos:framePos, frameData:frameData, framePadSync:_framePadSync, chrome:chrome,
+        sizeHelper: sizeHelperOn() ? { on:1, snap:_sizeSnap } : null, indentV2:1,
+        multiPage: { pages:pages, pageIdx:pageIdx, nextId:_nextPageId, sharedTitle:sharedTitle, sharedSubtitle:sharedSubtitle, sharedName:sharedName, gridCols:gridCols, alignPages:alignPages, novelMode:novelMode }
       };
-      try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
-      catch(e){ try{ data.photoData=null; localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e2){} }
-    }catch(e){}
+      return data;
   }
   // 저장은 무겁다(사진 base64 포함 JSON 직렬화 + localStorage). 타이핑 경로에서 빼고 잠깐 멈춘 뒤 한 번만.
   var _saveT=null;
@@ -7826,7 +8897,10 @@
   function flushSave(){ if(_saveT){ clearTimeout(_saveT); _saveT=null; } saveState(); }
   window.addEventListener('pagehide', flushSave);
   window.addEventListener('beforeunload', flushSave);
-  document.addEventListener('visibilitychange', function(){ if(document.hidden) flushSave(); });
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ flushSave(); }
+    else { updateFrameInteractive(); fitStage(); }
+  });
   function safeRestoreValue(id, val){
     var e=$(id); if(!e) return;
     if(e.type==='range'){
@@ -7869,6 +8943,7 @@
         sharedName = data.multiPage.sharedName || '';
         gridCols = parseInt(data.multiPage.gridCols) || 0;
         alignPages = !!data.multiPage.alignPages;
+        novelMode = !!data.multiPage.novelMode;
       } else {
         // 기존 v1 데이터 → 단일 페이지로 마이그레이션
         pages = [{ id:'p1', body: (typeof data.editorHtml==='string' ? data.editorHtml : ''), title:null, subtitle:null, name:null }];
@@ -7895,6 +8970,10 @@
       nameRuleStyle = ({solid:1,dashed:1,dotted:1,double:1})[data.nameRuleStyle] ? data.nameRuleStyle : 'solid';
       if(typeof syncTitleRuleUI==='function') syncTitleRuleUI();
       if(typeof syncNameRuleUI==='function') syncNameRuleUI();
+      if($('para-indent')){ $('para-indent').checked = !!data.paraIndent; syncIndentUI(); }
+      // 예전 방식으로 저장된 들여쓰기 → 문단 앞 빈칸 방식으로 한 번 옮긴다('뺀 문단' 표식은 빈칸 없이)
+      if(!data.indentV2 && data.paraIndent) applyIndentMarkers(true, true);
+      if($('name-in-margin')){ $('name-in-margin').checked = !!data.nameInMargin; }
       if(typeof normalizeNamePos==='function') normalizeNamePos();
       if(typeof syncNameSegs==='function') syncNameSegs();
       if($('size-helper')){
@@ -7930,10 +9009,12 @@
       frameData = (typeof data.frameData==='string') ? data.frameData : null;
       framePos = ({none:1,left:1,right:1,top:1,bottom:1,all:1})[data.framePos] ? data.framePos : 'none';
       document.querySelectorAll('#frame-pos-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-fpos')===framePos?'true':'false'); });
+      _framePadSync = !!data.framePadSync;
+      if($('frame-pad-sync')) $('frame-pad-sync').checked = _framePadSync;
       loadFrameNat(render);
       if(typeof updateFrameUI==='function') updateFrameUI();
       requestAnimationFrame(function(){ moveThumb($('frame-pos-seg')); });
-      bubbleShape = ({imessage:1,simple:1,soft:1,plain:1,script:1})[data.bubbleShape] ? data.bubbleShape : 'imessage';
+      bubbleShape = ({imessage:1,simple:1,soft:1,plain:1,script:1,line:1,kakao:1})[data.bubbleShape] ? data.bubbleShape : 'imessage';
       syncShapeSeg();
       applyBubbleShape();
       if($('script-align')) $('script-align').checked = !!data.scriptAlign;
@@ -7976,24 +9057,92 @@
     try{ localStorage.removeItem(PRESET_KEY); }catch(e){}
     renderMyPresets();
   });
+  if($('reset-framelib')) $('reset-framelib').addEventListener('click', function(){
+    if(!confirm('꾸밈 사진 저장소를 비울까요?')) return;
+    _activeLibId=null;
+    clearFrameLib(renderFrameLib);
+  });
   if($('reset-snapshot')) $('reset-snapshot').addEventListener('click', function(){
     if(!confirm('저장된 스냅샷을 모두 삭제할까요?')) return;
-    try{ localStorage.removeItem(SNAPSHOT_KEY); }catch(e){}
-    renderSnapshots();
+    snapClear(renderSnapshots);
   });
 
   /* ============================================================
      이어서 편집하기 (다중 스냅샷)
      saveState()와 같은 데이터를 이름별로 여러 개 저장/복원
      ============================================================ */
+  /* 스냅샷은 편집 상태 전체(사진 포함)를 담아 커서, 5MB 남짓인 localStorage 대신
+     꾸밈 사진 저장소처럼 IndexedDB(훨씬 넉넉함)에 둔다.
+     예전 localStorage 스냅샷은 처음 열 때 한 번 옮기고 지운다(그래야 자동 저장 공간도 돌아온다). */
   var SNAPSHOT_KEY = 'logmaker-snapshot-v1';
-  function loadSnapshots(){ try{ var r=localStorage.getItem(SNAPSHOT_KEY); if(!r) return []; var p=JSON.parse(r); return Array.isArray(p)?p:[]; }catch(e){ return []; } }
-  function saveSnapshots(arr){ try{ localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(arr)); }catch(e){ alert('저장 공간이 부족해요. 사용하지 않는 스냅샷을 삭제해 주세요.'); } }
+  var _snapDB = null, _snapDBTried = false, _snapWaiters = [];
+  function legacySnaps(){ try{ var r=localStorage.getItem(SNAPSHOT_KEY); if(!r) return []; var p=JSON.parse(r); return Array.isArray(p)?p:[]; }catch(e){ return []; } }
+  function openSnapDB(cb){
+    if(_snapDBTried){ cb(_snapDB); return; }
+    _snapWaiters.push(cb);
+    if(_snapWaiters.length > 1) return;
+    function done(db){
+      _snapDB = db; _snapDBTried = true;
+      var w = _snapWaiters; _snapWaiters = [];
+      w.forEach(function(f){ f(db); });
+    }
+    var req;
+    try{ req = indexedDB.open('logmaker-snapshots', 1); }catch(e){ done(null); return; }
+    req.onupgradeneeded = function(e){ e.target.result.createObjectStore('snaps', {keyPath:'id', autoIncrement:true}); };
+    req.onerror = function(){ done(null); };
+    req.onsuccess = function(e){
+      var db = e.target.result;
+      var old = legacySnaps();
+      if(!old.length){ done(db); return; }
+      // 예전 스냅샷 옮기기 — 다 들어간 뒤에만 localStorage 에서 지운다
+      var tx = db.transaction('snaps','readwrite'), st = tx.objectStore('snaps');
+      old.forEach(function(x){ if(x && x.data) st.add({ name:x.name, time:x.time, data:x.data }); });
+      tx.oncomplete = function(){ try{ localStorage.removeItem(SNAPSHOT_KEY); }catch(_){} done(db); };
+      tx.onabort = tx.onerror = function(){ done(db); };
+    };
+  }
+  // 목록 (저장한 순서대로). IndexedDB 를 못 쓰는 브라우저에선 예전 방식 그대로
+  function snapAll(cb){
+    openSnapDB(function(db){
+      if(!db){ cb(legacySnaps().map(function(x, i){ x.id = i; return x; })); return; }
+      var r = db.transaction('snaps','readonly').objectStore('snaps').getAll();
+      r.onsuccess = function(){ cb(r.result || []); };
+      r.onerror = function(){ cb([]); };
+    });
+  }
+  function snapFull(){ alert('저장 공간이 부족해요. 사용하지 않는 스냅샷을 삭제해 주세요.'); }
+  function snapWrite(fn, cb){
+    openSnapDB(function(db){
+      if(!db){
+        // 예비: localStorage 배열
+        var arr = legacySnaps(); fn(null, arr);
+        try{ localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(arr.map(function(x){ return { name:x.name, time:x.time, data:x.data }; }))); }catch(e){ snapFull(); }
+        if(cb) cb(); return;
+      }
+      var tx = db.transaction('snaps','readwrite');
+      fn(tx.objectStore('snaps'), null);
+      tx.oncomplete = function(){ if(cb) cb(); };
+      tx.onabort = function(){ snapFull(); if(cb) cb(); };
+    });
+  }
+  function snapAdd(items, cb){ snapWrite(function(st, arr){ items.forEach(function(it){ var o={ name:it.name, time:it.time, data:it.data }; if(st) st.add(o); else arr.push(o); }); }, cb); }
+  function snapPut(item, cb){ snapWrite(function(st, arr){ if(st) st.put(item); else if(arr[item.id]) arr[item.id] = item; }, cb); }
+  function snapDel(id, cb){ snapWrite(function(st, arr){ if(st) st.delete(id); else arr.splice(id, 1); }, cb); }
+  function snapClear(cb){ snapWrite(function(st, arr){ if(st) st.clear(); else arr.length = 0; }, cb); }
+  function nowStamp(){
+    var now=new Date();
+    return now.getFullYear()+'.'+(now.getMonth()+1)+'.'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  }
+  // 지금 편집 상태 — 자동 저장 사본이 아니라 화면에서 바로 만든다(자동 저장이 공간 부족으로 실패했어도 최신 상태가 담기게)
+  function currentStateData(){
+    flushSave();
+    return JSON.parse(JSON.stringify(buildStateData()));
+  }
   function renderSnapshots(){
     var list=$('snapshot-list'); if(!list) return;
-    var snaps=loadSnapshots();
+    snapAll(function(snaps){
     list.innerHTML='';
-    snaps.forEach(function(s, idx){
+    snaps.forEach(function(s){
       var chip=document.createElement('div'); chip.className='mychip';
       var lbl=document.createElement('span'); lbl.className='mychip__name';
       lbl.textContent=s.name+(s.time?' ('+s.time+')':'');
@@ -8001,24 +9150,22 @@
         openSheetDef({ title:s.name, noFocus:true, options:[
           { label:'불러오기', run:function(){
             if(!confirm('현재 작업은 사라져요. 불러올까요?')) return;
-            try{
-              _restoring=true;
-              if(_saveT){ clearTimeout(_saveT); _saveT=null; }
-              localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign({}, s.data)));
-              location.reload();
-            }catch(e){ _restoring=false; alert('불러오기에 실패했어요.'); }
+            _restoring=true;
+            if(_saveT){ clearTimeout(_saveT); _saveT=null; }
+            var json=JSON.stringify(Object.assign({}, s.data));
+            try{ localStorage.setItem(STORE_KEY, json); }
+            catch(e){
+              // 자리가 모자라면 지금 작업을 비우고 다시 시도(어차피 덮어쓸 내용)
+              try{ localStorage.removeItem(STORE_KEY); localStorage.setItem(STORE_KEY, json); }
+              catch(e2){ _restoring=false; alert('불러오기에 실패했어요. 저장 공간이 부족해요.'); return; }
+            }
+            location.reload();
           }},
           { label:'현재 상태로 덮어쓰기', run:function(){
             try{
-              flushSave();
-              var raw=localStorage.getItem(STORE_KEY); if(!raw) return;
-              var data=JSON.parse(raw);
-              var now=new Date();
-              var time=now.getFullYear()+'.'+(now.getMonth()+1)+'.'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-              var arr=loadSnapshots();
-              if(arr[idx]){ arr[idx].data=data; arr[idx].time=time; }
-              saveSnapshots(arr);
-              renderSnapshots();
+              var data=currentStateData(); if(!data) return;
+              s.data=data; s.time=nowStamp();
+              snapPut(s, renderSnapshots);
             }catch(e){ alert('업데이트에 실패했어요.'); }
           }},
         ]});
@@ -8027,10 +9174,11 @@
       del.addEventListener('click', function(e){
         e.stopPropagation();
         if(!confirm('「'+s.name+'」을(를) 삭제할까요?')) return;
-        var arr=loadSnapshots(); arr.splice(idx,1); saveSnapshots(arr); renderSnapshots();
+        snapDel(s.id, renderSnapshots);
       });
       chip.appendChild(lbl); chip.appendChild(del);
       list.appendChild(chip);
+    });
     });
   }
   if($('snapshot-save')) $('snapshot-save').addEventListener('click', function(){
@@ -8038,15 +9186,8 @@
     if(!name || !name.trim()) return;
     name=name.trim();
     try{
-      flushSave();
-      var raw=localStorage.getItem(STORE_KEY); if(!raw){ alert('저장할 상태가 없어요.'); return; }
-      var data=JSON.parse(raw);
-      var now=new Date();
-      var time=now.getFullYear()+'.'+(now.getMonth()+1)+'.'+now.getDate()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
-      var snaps=loadSnapshots();
-      snaps.push({ name:name, time:time, data:data });
-      saveSnapshots(snaps);
-      renderSnapshots();
+      var data=currentStateData(); if(!data){ alert('저장할 상태가 없어요.'); return; }
+      snapAdd([{ name:name, time:nowStamp(), data:data }], renderSnapshots);
     }catch(e){ alert('저장에 실패했어요.'); }
   });
   renderSnapshots();
@@ -8075,18 +9216,16 @@
   }
   /* 이어서 편집하기 내보내기/가져오기 */
   if($('snapshot-export')) $('snapshot-export').addEventListener('click', function(){
-    var snaps = loadSnapshots();
-    if(!snaps.length){ alert('내보낼 스냅샷이 없어요.'); return; }
-    exportJSON('logmaker-snapshot.json', { type:'snapshot', items:snaps });
+    snapAll(function(snaps){
+      if(!snaps.length){ alert('내보낼 스냅샷이 없어요.'); return; }
+      exportJSON('logmaker-snapshot.json', { type:'snapshot', items:snaps.map(function(x){ return { name:x.name, time:x.time, data:x.data }; }) });
+    });
   });
   if($('snapshot-import')) $('snapshot-import').addEventListener('click', function(){
     importJSON('.json', function(obj){
       if(!obj || obj.type!=='snapshot' || !Array.isArray(obj.items)){ alert('올바른 스냅샷 파일이 아니에요.'); return; }
-      var cur = loadSnapshots();
-      obj.items.forEach(function(s){ if(s.name && s.data) cur.push(s); });
-      saveSnapshots(cur);
-      renderSnapshots();
-      alert(obj.items.length+'개의 스냅샷을 가져왔어요.');
+      var ok = obj.items.filter(function(s){ return s && s.name && s.data; });
+      snapAdd(ok, function(){ renderSnapshots(); alert(ok.length+'개의 스냅샷을 가져왔어요.'); });
     });
   });
   /* 내 프리셋 내보내기/가져오기 */
@@ -8128,6 +9267,7 @@
     // 선택 표시(is-sel)는 일시적 UI 상태 → 스냅샷에서 제외(선택만으로 기록이 쌓이지 않게)
     var c=editor.cloneNode(true);
     [].forEach.call(c.querySelectorAll('.is-sel'), function(x){ x.classList.remove('is-sel'); });
+    [].forEach.call(c.querySelectorAll('.g-ind-vis'), function(x){ x.parentNode.removeChild(x); });   // 들여쓰기 표시 칸은 기록에서 뺀다
     var snap={ body:c.innerHTML };
     HIST_EDS.forEach(function(id){ var e=$(id); if(e) snap[id]=e.innerHTML; });
     return JSON.stringify(snap);
@@ -8246,7 +9386,10 @@
   var PRESET_KEY = 'logmaker-presets-v1';
   function captureSettings(){
     var vals={}; TEXT_IDS.forEach(function(id){ var e=$(id); if(e) vals[id]=e.value; });
-    return { vals:vals, bgValue:bgValue, align:currentAlign, titleAlign:titleAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape };
+    // 인물 자물쇠 상태 (charId → hidden)
+    var charHidden={};
+    characters.forEach(function(c){ if(c.id) charHidden[c.id]=!!c.hidden; });
+    return { vals:vals, bgValue:bgValue, align:currentAlign, titleAlign:titleAlign, sizeMode:sizeMode, ratio:ratio, bgMode:bgMode, bubbleShape:bubbleShape, charHidden:charHidden, framePadSync:_framePadSync, paraIndent:paraIndentOn(), nameInMargin:(!!($('name-in-margin')&&$('name-in-margin').checked)) };
   }
   function applySettings(s){
     if(!s) return;
@@ -8274,10 +9417,26 @@
     document.querySelectorAll('#bg-mode-seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-bgmode')===bgMode?'true':'false'); });
     applyBgViews();
     photoOn = (bgMode==='photo') && !!photoData;
-    bubbleShape = ({imessage:1,simple:1,soft:1,plain:1,script:1})[s.bubbleShape] ? s.bubbleShape : 'imessage';
+    bubbleShape = ({imessage:1,simple:1,soft:1,plain:1,script:1,line:1,kakao:1})[s.bubbleShape] ? s.bubbleShape : 'imessage';
     syncShapeSeg();
     applyBubbleShape();
-    ['c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-hl5','c-hl6','c-em','c-em2','c-em3','c-em4','c-em5','c-em6','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-quote2','c-quote3','c-quote4','c-quote5','c-quote6','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
+    // 문단 들여쓰기 복원(옛 프리셋엔 값이 없으니 그대로 둔다)
+    if(typeof s.paraIndent==='boolean' && $('para-indent')){
+      var _indWas = paraIndentOn();
+      $('para-indent').checked = s.paraIndent; syncIndentUI();
+      if(_indWas !== s.paraIndent) applyIndentMarkers(s.paraIndent, false);   // 문단 앞 빈칸도 함께 넣거나 뗀다
+    }
+    if(typeof s.nameInMargin==='boolean' && $('name-in-margin')){ $('name-in-margin').checked = s.nameInMargin; }
+    // 여백 맞추기 복원
+    _framePadSync = !!s.framePadSync;
+    if($('frame-pad-sync')) $('frame-pad-sync').checked = _framePadSync;
+    // 인물 자물쇠 상태 복원
+    if(s.charHidden){
+      var changed=false;
+      characters.forEach(function(c){ if(c.id && s.charHidden[c.id]!=null){ var h=!!s.charHidden[c.id]; if(c.hidden!==h){ c.hidden=h; changed=true; } } });
+      if(changed){ saveChars(); renderCharList(); renderCharInsert(); if(typeof renderTopbarCharList==='function') renderTopbarCharList(); }
+    }
+    ['c-time','c-read','c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-hl5','c-hl6','c-em','c-em2','c-em3','c-em4','c-em5','c-em6','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-quote2','c-quote3','c-quote4','c-quote5','c-quote6','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
       var t=$(cid+'-txt'); if(t){ var v=t.value.trim(); if(v.indexOf('gradient')===-1 && /^#?[0-9a-fA-F]{3,8}$/.test(v)){ $(cid).value = v.charAt(0)==='#'?v:'#'+v; } }
     });
     if(typeof moveAllThumbs==='function'){ requestAnimationFrame(moveAllThumbs); }
@@ -9013,6 +10172,10 @@
      초기화
      ============================================================ */
   restoreState();
+  // 복원된 frameData가 저장소 항목과 일치하면 _activeLibId 복원
+  if(frameData){ loadFrameLib(function(list){
+    for(var i=0;i<list.length;i++){ if(list[i].src===frameData){ _activeLibId=list[i].id; break; } }
+  }); }
   renderPageTabs(); // 저장 데이터 없어도 탭 바 초기화
   restoreUIState();
   renderMyPresets();
@@ -9036,7 +10199,12 @@
   enableValueEditing();
   stepperize();
   // 웹폰트가 늦게 붙으면 글 높이가 바뀌므로 다 로드된 뒤 다시 잰다(새로고침해야 뜨던 문제)
-  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ centerRatioInner(); }); }
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(function(){ centerRatioInner(); refreshAlignSoon(); }); }
+  // 시작점 맞추기: 설정·제목·하단을 바꾸면 다른 페이지 측정값도 새로 잰다(하단 위치가 계속 맞도록)
+  (function(){
+    var ps = document.querySelector('.panelscroll'); if(!ps) return;
+    ['change','click','focusout'].forEach(function(ev){ ps.addEventListener(ev, refreshAlignSoon); });
+  })();
   // 폰트 변경 시 새 웹폰트가 로드되면 재측정(폴백 폰트로 잘못 측정하는 문제 방지)
   if(document.fonts){ document.fonts.addEventListener('loadingdone', function(){ centerRatioInner(); }); }
 
