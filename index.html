@@ -1218,7 +1218,7 @@
     font-size:.6em !important;line-height:1.3 !important;white-space:nowrap !important;font-weight:400 !important;font-style:normal !important;text-decoration:none !important;text-indent:0 !important;}
   #canvas .g-bub-meta.left,.canvas-clone .g-bub-meta.left{left:100% !important;right:auto !important;margin-left:.6em !important;align-items:flex-start !important;}
   #canvas .g-bub-meta.right,.canvas-clone .g-bub-meta.right{right:100% !important;left:auto !important;margin-right:.6em !important;align-items:flex-end !important;}
-  #canvas .g-bub-meta .g-meta-read,.canvas-clone .g-bub-meta .g-meta-read{color:var(--read-color,#f2c200) !important;font-weight:700 !important;}
+  #canvas .g-bub-meta .g-meta-read,.canvas-clone .g-bub-meta .g-meta-read{color:var(--time-color,#6b7684) !important;}   /* 읽음 표시 = 시간과 같은 글자 · 색 */
   #canvas .g-bub-meta .g-meta-time,.canvas-clone .g-bub-meta .g-meta-time{color:var(--time-color,#6b7684) !important;}
   /* 입력창: 꼬리 · 시간 · 읽음 미리 보기 */
   #editor.bub-kt .g-bub{border-radius:12px;}
@@ -2153,8 +2153,7 @@
                   <input class="txt-input" id="read-text" type="text" value="1" maxlength="12" placeholder="예: 1, 읽음, Read">
                 </div>
                 <div class="cgrid cgrid--2" style="margin-top:12px">
-                  <div class="cchip"><label>시간</label><div class="cchip__box"><input id="c-time" type="color" value="#6b7684"><input class="cchip__hex" id="c-time-txt" type="text" value="#6b7684"></div></div>
-                  <div class="cchip"><label>읽음 표시</label><div class="cchip__box"><input id="c-read" type="color" value="#f2c200"><input class="cchip__hex" id="c-read-txt" type="text" value="#f2c200"></div></div>
+                  <div class="cchip"><label>시간 · 읽음 표시</label><div class="cchip__box"><input id="c-time" type="color" value="#6b7684"><input class="cchip__hex" id="c-time-txt" type="text" value="#6b7684"></div></div>
                 </div>
                 <p class="hint" style="margin-top:10px">말풍선을 누르면 뜨는 도구에서 시간 · 읽음 표시를 켜고 끌 수 있어요.<br>시간은 바로 위 말풍선의 시간을 따라가고, 입력에서 시간 · 읽음 글자를 누르면 그 말풍선만 고칠 수 있어요.</p>
               </div>
@@ -3423,7 +3422,6 @@
   linkColor('c-bar-plus','c-bar-plus-txt',false,false);
   linkColor('c-bar-arrow','c-bar-arrow-txt',false,false);
   linkColor('c-time','c-time-txt',false,false);
-  linkColor('c-read','c-read-txt',false,false);
   if($('read-text')) $('read-text').addEventListener('input', function(){ render(); });
 
   /* ============================================================
@@ -5934,7 +5932,6 @@
     var psz=$('photo-size'); if(psz){ var _pp=parseFloat(psz.value); el.style.setProperty('--photo-w', _pp+'%'); el.style.setProperty('--photo-w-px', Math.round(w*_pp/100)+'px'); }
     var lisz=$('logimg-size'); if(lisz){ el.style.setProperty('--logimg-w', parseFloat(lisz.value)+'%'); }
     var indz=$('indent-size'); el.style.setProperty('--para-indent', ((indz && parseFloat(indz.value))||1)+'em');
-    el.style.setProperty('--read-color', ($('c-read')||{}).value || '#f2c200');
     el.style.setProperty('--time-color', ($('c-time')||{}).value || '#6b7684');
     var lirad=$('logimg-radius'); if(lirad){ el.style.setProperty('--logimg-radius', parseFloat(lirad.value)+'px'); }
     var tf=$('title-font'), nf=$('name-font');
@@ -8273,7 +8270,7 @@
       // bold 웨이트가 없는 폰트의 b/strong에 text-stroke 보정 (html2canvas faux bold 미지원 대응)
       var BOLD_FONTS = ['pretendard','paperozi','paperlogy','presentation','freesentation','bookkmyungjo','maruburi','kopubdotum','kopubbatang','nanum myeongjo','nanummyeongjo'];
       var boldStrokeBackup=[];
-      [].forEach.call(canvas.querySelectorAll('b,strong,.g-script-name,.g-meta-read'), function(el){
+      [].forEach.call(canvas.querySelectorAll('b,strong,.g-script-name'), function(el){
         var ff = window.getComputedStyle(el).fontFamily.toLowerCase();
         var hasBold = BOLD_FONTS.some(function(f){ return ff.indexOf(f)!==-1; });
         if(!hasBold){
@@ -8851,7 +8848,7 @@
      상태 저장/복원/초기화
      ============================================================ */
   var STORE_KEY = 'logmaker-state-v1';
-  var TEXT_IDS = ['read-text','c-time','c-time-txt','c-read','c-read-txt','indent-size','name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-thick','quote-gap','hr-thick','title-hr-thick','grid-gap','script-font','font-size','subtext-size','parensub-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
+  var TEXT_IDS = ['read-text','c-time','c-time-txt','indent-size','name-pos','font','title-font','name-font','title-size','subtitle-size','name-size','title-gap','titleblk-gap','name-gap','msg-gap','bub-body-gap','para-gap','stack-gap','bar-body-gap','photo-size','frame-size','frame-zoom','frame-x','frame-y','logimg-size','logimg-radius','quote-thick','quote-gap','hr-thick','title-hr-thick','grid-gap','script-font','font-size','subtext-size','parensub-size','stretch','letter-spacing','line-height','pad','break-mode','base-w','ratio-w',
     'c-bg','c-bg-txt','c-fg','c-fg-txt','c-hl','c-hl-txt','c-hl2','c-hl2-txt','c-hl3','c-hl3-txt','c-hl4','c-hl4-txt','c-hl5','c-hl5-txt','c-hl6','c-hl6-txt','c-em','c-em-txt','c-em2','c-em2-txt','c-em3','c-em3-txt','c-em4','c-em4-txt','c-em5','c-em5-txt','c-em6','c-em6-txt','c-name','c-name-txt','c-bar','c-bar-txt',
     'c-brecv','c-brecv-txt','c-bsend','c-bsend-txt','c-brecv-ink','c-brecv-ink-txt','c-bsend-ink','c-bsend-ink-txt',
     'c-title','c-title-txt','c-subtitle','c-subtitle-txt','c-sub','c-sub-txt','c-star','c-star-txt','c-paren','c-paren-txt','c-quote','c-quote-txt','c-quote2','c-quote2-txt','c-quote3','c-quote3-txt','c-quote4','c-quote4-txt','c-quote5','c-quote5-txt','c-quote6','c-quote6-txt','c-hr','c-hr-txt','c-title-hr','c-title-hr-txt',
@@ -9434,7 +9431,7 @@
       characters.forEach(function(c){ if(c.id && s.charHidden[c.id]!=null){ var h=!!s.charHidden[c.id]; if(c.hidden!==h){ c.hidden=h; changed=true; } } });
       if(changed){ saveChars(); renderCharList(); renderCharInsert(); if(typeof renderTopbarCharList==='function') renderTopbarCharList(); }
     }
-    ['c-time','c-read','c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-hl5','c-hl6','c-em','c-em2','c-em3','c-em4','c-em5','c-em6','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-quote2','c-quote3','c-quote4','c-quote5','c-quote6','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
+    ['c-time','c-bg','c-fg','c-hl','c-hl2','c-hl3','c-hl4','c-hl5','c-hl6','c-em','c-em2','c-em3','c-em4','c-em5','c-em6','c-name','c-bar','c-brecv','c-bsend','c-brecv-ink','c-bsend-ink','c-title','c-subtitle','c-sub','c-star','c-paren','c-quote','c-quote2','c-quote3','c-quote4','c-quote5','c-quote6','c-hr','c-brecv-name','c-bsend-name','c-bar-bg','c-bar-accent','c-bar-name','c-bar-avatar','c-bar-plus','c-bar-arrow'].forEach(function(cid){
       var t=$(cid+'-txt'); if(t){ var v=t.value.trim(); if(v.indexOf('gradient')===-1 && /^#?[0-9a-fA-F]{3,8}$/.test(v)){ $(cid).value = v.charAt(0)==='#'?v:'#'+v; } }
     });
     if(typeof moveAllThumbs==='function'){ requestAnimationFrame(moveAllThumbs); }
